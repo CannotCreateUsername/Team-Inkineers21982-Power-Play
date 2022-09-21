@@ -7,7 +7,9 @@ FTC Robot Controller version 8.0 (https://github.com/FIRST-Tech-Challenge/FtcRob
 RoadRunner QuickStart (https://learnroadrunner.com/installing.html#method-1-downloading-the-quickstart)
 MeepMeep, which is a roadrunner visualization tool (https://learnroadrunner.com/tool/meepmeep.html)
 
+
 Last Update: 9/20/2022
+A POC to use Vuforia to detect images in custom sleeve
 
 ----- The following ReaMe is a copy of the FTCRobotContoller ------
 ## Welcome!
