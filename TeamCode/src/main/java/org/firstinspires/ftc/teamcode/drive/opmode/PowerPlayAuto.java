@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(group = "drive")
+@Autonomous(name="PowerPlay1", group="Linear Opmode")
 public class PowerPlayAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException  {
