@@ -93,9 +93,9 @@ public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
          * To start up Vuforia, tell it the view that we wish to use for camera monitor (on the RC phone);
          * If no camera monitor is desired, use the parameterless constructor instead (commented out below).
          */
-        // int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         // OR...  Do Not Activate the Camera Monitor View, to save power
         // VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -147,9 +147,14 @@ public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
 
 
 
-        targets1.activate();
-        targets2.activate();
-        targets3.activate();
+        targets1.activate();  // otopus
+        targets2.activate(); // triangle
+        targets3.activate(); // traffic
+
+        // check all the trackable targets to see which one (if any) is visible.
+        boolean targetVisible = false;
+        String targetName = "NOT FOUND";
+
         while (opModeIsActive()) {
 
             /**
@@ -159,20 +164,19 @@ public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
              * UNKNOWN will be returned by {@link RelicRecoveryVuMark#from(VuforiaTrackable)}.
              */
 
-            // check all the trackable targets to see which one (if any) is visible.
-            boolean targetVisible = false;
-            for (VuforiaTrackable trackable : allTrackables) {
-                if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
-                    telemetry.addData("Visible Target", trackable.getName());
-                    targetVisible = true;
-
-                    telemetry.update();
-                    break;
-                } else {
-                    telemetry.addData("No Visible Target", "NA" );
-                    telemetry.update();
+            if (!targetVisible) {
+                for (VuforiaTrackable trackable : allTrackables) {
+                    if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
+                        targetVisible = true;
+                        targetName = trackable.getName();
+                        break;
+                    }
                 }
             }
+
+            telemetry.addData("Visible Target",targetName );
+            telemetry.update();
+
         }
 
     }
