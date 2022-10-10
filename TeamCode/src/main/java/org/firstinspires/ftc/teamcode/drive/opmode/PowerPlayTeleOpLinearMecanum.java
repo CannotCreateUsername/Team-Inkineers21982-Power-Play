@@ -27,13 +27,21 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         while (!isStopRequested()) {
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y,
-                            -gamepad1.left_stick_x,
+                            -gamepad1.left_stick_y/2,
+                            -gamepad1.left_stick_x/2,
                             -gamepad1.right_stick_x
                     )
             );
 
             drive.update();
+
+            if(gamepad1.a) {
+
+            } else if (gamepad1.b) {
+
+            } else {
+
+            }
 
             Pose2d poseEstimate = drive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
