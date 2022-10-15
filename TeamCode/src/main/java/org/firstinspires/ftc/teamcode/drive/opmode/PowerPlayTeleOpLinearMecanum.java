@@ -27,8 +27,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         while (!isStopRequested()) {
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y/2,
-                            -gamepad1.left_stick_x/2,
+                            -gamepad1.left_stick_y*0.75,
+                            -gamepad1.left_stick_x*0.75,
                             -gamepad1.right_stick_x
                     )
             );
@@ -36,11 +36,13 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             drive.update();
 
             if(gamepad1.a) {
-
+                //Slide to ground
             } else if (gamepad1.b) {
-
-            } else {
-
+                //Slide to low
+            } else if (gamepad1.y) {
+                //Slide to medium
+            } else if (gamepad1.x) {
+                //Slide to high
             }
 
             Pose2d poseEstimate = drive.getPoseEstimate();

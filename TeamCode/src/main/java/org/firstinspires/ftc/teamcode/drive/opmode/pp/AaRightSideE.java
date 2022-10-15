@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -53,9 +53,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Red & Blue Left Encoder", group = "Concept")
+@Autonomous(name = "Red & Blue Right Encoder", group = "Concept")
 @Disabled
-public class aaLeftSideE extends LinearOpMode {
+public class AaRightSideE extends LinearOpMode {
 
     /*
      * Specify the source for the Tensor Flow Model.
@@ -136,10 +136,10 @@ public class aaLeftSideE extends LinearOpMode {
             // (typically 16/9).
             tfod.setZoom(1.0, 16.0/9.0);
         }
-        front_left = hardwareMap.get(DcMotor.class, "front_left");
-        back_left = hardwareMap.get(DcMotor.class, "back_left");
-        front_right = hardwareMap.get(DcMotor.class, "front_right");
-        back_right = hardwareMap.get(DcMotor.class, "back_right");
+        front_left = hardwareMap.get(DcMotor.class, "left_front_drive");
+        back_left = hardwareMap.get(DcMotor.class, "left_back_drive");
+        front_right = hardwareMap.get(DcMotor.class, "right_front_drive");
+        back_right = hardwareMap.get(DcMotor.class, "right_back_drive");
         slides = hardwareMap.get(DcMotor.class, "slides");
 
         //Encoder Stuff
@@ -153,6 +153,7 @@ public class aaLeftSideE extends LinearOpMode {
 
         if (opModeIsActive()) {
             int label = 0;
+            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             runtime.reset();
             while (runtime.time() < 8 && opModeIsActive()) {
                 if (tfod != null) {
@@ -200,13 +201,6 @@ public class aaLeftSideE extends LinearOpMode {
                 telemetry.addData("Haha","No image detected");
             }
         }
-    }
-    //True Code!
-    private void dropCone() {
-        encoderStrafeRight(10);
-        encoderForward(15);
-        encoderStrafeLeft(5);
-        //insert arm code here
     }
 
     //Encoder Strafing
@@ -290,6 +284,36 @@ public class aaLeftSideE extends LinearOpMode {
         // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
         // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
+    }
+    private void highJunction() {
+        slides.setTargetPosition(2000);
+        slides.setPower(0.5);
+        while (opModeIsActive() && slides.isBusy()) {
+            telemetry.addData("Dispenser", "Going up!");
+        }
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    private void mediumJunction () {
+        slides.setTargetPosition(1200);
+        slides.setPower(0.5);
+        while (opModeIsActive() && slides.isBusy()) {
+            telemetry.addData("Dispenser", "Going up!");
+        }
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    private void lowJunction() {
+        slides.setTargetPosition(500);
+        slides.setPower(0.5);
+        while (opModeIsActive() && slides.isBusy()) {
+            telemetry.addData("Dispenser", "Going up!");
+        }
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    private void dropCone() {
+        encoderStrafeLeft(10);
+        encoderForward(15);
+        encoderStrafeRight(5);
+        //insert arm code here
     }
 
     private void resetPosition() {

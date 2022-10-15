@@ -27,14 +27,12 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -55,10 +53,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Blue Right", group = "Concept")
+@Autonomous(name = "Red & Blue Left Encoder", group = "Concept")
 @Disabled
-public class BlueR extends LinearOpMode {
-
+public class AaLeftSideE extends LinearOpMode {
     /*
      * Specify the source for the Tensor Flow Model.
      * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
@@ -71,11 +68,8 @@ public class BlueR extends LinearOpMode {
     private DcMotor back_left = null;
     private DcMotor back_right = null;
     private DcMotor slides = null;
-    private Servo left_arm_grasp = null;
-    private Servo right_arm_grasp = null;
     private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
     // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
-
 
     private static final String[] LABELS = {
             "1 Bolt",
@@ -83,6 +77,15 @@ public class BlueR extends LinearOpMode {
             "3 Panel"
     };
 
+    //Encoder Stuff
+    static final double COUNTS_PER_MOTOR_REV = 312;
+    static final double DRIVE_GEAR_REDUCTION = 19.2;
+    static final double WHEEL_DIAMETER_INCHES = 3.77;
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES *3.14159265359);
+    static final double DRIVE_SPEED = 0.6;
+    static final double TURN_SPEED = 0.5;
+
+    private ElapsedTime runtime = new ElapsedTime();
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
      * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
@@ -116,7 +119,6 @@ public class BlueR extends LinearOpMode {
         // first.
         initVuforia();
         initTfod();
-        ElapsedTime myTimer;
 
         /**
          * Activate TensorFlow Object Detection before we wait for the start command.
@@ -133,14 +135,15 @@ public class BlueR extends LinearOpMode {
             // (typically 16/9).
             tfod.setZoom(1.0, 16.0/9.0);
         }
-        front_left = hardwareMap.get(DcMotor.class, "front_left");
-        back_left = hardwareMap.get(DcMotor.class, "back_left");
-        front_right = hardwareMap.get(DcMotor.class, "front_right");
-        back_right = hardwareMap.get(DcMotor.class, "back_right");
+        front_left = hardwareMap.get(DcMotor.class, "left_front_drive");
+        back_left = hardwareMap.get(DcMotor.class, "left_back_drive");
+        front_right = hardwareMap.get(DcMotor.class, "right_front_drive");
+        back_right = hardwareMap.get(DcMotor.class, "right_back_drive");
         slides = hardwareMap.get(DcMotor.class, "slides");
-        left_arm_grasp = hardwareMap.get(Servo.class, "left_arm_grasp");
-        right_arm_grasp = hardwareMap.get(Servo.class, "right_arm_grasp");
-        myTimer = new ElapsedTime();
+
+        //Encoder Stuff
+        resetPosition();
+        modeUseEncoders();
 
         /** Wait for the game to begin */
         telemetry.addData(">", "Press Play to start op mode");
@@ -149,8 +152,9 @@ public class BlueR extends LinearOpMode {
 
         if (opModeIsActive()) {
             int label = 0;
-            myTimer.reset();
-            while (myTimer.time() < 8 && opModeIsActive()) {
+            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            runtime.reset();
+            while (runtime.time() < 8 && opModeIsActive()) {
                 if (tfod != null) {
                     // getUpdatedRecognitions() will return null if no new information is available since
                     // the last time that call was made.
@@ -185,22 +189,68 @@ public class BlueR extends LinearOpMode {
             }
             if (label == 1) {
                 dropCone();
-                strafeLeft();
-                sleep(1000);
+                strafeLeft(1000);
             } else if (label == 2) {
                 dropCone();
             } else if (label == 3) {
                 dropCone();
-                strafeRight();
-                sleep(1000);
+                strafeRight(1000);
             } else {
-                goForward();
-                sleep(1000);
+                goForward(1000);
                 telemetry.addData("Haha","No image detected");
             }
         }
     }
 
+    //Encoder Strafing
+    private void encoderStrafeRight(int distanceInches) {
+        encoderDrive(DRIVE_SPEED, distanceInches, -distanceInches, -distanceInches, distanceInches, 2);
+    }
+    private void encoderStrafeLeft(int distanceInches) {
+        encoderDrive(DRIVE_SPEED, -distanceInches, distanceInches, distanceInches, -distanceInches, 2);
+    }
+    private void encoderForward(int distanceInches) {
+        encoderDrive(DRIVE_SPEED, distanceInches, distanceInches, distanceInches, distanceInches, 2);
+    }
+    private void encoderBackward(int distanceInches) {
+        encoderDrive(DRIVE_SPEED, -distanceInches, -distanceInches, -distanceInches, -distanceInches, 2);
+    }
+
+    //Encoder Running
+    public void encoderDrive(double speed, double frontLeftInches, double backLeftInches, double frontRightInches, double backRightInches, double timeoutS) {
+        int newFrontLeftTarget;
+        int newBackLeftTarget;
+        int newFrontRightTarget;
+        int newBackRightTarget;
+
+        if (opModeIsActive()) {
+            newFrontLeftTarget = front_left.getCurrentPosition() + (int)(frontLeftInches * COUNTS_PER_INCH);
+            newBackLeftTarget = back_left.getCurrentPosition() + (int)(backLeftInches * COUNTS_PER_INCH);
+            newFrontRightTarget = front_right.getCurrentPosition() + (int)(frontRightInches * COUNTS_PER_INCH);
+            newBackRightTarget = back_right.getCurrentPosition() + (int)(backRightInches * COUNTS_PER_INCH);
+            front_left.setTargetPosition(newFrontLeftTarget);
+            back_left.setTargetPosition(newBackLeftTarget);
+            front_right.setTargetPosition(newFrontRightTarget);
+            back_right.setTargetPosition(newBackRightTarget);
+
+            modeRunToPosition();
+            //Motor go bRr
+
+            front_left.setPower(Math.abs(speed));
+            back_left.setPower(Math.abs(speed));
+            front_right.setPower(Math.abs(speed));
+            back_right.setPower(Math.abs(speed));
+
+            while (opModeIsActive() && (runtime.seconds() < timeoutS) && (front_left.isBusy() && back_left.isBusy() && front_right.isBusy() && back_right.isBusy())) {
+                // Display it for the driver.
+                telemetry.addData("Never gonna", "give you up");
+                telemetry.addData("Never gonna", "let you down");
+                telemetry.addData("Never gonna", "turn around");
+                telemetry.addData("and", "desert you");
+                telemetry.update();
+            }
+        }
+    }
     /**
      * Initialize the Vuforia localization engine.
      */
@@ -235,62 +285,97 @@ public class BlueR extends LinearOpMode {
         // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
     }
 
-    private void stop2() {
+    private void highJunction() {
+        slides.setTargetPosition(2000);
+        slides.setPower(0.5);
+        while (opModeIsActive() && slides.isBusy()) {
+            telemetry.addData("Dispenser", "Going up!");
+        }
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    private void mediumJunction () {
+        slides.setTargetPosition(1200);
+        slides.setPower(0.5);
+        while (opModeIsActive() && slides.isBusy()) {
+            telemetry.addData("Dispenser", "Going up!");
+        }
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    private void lowJunction() {
+        slides.setTargetPosition(500);
+        slides.setPower(0.5);
+        while (opModeIsActive() && slides.isBusy()) {
+            telemetry.addData("Dispenser", "Going up!");
+        }
+        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+    private void dropCone() {
+        encoderStrafeRight(10);
+        encoderForward(15);
+        encoderStrafeLeft(5);
+        //insert arm code here
+    }
+
+    private void resetPosition() {
+        front_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        back_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        front_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        back_left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    }
+    private void modeRunToPosition() {
+        front_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        back_right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        front_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        back_left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+    private void modeUseEncoders() {
+        front_right.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        back_right.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        front_left.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+        back_left.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
+    }
+    private void motorBusy() {
+        front_right.isBusy();
+        back_right.isBusy();
+        front_left.isBusy();
+        back_left.isBusy();
+    }
+
+    //Extra Hardcode
+    private void stop2(int sleepTime) {
         back_left.setPower(0);
         front_left.setPower(0);
         back_right.setPower(0);
         front_right.setPower(0);
+        sleep(sleepTime);
     }
-    private void goBackward() {
+    private void goBackward(int sleepTime) {
         front_right.setPower(-0.2);
         back_right.setPower(-0.2);
         front_left.setPower(-0.2);
         back_left.setPower(-0.2);
+        sleep(sleepTime);
     }
-    private void goForward() {
+    private void goForward(int sleepTime) {
         front_right.setPower(0.3);
         back_right.setPower(0.3);
         front_left.setPower(0.3);
         back_left.setPower(0.3);
+        sleep(sleepTime);
     }
-    private void strafeRight() {
+    private void strafeRight(int sleepTime) {
         front_right.setPower(-0.5);
         back_right.setPower(0.5);
         front_left.setPower(0.5);
         back_left.setPower(-0.5);
+        sleep(sleepTime);
     }
-    private void strafeLeft() {
+    private void strafeLeft(int sleepTime) {
         front_right.setPower(0.5);
         back_right.setPower(-0.5);
         front_left.setPower(-0.5);
         back_left.setPower(0.5);
-    }
-    private void closeClaw() {
-        right_arm_grasp.setPosition(0.15);
-        left_arm_grasp.setPosition(0.55);
-    }
-    private void openClaw() {
-        right_arm_grasp.setPosition(0.5);
-        left_arm_grasp.setPosition(0.2);
-    }
-    private void dropCone() {
-        strafeLeft();
-        sleep(1000);
-        goForward();
-        sleep(2000);
-        strafeRight();
-        sleep(500);
-        goForward();
-        sleep(100);
-        goBackward();
-        sleep(100);
-        //insert arm code here
-    }
-
-    //Encoder time!
-
-    private void resetMotors() {
-        front_right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        sleep(sleepTime);
     }
 }
 
