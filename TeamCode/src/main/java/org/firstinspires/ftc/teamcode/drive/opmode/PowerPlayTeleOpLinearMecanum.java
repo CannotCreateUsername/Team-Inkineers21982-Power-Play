@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 /**
@@ -18,7 +19,10 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
+
+        // initialize all the subsystems: 1. drivetrain,  2 intake+slide
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        IntakeSlideSubsystem intakeSlide = new IntakeSlideSubsystem(hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -32,16 +36,10 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
                             -gamepad1.right_stick_x
                     )
             );
-
             drive.update();
 
-            if(gamepad1.a) {
-
-            } else if (gamepad1.b) {
-
-            } else {
-
-            }
+            intakeSlide.run(gamepad1, gamepad2);
+            telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide.getCurrentStatus());
 
             Pose2d poseEstimate = drive.getPoseEstimate();
             telemetry.addData("x", poseEstimate.getX());
