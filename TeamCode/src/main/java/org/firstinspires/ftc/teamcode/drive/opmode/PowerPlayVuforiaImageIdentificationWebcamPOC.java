@@ -146,7 +146,7 @@ public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
         waitForStart();
 
 
-        targets1.activate();  // otopus
+        targets1.activate();  // octopus
         targets2.activate(); // triangle
         targets3.activate(); // traffic
 
