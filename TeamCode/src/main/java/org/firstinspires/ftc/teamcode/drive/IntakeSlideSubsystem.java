@@ -1,23 +1,35 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+/**
+ * The IntakeSlideSubsystem class is a subsystem module that control
+ * the elevator and roller intake used in PowerPlay
+ *
+ * @author  MY, AN, SL
+ * @version 1.0
+ * @since   2022-10-20
+ */
 public class IntakeSlideSubsystem {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime intakeTimer = new ElapsedTime();
     private DcMotor slides = null;
+    private CRServo intake = null;
 
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
-    private final int targetPositionHigh = 2000;
-    private final int targetPositionMedium = 1500;
-    private final int targetPositionLow = 1000;
-    private final int targetPositionRetract = 100;
-    private final int targetPositionPickup = 0;  // assume pickup position is same as start
+    private final int targetPositionHigh = 2700;
+    private final int targetPositionMedium = 350;
+    private final int targetPositionLow = 300;
+    private final int targetPositionPikcup = 250;
+    private final int targetPositionRest = 120;  // ideally it should be zero !!!
 
     // distance error factor
     // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
@@ -26,22 +38,39 @@ public class IntakeSlideSubsystem {
 
     // 2022-10-19: THE DEFAULT POWER MIGHT NEED TO BE BE TUNED !!!
     private double defaultPower = 0.7;
+    private double defalutVelocity = 200;
+    private double defaultIntakeTime = 2.0;
+
+
     private double currentPower;
     private int currentTarget;
     private String currentCaption;
     private String currentStatus;
+
     private LiftState liftState;
+    private IntakeState intakeState;
+
+    private boolean intakeToggle;
 
     // 2022-10-19: REVIEW THE STATE !!!
     public enum LiftState {
-        START,   // all the way to the bottom
+        REST,   // all the way to the bottom
         PICKUP,  // level where the robot will pickup the cone
-        RETRACT, // after picking up the cone, raise slightly so we can travel
         LOW,
         MEDIUM,
         HIGH,
     }
 
+    public enum IntakeState {
+        STOP,
+        IN,
+        OUT
+    }
+
+    /**
+     *
+     * @param hardwareMap from teleop
+     */
     public IntakeSlideSubsystem(HardwareMap hardwareMap) {
 
         // Initialize the hardware variables. Note that the strings used here as parameters
@@ -52,21 +81,37 @@ public class IntakeSlideSubsystem {
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+        intake = hardwareMap.get(CRServo.class, "intake");
+
         runtime.reset();
+
 
         currentCaption = "Lift Status";
         currentStatus = "Initialized";
         currentTarget = 0;
         currentPower = 0;
-        liftState = LiftState.START;
+
+        intakeState = IntakeState.STOP;
+        liftState = LiftState.REST;
+
+
+        intakeToggle = false;
 
 
     }
 
+    /**
+     *
+     * @param position where the slider will travel to. It is measured in motor tickts
+     * @param power the power of motor ,
+     */
     private void runToPosition(int position, double power){
-        currentTarget = position;
-        slides.setTargetPosition(currentTarget);
+        slides.setTargetPosition(position);
         slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // TO DO: ACCORDING TO THIS LINK, TYPICALLY WE SET THE MAX VELOCITY INSTEAD OF POWER WHEN USING RUN_TO_POSITION
+        https://docs.revrobotics.com/duo-control/programming/using-encoder-feedback
         slides.setPower(power);
     }
 
@@ -83,71 +128,137 @@ public class IntakeSlideSubsystem {
         return currentStatus;
     }
 
-    private void setPower(){
-        if (Math.abs(slides.getCurrentPosition()- currentTarget) > 10){
+    /**
+     *   set the power and status
+     */
+    private void setSlidePower(double power){
+        if (Math.abs(slides.getCurrentPosition()- currentTarget) > 15){
             // our threshold is within
-            // 10 encoder ticks of our target.
+            // 15 encoder ticks of our target.
             // this is pretty arbitrary, and would have to be
             // tweaked for each robot.
-            currentPower = defaultPower;
+            currentPower = power;
             currentStatus = "Going to: " + currentTarget;
         } else {
             double posErr = currentTarget - slides.getCurrentPosition(); // measure error in terms of distance between current position and target
-            slides.setPower(posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
+            currentPower = (posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
             currentStatus = "Holding at: " + slides.getCurrentPosition();
         }
     }
 
+    /**
+     *  set slide power and status with default Power
+     */
+    private void setSlidePower(){
+        setSlidePower(defaultPower);
+    }
+
+
+
+    /**
+
+        https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
+
+        button mapping
+        gamepad1.y = high
+        gamepad1.x = medium
+        gamepad1.b = low
+        gamepad1.a = pickup
+        gamepad1.left_bumper = rest
+        gamepad1.right_bumper= release
+
+     */
     public void run(Gamepad gamepad1, Gamepad gamepad2){
 
         switch (liftState) {
-            case START:
+            case REST:
                 if (gamepad1.y) {
                     // y is pressed to to High postion
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
+                /*
                 } else if (gamepad1.x) {
-                    // x is pressed, go to low position
+                    // x is pressed, go to medium position
+                    currentTarget = targetPositionMedium;
+                    liftState = LiftState.MEDIUM;
+                } else if (gamepad1.b) {
+                    // b is pressed, go to low position
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
+                 */
+                } else if (gamepad1.a) {
+                    // a is pressed, go to pickup position
+                    currentTarget = targetPositionPikcup;
+                    liftState = LiftState.PICKUP;
                 }
                 break;
-            case RETRACT:
-                if (gamepad1.y) {
-                    // y is pressed to to High postion
-                    currentTarget = targetPositionHigh;
-                    liftState = LiftState.HIGH;
-                } else if (gamepad1.x) {
-                    // x is pressed, go to low position
-                    currentTarget = targetPositionLow;
-                    liftState = LiftState.LOW;
+            case PICKUP:
+                if (gamepad1.left_bumper) {
+                    // left_trigger is pressed, go to rest position and turn on the intake
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
+
+                    // start intake as well
+                    intakeState = IntakeState.IN;
+                    intakeTimer.reset();
+
+                    // use slow power when it get down
+                    setSlidePower(0.09);
                 } else {
-                    setPower();
+                    setSlidePower();
                 }
                 break;
             case HIGH:
-                if (gamepad1.b){
-                    // from high to extract state
-                    currentTarget = targetPositionRetract;
-                    liftState = LiftState.RETRACT;
-                }  else {
-                    setPower();
-                }
-                break;
-            case LOW:
-                if (gamepad1.b){
-                    // from low to extract state
-                    currentTarget = targetPositionRetract;
-                    liftState = LiftState.RETRACT;
+                if (gamepad1.left_bumper) {
+                    // from high to rest state
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
+                    setSlidePower();
+                } else if (gamepad1.right_bumper) {
+                    // release intake
+                    intakeState = IntakeState.OUT;
+                    intakeTimer.reset();
                 } else {
-                    setPower();
+                    setSlidePower();
                 }
                 break;
-
         }
 
         runToPosition(currentTarget, currentPower);
+        runIntake();
 
+
+    }
+
+
+    /**
+     * start or stop intake, depending upon the current state
+     *
+     *  steady state and transient state
+     *  https://resources.pcb.cadence.com/blog/2020-steady-state-vs-transient-state-in-system-design-and-stability-analysis
+
+     */
+    private void runIntake(){
+
+        switch (intakeState) {
+            case STOP:
+                intake.setPower(0);
+                break;
+            case IN:
+                if (intakeTimer.seconds() <= defaultIntakeTime) {
+                    intake.setPower(-1);
+                } else {
+                    intakeState = IntakeState.STOP;
+                }
+                break;
+            case OUT:
+                if (intakeTimer.seconds() <= defaultIntakeTime) {
+                    intake.setPower(1);
+                } else {
+                    intakeState = IntakeState.STOP;
+                }
+                break;
+        }
 
     }
 
