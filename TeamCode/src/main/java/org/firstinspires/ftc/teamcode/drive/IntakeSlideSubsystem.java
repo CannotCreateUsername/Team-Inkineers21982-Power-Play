@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.drive;
 
-import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.internal.opmode.AnnotatedOpModeClassFilter;
 
 /**
  * The IntakeSlideSubsystem class is a subsystem module that control
@@ -25,7 +21,7 @@ public class IntakeSlideSubsystem {
     private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime levelTimer = new ElapsedTime();
     private ElapsedTime intakeTimer = new ElapsedTime();
-    
+
     // Variable to detect on press and on release
     private boolean pressedLastIterationRT = false;
     private boolean pressedLastIterationRB = false;
@@ -33,14 +29,14 @@ public class IntakeSlideSubsystem {
 
     // Variable to auto spin in intake
     private boolean autoIn = false;
-    
+
     private DcMotor slides = null;
     private CRServo intake = null;
 
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
     private final int targetPositionHigh = 2500;
-    private final int targetPositionMedium = 350;
-    private final int targetPositionLow = 300;
+    private final int targetPositionMedium = 1200;
+    private final int targetPositionLow = 400;
     private final int targetPositionPickup = 130;
     private final int targetPositionRest = 0;  // ideally it should be zero !!!
 
@@ -56,7 +52,8 @@ public class IntakeSlideSubsystem {
 
     private int timesPressed;
     private boolean triggerPressed;
-
+    
+    private int currentPosition;
     private double currentPower;
     private int currentTarget;
     private String currentCaption;
@@ -103,7 +100,7 @@ public class IntakeSlideSubsystem {
 
         runtime.reset();
 
-
+        currentPosition = slides.getCurrentPosition();
         currentCaption = "Lift Status";
         currentStatus = "Initialized";
         currentTarget = 0;
@@ -136,19 +133,23 @@ public class IntakeSlideSubsystem {
         runToPosition (position, defaultPower);
     }
 
-    public String getCurrentCaption(){
+    public String getCurrentCaption() {
         return currentCaption;
     }
 
-    public String getCurrentStatus(){
+    public String getCurrentStatus() {
         return currentStatus;
+    }
+    
+    public int getCurrentSlidePosition() {
+        return currentPosition;
     }
 
     /**
      *   set the power and status
      */
     private void setSlidePower(double power){
-        if (Math.abs(slides.getCurrentPosition()- currentTarget) > 15){
+        if (Math.abs(currentPosition- currentTarget) > 15){
             // our threshold is within
             // 15 encoder ticks of our target.
             // this is pretty arbitrary, and would have to be
@@ -156,9 +157,9 @@ public class IntakeSlideSubsystem {
             currentPower = power;
             currentStatus = "Going to: " + currentTarget;
         } else {
-            double posErr = currentTarget - slides.getCurrentPosition(); // measure error in terms of distance between current position and target
+            double posErr = currentTarget - currentPosition; // measure error in terms of distance between current position and target
             currentPower = (posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
-            currentStatus = "Holding at: " + slides.getCurrentPosition();
+            currentStatus = "Holding at: " + currentPosition;
         }
     }
 
@@ -184,7 +185,7 @@ public class IntakeSlideSubsystem {
         switch (liftState) {
             case REST:
                 // stops intake when slides hit rest
-                if (slides.getCurrentPosition() == currentTarget) {
+                if (currentPosition == currentTarget) {
                     autoIn = false;
                 }
                 if (onPress(gamepad2.right_bumper, "RB")) {
@@ -196,8 +197,13 @@ public class IntakeSlideSubsystem {
                     autoIn = false;
                     currentTarget = targetPositionPickup;
                     liftState = LiftState.PICKUP;
+                } else if (onPress(gamepad2.left_bumper, "LB")) {
+                    autoIn = false;
                 }
-
+                // Manual
+                if (gamepad2.x || gamepad2.y || gamepad2.a || gamepad2.b) {
+                    liftState = LiftState.MANUAL;
+                }
                 /*
                 if (gamepad1.y) {
                     // y is pressed to to High postion
@@ -216,13 +222,7 @@ public class IntakeSlideSubsystem {
                     currentTarget = targetPositionPickup;
                     liftState = LiftState.PICKUP;
                 }
-
                  */
-
-                // Manual
-                if (gamepad2.x || gamepad2.y || gamepad2.a || gamepad2.b) {
-                    liftState = LiftState.MANUAL;
-                }
                 break;
             case PICKUP:
                 if (onRelease(gamepad2.right_trigger > 0, "RT")) {
@@ -239,9 +239,11 @@ public class IntakeSlideSubsystem {
                     liftState = LiftState.REST;
                     autoIn = false;
                     setSlidePower();
+                } else if (currentPosition < targetPositionLow) {
+                    // add position to pick up from stack all the way to LOW
+                    currentTarget += 3;
+                    setSlidePower();
                 } else {
-                    // add position to pick up from stack
-                    currentTarget += 1;
                     setSlidePower();
                 }
                 break;
@@ -299,15 +301,15 @@ public class IntakeSlideSubsystem {
                     currentTarget -= 1;
                 }
 
-                if ((onPress(gamepad2.right_bumper, "RB")) && (slides.getCurrentPosition() < 300)) {
+                if ((onPress(gamepad2.right_bumper, "RB")) && (currentPosition < 300)) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
                     setSlidePower();
-                } else if ((onPress(gamepad2.right_bumper, "RB")) && (slides.getCurrentPosition() >= 300 && slides.getCurrentPosition() < 350)) {
+                } else if ((onPress(gamepad2.right_bumper, "RB")) && (currentPosition >= 300 && currentPosition < 350)) {
                     currentTarget = targetPositionMedium;
                     liftState = LiftState.MEDIUM;
                     setSlidePower();
-                } else if ((onPress(gamepad2.right_bumper, "RB")) && (slides.getCurrentPosition() >= 350 && slides.getCurrentPosition() < 2500)) {
+                } else if ((onPress(gamepad2.right_bumper, "RB")) && (currentPosition >= 350 && currentPosition < 2500)) {
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
                     setSlidePower();
@@ -335,7 +337,6 @@ public class IntakeSlideSubsystem {
      */
     /*
     private void runIntake(){
-
         switch (intakeState) {
             case STOP:
                 intake.setPower(0);
@@ -356,7 +357,6 @@ public class IntakeSlideSubsystem {
                 break;
         }
     }
-
      */
     private void runIntake2(Gamepad controller){
 
@@ -392,29 +392,29 @@ public class IntakeSlideSubsystem {
         switch (ButtonName) {
             case "RT":
                 if (ButtonState && !pressedLastIterationRT) {
-                    pressedLastIterationRT = ButtonState;
                     return true;
                 }
+                pressedLastIterationRT = ButtonState;
             case "RB":
                 if (ButtonState && !pressedLastIterationRB) {
-                    pressedLastIterationRB = ButtonState;
                     return true;
                 }
+                pressedLastIterationRB = ButtonState;
             case "LB":
                 if (ButtonState && !pressedLastIterationLB) {
-                    pressedLastIterationLB = ButtonState;
                     return true;
                 }
-            }
+                pressedLastIterationLB = ButtonState;
+        }
         return false;
     }
     private boolean onRelease(boolean ButtonState, String ButtonName) {
         switch (ButtonName) {
             case "RT":
                 if (!ButtonState && pressedLastIterationRT) {
-                    pressedLastIterationRT = ButtonState;
                     return true;
                 }
+                pressedLastIterationRT = ButtonState;
         }
         return false;
     }

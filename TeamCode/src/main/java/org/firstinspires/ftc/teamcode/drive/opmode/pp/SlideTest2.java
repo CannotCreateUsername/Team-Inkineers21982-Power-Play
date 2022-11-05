@@ -29,13 +29,11 @@
 
 package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -51,9 +49,9 @@ import com.qualcomm.robotcore.util.Range;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@TeleOp(name="Position Test", group="Linear Opmode")
+@TeleOp(name="Position Test 2", group="Linear Opmode")
 //@Disabled
-public class SlideTest extends LinearOpMode {
+public class SlideTest2 extends LinearOpMode {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
@@ -71,7 +69,7 @@ public class SlideTest extends LinearOpMode {
         slides.setDirection(DcMotorSimple.Direction.REVERSE);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -79,35 +77,38 @@ public class SlideTest extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             int encoderPosition = slides.getCurrentPosition();
-            if (gamepad1.a) {
-                slides.setPower(0.5);
-            } else if (gamepad1.b) {
-                slides.setPower(-0.5);
-            } else if (gamepad1.y) {
-                slides.setTargetPosition(2000);
-                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.5);
-                while (!isStopRequested() && slides.isBusy()) {
-                    telemetry.addData("Dispenser", "Going up!");
-                    telemetry.update();
-                }
-                slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            } else if (gamepad1.x) {
-                slides.setTargetPosition(1000);
-                slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                slides.setPower(0.5);
-                while (!isStopRequested() && slides.isBusy()) {
-                    telemetry.addData("Dispenser", "Going up!");
-                    telemetry.update();
-                }
-                slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            } else {
-                slides.setPower(0);
+            if (gamepad1.y) {
+                updateLiftDrive(2000);
             }
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Position", encoderPosition);
             telemetry.update();
         }
+    }
+    public void updateLiftDrive(double targetLiftPosition){
+        double liftPower;
+        double currentLiftPosition = slides.getCurrentPosition();  // Get the position of the lift in ticks
+        double liftError = targetLiftPosition - currentLiftPosition;  // determine the error in ticks between our current lift position and where it should be
+
+        if (liftError > 5 || liftError < -5){  // Hysteresis band to provide damping/braking zone to reduce oscillations
+
+            liftPower = ((liftError * .03)+ .1);  // PID with P only factor plus feed forward
+
+            if (liftPower > .4){
+                liftPower = .4;
+            }
+            if (liftPower < -.4){
+                liftPower = -.4;
+            }
+        }
+        else {
+
+            liftPower = 0;
+
+        } // end of if-else
+
+        slides.setPower(liftPower);
+
     }
 }
