@@ -76,6 +76,7 @@ public class GamepadHelper {
             currentGameStickState = GamePadState.POSITIVE;
         } else {
             currentGameStickState = GamePadState.NETURAL;
+            gameStickMultipler = minMultiplier;
         }
         if (prevoiusGameStickState != currentGameStickState ){
             isRamping = true;
