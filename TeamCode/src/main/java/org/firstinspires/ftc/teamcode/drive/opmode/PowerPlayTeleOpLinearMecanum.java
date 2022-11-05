@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.drive.GamePadState;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -67,6 +66,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
             // intake control loop
             intakeSlide.run(gamepad1, gamepad2);
+            telemetry.addData("Current Slide Position", intakeSlide.getCurrentSlidePosition());
             telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide.getCurrentStatus());
 
             // publish all the telemetry at once

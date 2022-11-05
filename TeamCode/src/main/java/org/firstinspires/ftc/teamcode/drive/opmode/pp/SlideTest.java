@@ -70,7 +70,8 @@ public class SlideTest extends LinearOpMode {
         slides = hardwareMap.get(DcMotor.class, "slides");
         slides.setDirection(DcMotorSimple.Direction.REVERSE);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
+        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
         runtime.reset();
@@ -101,7 +102,7 @@ public class SlideTest extends LinearOpMode {
                 }
                 slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             } else {
-                slides.setPower(0.05);
+                slides.setPower(0);
             }
 
             telemetry.addData("Status", "Run Time: " + runtime.toString());
