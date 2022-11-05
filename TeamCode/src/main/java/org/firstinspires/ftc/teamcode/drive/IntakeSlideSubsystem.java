@@ -149,7 +149,7 @@ public class IntakeSlideSubsystem {
      *   set the power and status
      */
     private void setSlidePower(double power){
-        if (Math.abs(currentPosition- currentTarget) > 15){
+        if (Math.abs(slides.getCurrentPosition() - currentTarget) > 15){
             // our threshold is within
             // 15 encoder ticks of our target.
             // this is pretty arbitrary, and would have to be
@@ -157,9 +157,9 @@ public class IntakeSlideSubsystem {
             currentPower = power;
             currentStatus = "Going to: " + currentTarget;
         } else {
-            double posErr = currentTarget - currentPosition; // measure error in terms of distance between current position and target
+            double posErr = currentTarget - slides.getCurrentPosition(); // measure error in terms of distance between current position and target
             currentPower = (posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
-            currentStatus = "Holding at: " + currentPosition;
+            currentStatus = "Holding at: " + slides.getCurrentPosition();
         }
     }
 
@@ -185,7 +185,7 @@ public class IntakeSlideSubsystem {
         switch (liftState) {
             case REST:
                 // stops intake when slides hit rest
-                if (currentPosition == currentTarget) {
+                if (slides.getCurrentPosition() == currentTarget) {
                     autoIn = false;
                 }
                 if (onPress(gamepad2.right_bumper, "RB")) {
@@ -229,20 +229,16 @@ public class IntakeSlideSubsystem {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = true;
-                    setSlidePower(0.09);
                 } else if (onPress(gamepad2.right_bumper, "RB")) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                    setSlidePower();
                 } else if (onPress(gamepad2.left_bumper, "LB")) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = false;
-                    setSlidePower();
-                } else if (currentPosition < targetPositionLow) {
+                } else if (slides.getCurrentPosition() < targetPositionLow) {
                     // add position to pick up from stack all the way to LOW
-                    currentTarget += 3;
-                    setSlidePower();
+                    currentTarget += 2;
                 } else {
                     setSlidePower();
                 }
@@ -252,45 +248,46 @@ public class IntakeSlideSubsystem {
                     // code here
                     currentTarget = targetPositionMedium;
                     liftState = LiftState.MEDIUM;
-                    setSlidePower();
-                }
-                if (onPress(gamepad2.left_bumper, "LB")) {
+                } else if (onPress(gamepad2.left_bumper, "LB")) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                } else {
                     setSlidePower();
                 }
-                if (gamepad2.x || gamepad2.y) {
-                    liftState = LiftState.MANUAL;
-                }
+                //if (gamepad2.x || gamepad2.y) {
+                //  liftState = LiftState.MANUAL;
+                //}
             case MEDIUM:
                 if (onPress(gamepad2.right_bumper, "RB")) {
                     // code here
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
-                    setSlidePower();
-                }
-                if (onPress(gamepad2.left_bumper, "LB")) {
+                } else if (onPress(gamepad2.left_bumper, "LB")) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                } else {
                     setSlidePower();
                 }
-                if (gamepad2.x || gamepad2.y) {
-                    liftState = LiftState.MANUAL;
-                }
+                //if (gamepad2.x || gamepad2.y) {
+                //   liftState = LiftState.MANUAL;
+                //}
             case HIGH:
                 // DO SOMETHING TO MAKE DRIVING SLOWER WHILE THE CASE IS HIGH FOR BETTER CONTROL
                 if (onPress(gamepad2.left_bumper, "LB")) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                } else {
                     setSlidePower();
                 }
-                if (gamepad2.x || gamepad2.y) {
-                    liftState = LiftState.MANUAL;
-                }
+                //if (gamepad2.x || gamepad2.y) {
+                //   liftState = LiftState.MANUAL;
+                //}
                 break;
+                /*
+
             case MANUAL:
                 // Backup Controls
 
@@ -321,6 +318,8 @@ public class IntakeSlideSubsystem {
                     setSlidePower();
                 }
                 break;
+
+                 */
         }
 
         runToPosition(currentTarget, currentPower);
