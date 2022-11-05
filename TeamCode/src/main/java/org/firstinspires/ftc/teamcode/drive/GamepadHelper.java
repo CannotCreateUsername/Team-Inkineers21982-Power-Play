@@ -4,6 +4,9 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
+
+
+
 public class GamepadHelper {
 
     public enum GamePadState {
@@ -12,10 +15,12 @@ public class GamepadHelper {
         NEGATIVE
     }
 
+
     private    double  minMultiplier = 0.1;
-    private    double  maxMultiplier = 0.75;
-    private    double  incrementMultipler = 0.1;
-    private    double  gameStickMultipler;
+    private         double  maxMultiplier = 0.75;
+    private         double  incrementMultipler = 0.1;
+    private        double gameStickMultipler;
+    private  double  timeIncrementInMs = 200;
 
     /*
     Time Base Ramping
@@ -63,7 +68,7 @@ public class GamepadHelper {
      i.e. from NEUTRAL TO NEGATIVE , NEUTRAL TO POSISTIVE, POSTIVE TO NEGATIVE, NEGATIVE TO POSITIVE ....
      */
     
-    public double  getGamepadStickRampingMultiplier(float gameStick){
+    public double  getGamepadStickRampingMultiplier(volatile float gameStick){
 
         prevoiusGameStickState = currentGameStickState;
         if (gameStick < 0){
