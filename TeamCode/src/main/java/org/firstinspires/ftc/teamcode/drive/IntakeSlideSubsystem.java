@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.qualcomm.robotcore.exception.RobotCoreException;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -7,6 +8,8 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.internal.opmode.AnnotatedOpModeClassFilter;
 
 /**
  * The IntakeSlideSubsystem class is a subsystem module that control
@@ -20,16 +23,26 @@ public class IntakeSlideSubsystem {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
+    private ElapsedTime levelTimer = new ElapsedTime();
     private ElapsedTime intakeTimer = new ElapsedTime();
+    
+    // Variable to detect on press and on release
+    private boolean pressedLastIterationRT = false;
+    private boolean pressedLastIterationRB = false;
+    private boolean pressedLastIterationLB = false;
+
+    // Variable to auto spin in intake
+    private boolean autoIn = false;
+    
     private DcMotor slides = null;
     private CRServo intake = null;
 
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
-    private final int targetPositionHigh = 2700;
+    private final int targetPositionHigh = 2500;
     private final int targetPositionMedium = 350;
     private final int targetPositionLow = 300;
-    private final int targetPositionPikcup = 250;
-    private final int targetPositionRest = 120;  // ideally it should be zero !!!
+    private final int targetPositionPickup = 130;
+    private final int targetPositionRest = 0;  // ideally it should be zero !!!
 
     // distance error factor
     // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
@@ -41,6 +54,8 @@ public class IntakeSlideSubsystem {
     private double defalutVelocity = 200;
     private double defaultIntakeTime = 2.0;
 
+    private int timesPressed;
+    private boolean triggerPressed;
 
     private double currentPower;
     private int currentTarget;
@@ -59,6 +74,7 @@ public class IntakeSlideSubsystem {
         LOW,
         MEDIUM,
         HIGH,
+        MANUAL
     }
 
     public enum IntakeState {
@@ -154,29 +170,39 @@ public class IntakeSlideSubsystem {
     }
 
 
-
     /**
-
-        https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
-
-        button mapping
-        gamepad1.y = high
-        gamepad1.x = medium
-        gamepad1.b = low
-        gamepad1.a = pickup
-        gamepad1.left_bumper = rest
-        gamepad1.right_bumper= release
-
+     https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
+     button mapping
+     gamepad1.y = high
+     gamepad1.x = medium
+     gamepad1.b = low
+     gamepad1.a = pickup
+     gamepad1.left_bumper = rest
+     gamepad1.right_bumper= release
      */
     public void run(Gamepad gamepad1, Gamepad gamepad2){
-
         switch (liftState) {
             case REST:
+                // stops intake when slides hit rest
+                if (slides.getCurrentPosition() == currentTarget) {
+                    autoIn = false;
+                }
+                if (onPress(gamepad2.right_bumper, "RB")) {
+                    // code here
+                    currentTarget = targetPositionLow;
+                    liftState = LiftState.LOW;
+                } else if (onPress(gamepad2.right_trigger > 0, "RT")) {
+                    // code here
+                    autoIn = false;
+                    currentTarget = targetPositionPickup;
+                    liftState = LiftState.PICKUP;
+                }
+
+                /*
                 if (gamepad1.y) {
                     // y is pressed to to High postion
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
-                /*
                 } else if (gamepad1.x) {
                     // x is pressed, go to medium position
                     currentTarget = targetPositionMedium;
@@ -185,49 +211,119 @@ public class IntakeSlideSubsystem {
                     // b is pressed, go to low position
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                 */
                 } else if (gamepad1.a) {
                     // a is pressed, go to pickup position
-                    currentTarget = targetPositionPikcup;
+                    currentTarget = targetPositionPickup;
                     liftState = LiftState.PICKUP;
+                }
+
+                 */
+
+                // Manual
+                if (gamepad2.x || gamepad2.y || gamepad2.a || gamepad2.b) {
+                    liftState = LiftState.MANUAL;
                 }
                 break;
             case PICKUP:
-                if (gamepad1.left_bumper) {
-                    // left_trigger is pressed, go to rest position and turn on the intake
+                if (onRelease(gamepad2.right_trigger > 0, "RT")) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
-
-                    // start intake as well
-                    intakeState = IntakeState.IN;
-                    intakeTimer.reset();
-
-                    // use slow power when it get down
+                    autoIn = true;
                     setSlidePower(0.09);
+                } else if (onPress(gamepad2.right_bumper, "RB")) {
+                    currentTarget = targetPositionLow;
+                    liftState = LiftState.LOW;
+                    setSlidePower();
+                } else if (onPress(gamepad2.left_bumper, "LB")) {
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
+                    autoIn = false;
+                    setSlidePower();
                 } else {
+                    // add position to pick up from stack
+                    currentTarget += 1;
                     setSlidePower();
                 }
                 break;
-            case HIGH:
-                if (gamepad1.left_bumper) {
-                    // from high to rest state
+            case LOW:
+                if (onPress(gamepad2.right_bumper, "RB")) {
+                    // code here
+                    currentTarget = targetPositionMedium;
+                    liftState = LiftState.MEDIUM;
+                    setSlidePower();
+                }
+                if (onPress(gamepad2.left_bumper, "LB")) {
+                    // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     setSlidePower();
-                } else if (gamepad1.right_bumper) {
-                    // release intake
-                    intakeState = IntakeState.OUT;
-                    intakeTimer.reset();
-                } else {
+                }
+                if (gamepad2.x || gamepad2.y) {
+                    liftState = LiftState.MANUAL;
+                }
+            case MEDIUM:
+                if (onPress(gamepad2.right_bumper, "RB")) {
+                    // code here
+                    currentTarget = targetPositionHigh;
+                    liftState = LiftState.HIGH;
+                    setSlidePower();
+                }
+                if (onPress(gamepad2.left_bumper, "LB")) {
+                    // code here
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
+                    setSlidePower();
+                }
+                if (gamepad2.x || gamepad2.y) {
+                    liftState = LiftState.MANUAL;
+                }
+            case HIGH:
+                // DO SOMETHING TO MAKE DRIVING SLOWER WHILE THE CASE IS HIGH FOR BETTER CONTROL
+                if (onPress(gamepad2.left_bumper, "LB")) {
+                    // code here
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
+                    setSlidePower();
+                }
+                if (gamepad2.x || gamepad2.y) {
+                    liftState = LiftState.MANUAL;
+                }
+                break;
+            case MANUAL:
+                // Backup Controls
+
+                // Viper Slides
+                if (gamepad2.y && !gamepad2.x) {
+                    currentTarget += 1;
+                } else if (gamepad2.x && !gamepad2.y) {
+                    currentTarget -= 1;
+                }
+
+                if ((onPress(gamepad2.right_bumper, "RB")) && (slides.getCurrentPosition() < 300)) {
+                    currentTarget = targetPositionLow;
+                    liftState = LiftState.LOW;
+                    setSlidePower();
+                } else if ((onPress(gamepad2.right_bumper, "RB")) && (slides.getCurrentPosition() >= 300 && slides.getCurrentPosition() < 350)) {
+                    currentTarget = targetPositionMedium;
+                    liftState = LiftState.MEDIUM;
+                    setSlidePower();
+                } else if ((onPress(gamepad2.right_bumper, "RB")) && (slides.getCurrentPosition() >= 350 && slides.getCurrentPosition() < 2500)) {
+                    currentTarget = targetPositionHigh;
+                    liftState = LiftState.HIGH;
+                    setSlidePower();
+                }
+                if (onPress(gamepad2.left_bumper, "LB")) {
+                    // code here
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
                     setSlidePower();
                 }
                 break;
         }
 
         runToPosition(currentTarget, currentPower);
-        runIntake();
-
-
+        runIntake2(gamepad2);
+        //runIntake();
     }
 
 
@@ -236,8 +332,8 @@ public class IntakeSlideSubsystem {
      *
      *  steady state and transient state
      *  https://resources.pcb.cadence.com/blog/2020-steady-state-vs-transient-state-in-system-design-and-stability-analysis
-
      */
+    /*
     private void runIntake(){
 
         switch (intakeState) {
@@ -259,7 +355,67 @@ public class IntakeSlideSubsystem {
                 }
                 break;
         }
-
     }
 
+     */
+    private void runIntake2(Gamepad controller){
+
+        switch (intakeState) {
+            case STOP:
+                intake.setPower(0);
+                if ((controller.left_trigger > 0) || controller.b) {
+                    intakeState = IntakeState.OUT;
+                }
+                if (controller.a || autoIn) {
+                    intakeState = IntakeState.IN;
+                }
+                break;
+            case IN:
+                if (!controller.a && !autoIn) {
+                    intakeState = IntakeState.STOP;
+                } else if (controller.left_trigger > 0 || controller.b) {
+                    autoIn = false;
+                    intakeState = IntakeState.STOP;
+                }
+                intake.setPower(-1);
+                break;
+            case OUT:
+                if (controller.left_trigger == 0 || !controller.b) {
+                    intakeState = IntakeState.STOP;
+                }
+                intake.setPower(1);
+        }
+    }
+
+
+    private boolean onPress(boolean ButtonState, String ButtonName) {
+        switch (ButtonName) {
+            case "RT":
+                if (ButtonState && !pressedLastIterationRT) {
+                    pressedLastIterationRT = ButtonState;
+                    return true;
+                }
+            case "RB":
+                if (ButtonState && !pressedLastIterationRB) {
+                    pressedLastIterationRB = ButtonState;
+                    return true;
+                }
+            case "LB":
+                if (ButtonState && !pressedLastIterationLB) {
+                    pressedLastIterationLB = ButtonState;
+                    return true;
+                }
+            }
+        return false;
+    }
+    private boolean onRelease(boolean ButtonState, String ButtonName) {
+        switch (ButtonName) {
+            case "RT":
+                if (!ButtonState && pressedLastIterationRT) {
+                    pressedLastIterationRT = ButtonState;
+                    return true;
+                }
+        }
+        return false;
+    }
 }
