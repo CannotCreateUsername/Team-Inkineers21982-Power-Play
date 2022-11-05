@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -19,7 +20,6 @@ public class IntakeSlideSubsystem2 {
 
     // Declare OpMode members.
     private ElapsedTime runtime = new ElapsedTime();
-    private ElapsedTime levelTimer = new ElapsedTime();
     private ElapsedTime intakeTimer = new ElapsedTime();
     private DcMotor slides = null;
     private CRServo intake = null;
@@ -29,7 +29,7 @@ public class IntakeSlideSubsystem2 {
     private final int targetPositionMedium = 350;
     private final int targetPositionLow = 300;
     private final int targetPositionPikcup = 250;
-    private final int targetPositionRest = 0;  // ideally it should be zero !!!
+    private final int targetPositionRest = 120;  // ideally it should be zero !!!
 
     // distance error factor
     // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
@@ -41,13 +41,11 @@ public class IntakeSlideSubsystem2 {
     private double defalutVelocity = 200;
     private double defaultIntakeTime = 2.0;
 
-    private int timesPressed;
 
     private double currentPower;
     private int currentTarget;
     private String currentCaption;
     private String currentStatus;
-    private String currentLevel;
 
     private LiftState liftState;
     private IntakeState intakeState;
@@ -92,7 +90,6 @@ public class IntakeSlideSubsystem2 {
 
         currentCaption = "Lift Status";
         currentStatus = "Initialized";
-        currentLevel = "Rest";
         currentTarget = 0;
         currentPower = 0;
 
@@ -131,8 +128,6 @@ public class IntakeSlideSubsystem2 {
         return currentStatus;
     }
 
-
-
     /**
      *   set the power and status
      */
@@ -143,22 +138,11 @@ public class IntakeSlideSubsystem2 {
             // this is pretty arbitrary, and would have to be
             // tweaked for each robot.
             currentPower = power;
-            if (currentTarget > targetPositionRest+20 && currentTarget < targetPositionLow-20) {
-                currentLevel = "Pickup";
-            } else if (currentTarget > targetPositionPikcup+20 && currentTarget < targetPositionMedium-20) {
-                currentLevel = "Low";
-            } else if (currentTarget > targetPositionLow+20 && currentTarget < targetPositionHigh-20) {
-                currentLevel = "Medium";
-            } else if (currentTarget > targetPositionMedium+20) {
-                currentLevel = "High";
-            } else {
-                currentLevel = "Rest";
-            }
-            currentStatus = "Going to: " + currentTarget + currentLevel;
+            currentStatus = "Going to: " + currentTarget;
         } else {
             double posErr = currentTarget - slides.getCurrentPosition(); // measure error in terms of distance between current position and target
             currentPower = (posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
-            currentStatus = "Holding at: " + slides.getCurrentPosition() + currentLevel;
+            currentStatus = "Holding at: " + slides.getCurrentPosition();
         }
     }
 
@@ -172,46 +156,37 @@ public class IntakeSlideSubsystem2 {
 
 
     /**
-
-        https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
-
-        button mapping
-        gamepad1.y = high
-        gamepad1.x = medium
-        gamepad1.b = low
-        gamepad1.a = pickup
-        gamepad1.left_bumper = rest
-        gamepad1.right_bumper= release
-
+     https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
+     button mapping
+     gamepad1.y = high
+     gamepad1.x = medium
+     gamepad1.b = low
+     gamepad1.a = pickup
+     gamepad1.left_bumper = rest
+     gamepad1.right_bumper= release
      */
     public void run(Gamepad gamepad1, Gamepad gamepad2){
 
         switch (liftState) {
             case REST:
                 if (gamepad1.y) {
-                    levelTimer.reset();
-                    timesPressed += 1;
-                    while (levelTimer.time() < 2) {
-                        // Within 2 seconds:
-                        if (gamepad1.y) {
-                            timesPressed += 1;
-                        }
-                    }
-                    if (timesPressed == 1) {
-                        // If pressed one time, go low
-                        currentTarget = targetPositionLow;
-                        liftState = LiftState.LOW;
-                    } else if (timesPressed == 2) {
-                        // If pressed two times, go middle
-                        currentTarget = targetPositionMedium;
-                        liftState = liftState.MEDIUM;
-                    } else if (timesPressed > 2) {
-                        // If pressed three or more times, go to high
-                        currentTarget = targetPositionHigh;
-                        liftState = LiftState.HIGH;
-                    }
-                    // Reset timesPressed
-                    timesPressed = 0;
+                    // y is pressed to to High postion
+                    currentTarget = targetPositionHigh;
+                    liftState = LiftState.HIGH;
+                /*
+                } else if (gamepad1.x) {
+                    // x is pressed, go to medium position
+                    currentTarget = targetPositionMedium;
+                    liftState = LiftState.MEDIUM;
+                } else if (gamepad1.b) {
+                    // b is pressed, go to low position
+                    currentTarget = targetPositionLow;
+                    liftState = LiftState.LOW;
+                 */
+                } else if (gamepad1.a) {
+                    // a is pressed, go to pickup position
+                    currentTarget = targetPositionPikcup;
+                    liftState = LiftState.PICKUP;
                 }
                 break;
             case PICKUP:
@@ -231,35 +206,7 @@ public class IntakeSlideSubsystem2 {
                 }
                 break;
             case HIGH:
-                if (gamepad1.x) {
-                    // from high to rest state
-                    currentTarget = targetPositionRest;
-                    liftState = LiftState.REST;
-                    setSlidePower();
-                } else if (gamepad1.right_bumper) {
-                    // release intake
-                    intakeState = IntakeState.OUT;
-                    intakeTimer.reset();
-                } else {
-                    setSlidePower();
-                }
-                break;
-            case MEDIUM:
-                if (gamepad1.x) {
-                    // from high to rest state
-                    currentTarget = targetPositionRest;
-                    liftState = LiftState.REST;
-                    setSlidePower();
-                } else if (gamepad1.right_bumper) {
-                    // release intake
-                    intakeState = IntakeState.OUT;
-                    intakeTimer.reset();
-                } else {
-                    setSlidePower();
-                }
-                break;
-            case LOW:
-                if (gamepad1.x) {
+                if (gamepad1.left_bumper) {
                     // from high to rest state
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
@@ -286,7 +233,6 @@ public class IntakeSlideSubsystem2 {
      *
      *  steady state and transient state
      *  https://resources.pcb.cadence.com/blog/2020-steady-state-vs-transient-state-in-system-design-and-stability-analysis
-
      */
     private void runIntake(){
 
