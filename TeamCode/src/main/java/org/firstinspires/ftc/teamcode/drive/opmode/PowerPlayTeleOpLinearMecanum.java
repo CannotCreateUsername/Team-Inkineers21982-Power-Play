@@ -7,9 +7,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 /**
@@ -84,7 +84,9 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // so at any point in time, only one drive control logic is being used
             currentIntakeSlide.run(gamepad1, gamepad2);
             telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
-            // telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
+            telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
+            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
+            telemetry.addData("Was RB pressed?", intakeSlide.getLastIterationRB());
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
 
 

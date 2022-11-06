@@ -16,7 +16,7 @@ public class GamepadHelper {
     }
 
     private    double  minMultiplier = 0.1;
-    private    double  maxMultiplier = 0.75;
+    private    double  maxMultiplier = 1;
     private    double  incrementMultipler = 0.1;
     private    double gameStickMultipler;
     private    double  timeIncrementInMs = 200;
@@ -84,7 +84,7 @@ public class GamepadHelper {
             xGamePadTimer.reset();
         }
 
-        if (isRamping && xGamePadTimer.milliseconds() > 10) {
+        if (isRamping && xGamePadTimer.milliseconds() > timeIncrementInMs) {
             if (gameStickMultipler <= maxMultiplier) {
                 gameStickMultipler += incrementMultipler;
             } else {
