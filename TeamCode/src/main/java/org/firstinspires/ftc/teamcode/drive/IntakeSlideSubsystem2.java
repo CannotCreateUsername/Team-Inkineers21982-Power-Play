@@ -122,6 +122,14 @@ public class IntakeSlideSubsystem2 {
         return currentStatus;
     }
 
+    public String getCurrentState() {
+        return liftState.name();
+    }
+
+    public int getCurrentSlidePosition() {
+        return slides.getCurrentPosition();
+    }
+
     /**
      *   set the power and status
      */
