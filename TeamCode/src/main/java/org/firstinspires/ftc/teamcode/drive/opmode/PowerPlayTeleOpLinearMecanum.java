@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -29,8 +30,13 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
         // initialize all the subsystems: 1. drivetrain,  2 intake+slide
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        IntakeSlideSubsystem intakeSlide = new IntakeSlideSubsystem(hardwareMap);
-        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2(hardwareMap);
+        IntakeSlideSubsystem intakeSlide = new IntakeSlideSubsystem();
+        intakeSlide.init(hardwareMap);
+        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
+        intakeSlide2.init(hardwareMap);
+
+        // by default , use Drive Control #1
+        IntakeSlide currentIntakeSlide = intakeSlide;
 
         double leftStickMultiplierX, leftStickMultiplierY;
         GamepadHelper leftStickX = new GamepadHelper();
@@ -67,19 +73,19 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("GamePad leftStick y Input", gamepad1.left_stick_y);
 
 
-            // intake subsystem 1
-            // note this is assumping that intake subsystem 1 and 2 won't interfere each other
-            intakeSlide.run(gamepad1, gamepad2);
-            telemetry.addData("Current Slide Position 1", intakeSlide.getCurrentSlidePosition());
-            telemetry.addData("Current State 1", intakeSlide.getCurrentState());
-            telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide.getCurrentStatus());
-
-            // intake subsystem 2
-            // note this is assumping that intake subsystem 1 and 2 won't interfere each other
-            intakeSlide2.run(gamepad1, gamepad2);
-            telemetry.addData("Current Slide Position 2", intakeSlide2.getCurrentSlidePosition());
-            telemetry.addData("Current State 2", intakeSlide2.getCurrentState());
-            telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide2.getCurrentStatus());
+            // switch between two subsystem
+            if (gamepad1.back || gamepad2.back){
+                currentIntakeSlide = intakeSlide;
+            } else if (gamepad1.start || gamepad2.start){
+                currentIntakeSlide = intakeSlide2;
+            }
+            // use the abstract class interface to call the run code. but the actual implementaiton
+            // can vary between intakeSlide and intakeSlide2
+            // so at any point in time, only one drive control logic is being used
+            currentIntakeSlide.run(gamepad1, gamepad2);
+            telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
+            // telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
+            telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
 
 
             // publish all the telemetry at once

@@ -15,10 +15,10 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * @version 1.0
  * @since   2022-10-20
  */
-public class IntakeSlideSubsystem {
+public class IntakeSlideSubsystem extends IntakeSlide {
 
+    // THESE VARIABLES ARE USED BY THIS IMPLEMENTATION OF DRIVE CONTROL
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime levelTimer = new ElapsedTime();
     private ElapsedTime intakeTimer = new ElapsedTime();
 
@@ -30,61 +30,120 @@ public class IntakeSlideSubsystem {
     // Variable to auto spin in intake
     private boolean autoIn = false;
 
-    private DcMotor slides = null;
-    private CRServo intake = null;
+//    private DcMotor slides = null;
+//    private CRServo intake = null;
+//
+//    // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
+//    private final int targetPositionHigh = 2500;
+//    private final int targetPositionMedium = 1200;
+//    private final int targetPositionLow = 400;
+//    private final int targetPositionPickup = 130;
+//    private final int targetPositionRest = 0;  // ideally it should be zero !!!
+//
+//    // distance error factor
+//    // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
+//    // 2022-10-19: THIS NUMBER MIGHT NEED TO BE TUNED !!!
+//    private final double Kp = .05;
+//
+//    // 2022-10-19: THE DEFAULT POWER MIGHT NEED TO BE BE TUNED !!!
+//    private double defaultPower = 0.7;
+//    private double defalutVelocity = 200;
+//    private double defaultIntakeTime = 2.0;
+//
+//    private int timesPressed;
+//    private boolean triggerPressed;
+//
+//    private int currentPosition;
+//    private double currentPower;
+//    private int currentTarget;
+//    private String currentCaption;
+//    private String currentStatus;
+//
+//    private LiftState liftState;
+//    private IntakeState intakeState;
+//
+//
+//    // 2022-10-19: REVIEW THE STATE !!!
+//    public enum LiftState {
+//        REST,   // all the way to the bottom
+//        PICKUP,  // level where the robot will pickup the cone
+//        LOW,
+//        MEDIUM,
+//        HIGH,
+//        MANUAL
+//    }
+//
+//    public enum IntakeState {
+//        STOP,
+//        IN,
+//        OUT
+//    }
 
-    // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
-    private final int targetPositionHigh = 2500;
-    private final int targetPositionMedium = 1200;
-    private final int targetPositionLow = 400;
-    private final int targetPositionPickup = 130;
-    private final int targetPositionRest = 0;  // ideally it should be zero !!!
 
-    // distance error factor
-    // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
-    // 2022-10-19: THIS NUMBER MIGHT NEED TO BE TUNED !!!
-    private final double Kp = .05;
 
-    // 2022-10-19: THE DEFAULT POWER MIGHT NEED TO BE BE TUNED !!!
-    private double defaultPower = 0.7;
-    private double defalutVelocity = 200;
-    private double defaultIntakeTime = 2.0;
+//    /**
+//     *
+//     * @param position where the slider will travel to. It is measured in motor tickts
+//     * @param power the power of motor ,
+//     */
+//    private void runToPosition(int position, double power){
+//        slides.setTargetPosition(position);
+//        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//        // TO DO: ACCORDING TO THIS LINK, TYPICALLY WE SET THE MAX VELOCITY INSTEAD OF POWER WHEN USING RUN_TO_POSITION
+//        https://docs.revrobotics.com/duo-control/programming/using-encoder-feedback
+//        slides.setPower(power);
+//    }
+//
+//    private void runToPosition(int position){
+//
+//        runToPosition (position, defaultPower);
+//    }
+//    public String getCurrentState() { return liftState.name(); }
+//
+//    public String getCurrentCaption() {
+//        return currentCaption;
+//    }
+//
+//    public String getCurrentStatus() {
+//        return currentStatus;
+//    }
+//
+//    public int getCurrentSlidePosition() {
+//        return currentPosition;
+//    }
+//
+//    /**
+//     *   set the power and status
+//     */
+//    private void setSlidePower(double power){
+//        if (Math.abs(slides.getCurrentPosition() - currentTarget) > 15){
+//            // our threshold is within
+//            // 15 encoder ticks of our target.
+//            // this is pretty arbitrary, and would have to be
+//            // tweaked for each robot.
+//            currentPower = power;
+//            currentStatus = "Going to: " + currentTarget;
+//        } else {
+//            double posErr = currentTarget - slides.getCurrentPosition(); // measure error in terms of distance between current position and target
+//            currentPower = (posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
+//            currentStatus = "Holding at: " + slides.getCurrentPosition();
+//        }
+//    }
+//
+//    /**
+//     *  set slide power and status with default Power
+//     */
+//    private void setSlidePower(){
+//        setSlidePower(defaultPower);
+//    }
 
-    private int timesPressed;
-    private boolean triggerPressed;
-    
-    private int currentPosition;
-    private double currentPower;
-    private int currentTarget;
-    private String currentCaption;
-    private String currentStatus;
-
-    private LiftState liftState;
-    private IntakeState intakeState;
-
-    private boolean intakeToggle;
-
-    // 2022-10-19: REVIEW THE STATE !!!
-    public enum LiftState {
-        REST,   // all the way to the bottom
-        PICKUP,  // level where the robot will pickup the cone
-        LOW,
-        MEDIUM,
-        HIGH,
-        MANUAL
-    }
-
-    public enum IntakeState {
-        STOP,
-        IN,
-        OUT
-    }
 
     /**
      *
      * @param hardwareMap from teleop
      */
-    public IntakeSlideSubsystem(HardwareMap hardwareMap) {
+    @Override
+    public void init(HardwareMap hardwareMap) {
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -98,7 +157,6 @@ public class IntakeSlideSubsystem {
 
         intake = hardwareMap.get(CRServo.class, "intake");
 
-        runtime.reset();
 
         currentPosition = slides.getCurrentPosition();
         currentCaption = "Lift Status";
@@ -110,77 +168,10 @@ public class IntakeSlideSubsystem {
         liftState = LiftState.REST;
 
 
-        intakeToggle = false;
-
-
-    }
-
-    /**
-     *
-     * @param position where the slider will travel to. It is measured in motor tickts
-     * @param power the power of motor ,
-     */
-    private void runToPosition(int position, double power){
-        slides.setTargetPosition(position);
-        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        // TO DO: ACCORDING TO THIS LINK, TYPICALLY WE SET THE MAX VELOCITY INSTEAD OF POWER WHEN USING RUN_TO_POSITION
-        https://docs.revrobotics.com/duo-control/programming/using-encoder-feedback
-        slides.setPower(power);
-    }
-
-    private void runToPosition(int position){
-
-        runToPosition (position, defaultPower);
-    }
-
-    public String getCurrentCaption() {
-        return currentCaption;
-    }
-
-    public String getCurrentStatus() {
-        return currentStatus;
-    }
-    
-    public int getCurrentSlidePosition() {
-        return currentPosition;
-    }
-
-    /**
-     *   set the power and status
-     */
-    private void setSlidePower(double power){
-        if (Math.abs(slides.getCurrentPosition() - currentTarget) > 15){
-            // our threshold is within
-            // 15 encoder ticks of our target.
-            // this is pretty arbitrary, and would have to be
-            // tweaked for each robot.
-            currentPower = power;
-            currentStatus = "Going to: " + currentTarget;
-        } else {
-            double posErr = currentTarget - slides.getCurrentPosition(); // measure error in terms of distance between current position and target
-            currentPower = (posErr * Kp); //instead of fixed power, use the concept of PID and increase power in proportion with the error
-            currentStatus = "Holding at: " + slides.getCurrentPosition();
-        }
-    }
-
-    /**
-     *  set slide power and status with default Power
-     */
-    private void setSlidePower(){
-        setSlidePower(defaultPower);
     }
 
 
-    /**
-     https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
-     button mapping
-     gamepad1.y = high
-     gamepad1.x = medium
-     gamepad1.b = low
-     gamepad1.a = pickup
-     gamepad1.left_bumper = rest
-     gamepad1.right_bumper= release
-     */
+    @Override
     public void run(Gamepad gamepad1, Gamepad gamepad2){
         switch (liftState) {
             case REST:
@@ -323,7 +314,7 @@ public class IntakeSlideSubsystem {
         }
 
         runToPosition(currentTarget, currentPower);
-        runIntake2(gamepad2);
+        runIntake(gamepad2);
         //runIntake();
     }
 
@@ -357,7 +348,8 @@ public class IntakeSlideSubsystem {
         }
     }
      */
-    private void runIntake2(Gamepad controller){
+    @Override
+    public void runIntake(Gamepad controller){
 
         switch (intakeState) {
             case STOP:
