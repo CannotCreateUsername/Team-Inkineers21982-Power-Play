@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 /**
@@ -29,6 +30,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         // initialize all the subsystems: 1. drivetrain,  2 intake+slide
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         IntakeSlideSubsystem intakeSlide = new IntakeSlideSubsystem(hardwareMap);
+        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2(hardwareMap);
 
         double leftStickMultiplierX, leftStickMultiplierY;
         GamepadHelper leftStickX = new GamepadHelper();
@@ -64,10 +66,17 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("GamePad leftStick x Input", gamepad1.left_stick_x);
             telemetry.addData("GamePad leftStick y Input", gamepad1.left_stick_y);
 
-            // intake control loop
+
             intakeSlide.run(gamepad1, gamepad2);
-            telemetry.addData("Current Slide Position", intakeSlide.getCurrentSlidePosition());
+            telemetry.addData("Current Slide Position 1", intakeSlide.getCurrentSlidePosition());
+            telemetry.addData("Current State 1", intakeSlide.getCurrentState());
             telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide.getCurrentStatus());
+
+            intakeSlide2.run(gamepad1, gamepad2);
+            telemetry.addData("Current Slide Position 2", intakeSlide2.getCurrentSlidePosition());
+            telemetry.addData("Current State 2", intakeSlide2.getCurrentState());
+            telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide2.getCurrentStatus());
+
 
             // publish all the telemetry at once
             telemetry.update();
