@@ -19,7 +19,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class IntakeSlideSubsystem2 {
 
     // Declare OpMode members.
-    private ElapsedTime runtime = new ElapsedTime();
     private ElapsedTime intakeTimer = new ElapsedTime();
     private DcMotor slides = null;
     private CRServo intake = null;
@@ -37,9 +36,9 @@ public class IntakeSlideSubsystem2 {
     private final double Kp = .05;
 
     // 2022-10-19: THE DEFAULT POWER MIGHT NEED TO BE BE TUNED !!!
-    private double defaultPower = 0.7;
+    private double defaultPower = 0.8;
     private double defalutVelocity = 200;
-    private double defaultIntakeTime = 2.0;
+    private double defaultIntakeTime = 2.3;
 
 
     private double currentPower;
@@ -50,7 +49,6 @@ public class IntakeSlideSubsystem2 {
     private LiftState liftState;
     private IntakeState intakeState;
 
-    private boolean intakeToggle;
 
     // 2022-10-19: REVIEW THE STATE !!!
     public enum LiftState {
@@ -82,10 +80,8 @@ public class IntakeSlideSubsystem2 {
         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
+        // initialize the hardware map of intake
         intake = hardwareMap.get(CRServo.class, "intake");
-
-        runtime.reset();
 
 
         currentCaption = "Lift Status";
@@ -96,8 +92,6 @@ public class IntakeSlideSubsystem2 {
         intakeState = IntakeState.STOP;
         liftState = LiftState.REST;
 
-
-        intakeToggle = false;
 
 
     }
@@ -159,8 +153,8 @@ public class IntakeSlideSubsystem2 {
      https://gm0.org/en/latest/docs/software/tutorials/gamepad.html
      button mapping
      gamepad1.y = high
-     gamepad1.x = medium
-     gamepad1.b = low
+     gamepad1.x = low
+     gamepad1.b = medium
      gamepad1.a = pickup
      gamepad1.left_bumper = rest
      gamepad1.right_bumper= release
@@ -173,21 +167,21 @@ public class IntakeSlideSubsystem2 {
                     // y is pressed to to High postion
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
-                /*
                 } else if (gamepad1.x) {
-                    // x is pressed, go to medium position
-                    currentTarget = targetPositionMedium;
-                    liftState = LiftState.MEDIUM;
-                } else if (gamepad1.b) {
-                    // b is pressed, go to low position
+                    // x is pressed, go to low position
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                 */
+                } else if (gamepad1.b) {
+                    // b is pressed, go to medium position
+                    currentTarget = targetPositionMedium;
+                    liftState = LiftState.MEDIUM;
                 } else if (gamepad1.a) {
                     // a is pressed, go to pickup position
                     currentTarget = targetPositionPikcup;
                     liftState = LiftState.PICKUP;
                 }
+                // use default power to go to all positions
+                setSlidePower();
                 break;
             case PICKUP:
                 if (gamepad1.left_bumper) {
@@ -202,10 +196,11 @@ public class IntakeSlideSubsystem2 {
                     // use slow power when it get down
                     setSlidePower(0.09);
                 } else {
+                    // hold to current position using default power
                     setSlidePower();
                 }
                 break;
-            case HIGH:
+            case HIGH: case MEDIUM: case LOW:
                 if (gamepad1.left_bumper) {
                     // from high to rest state
                     currentTarget = targetPositionRest;
@@ -216,6 +211,7 @@ public class IntakeSlideSubsystem2 {
                     intakeState = IntakeState.OUT;
                     intakeTimer.reset();
                 } else {
+                    // hold to the current position  using default power
                     setSlidePower();
                 }
                 break;
