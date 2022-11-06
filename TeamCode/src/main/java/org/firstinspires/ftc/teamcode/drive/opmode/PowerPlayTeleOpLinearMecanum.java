@@ -67,11 +67,15 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("GamePad leftStick y Input", gamepad1.left_stick_y);
 
 
+            // intake subsystem 1
+            // note this is assumping that intake subsystem 1 and 2 won't interfere each other
             intakeSlide.run(gamepad1, gamepad2);
             telemetry.addData("Current Slide Position 1", intakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", intakeSlide.getCurrentState());
             telemetry.addData(intakeSlide.getCurrentCaption(), intakeSlide.getCurrentStatus());
 
+            // intake subsystem 2
+            // note this is assumping that intake subsystem 1 and 2 won't interfere each other
             intakeSlide2.run(gamepad1, gamepad2);
             telemetry.addData("Current Slide Position 2", intakeSlide2.getCurrentSlidePosition());
             telemetry.addData("Current State 2", intakeSlide2.getCurrentState());
