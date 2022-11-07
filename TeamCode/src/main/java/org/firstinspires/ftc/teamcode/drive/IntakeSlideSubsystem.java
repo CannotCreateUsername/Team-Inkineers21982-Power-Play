@@ -243,9 +243,11 @@ public class IntakeSlideSubsystem extends IntakeSlide {
         switch (ButtonName) {
             case "RT":
                 if (ButtonState && !pressedLastIterationRT) {
+                    pressedLastIterationRT = ButtonState;
                     return true;
                 }
                 pressedLastIterationRT = ButtonState;
+                break;
             case "RB":
                 if (ButtonState && !pressedLastIterationRB) {
                     return true;
@@ -268,9 +270,11 @@ public class IntakeSlideSubsystem extends IntakeSlide {
         switch (ButtonName) {
             case "RT":
                 if (!ButtonState && pressedLastIterationRT) {
+                    pressedLastIterationRT = ButtonState;
                     return true;
                 }
                 pressedLastIterationRT = ButtonState;
+                break;
             case "RB":
                 if (!ButtonState && pressedLastIterationRB) {
                     return true;
