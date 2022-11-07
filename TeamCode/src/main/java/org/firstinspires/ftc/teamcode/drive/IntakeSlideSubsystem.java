@@ -196,6 +196,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
         pressedLastIterationDU = gamepad1.dpad_up;
         pressedLastIterationRB = gamepad1.right_bumper;
         pressedLastIterationLB = gamepad1.left_bumper;
+        pressedLastIterationRT = gamepad1.right_trigger > 0;
         runToPosition(currentTarget, currentPower);
         runIntake(gamepad1);
         //runIntake();
@@ -235,18 +236,22 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                     intakeState = IntakeState.STOP;
                 }
                 intake.setPower(1);
+                break;
         }
     }
 
 
-    private boolean onPress(boolean ButtonState, String ButtonName) {
+
+    private boolean  onPress(boolean ButtonState, String ButtonName) {
         switch (ButtonName) {
             case "RT":
+                /**
+                 *  ButtonState = true when right trigger is pressed i.e. trigger > 0
+                 *  ButtonState = false when trigger is not pressed i.e. trigger = 0
+                 */
                 if (ButtonState && !pressedLastIterationRT) {
-                    pressedLastIterationRT = ButtonState;
                     return true;
                 }
-                pressedLastIterationRT = ButtonState;
                 break;
             case "RB":
                 if (ButtonState && !pressedLastIterationRB) {
@@ -270,10 +275,8 @@ public class IntakeSlideSubsystem extends IntakeSlide {
         switch (ButtonName) {
             case "RT":
                 if (!ButtonState && pressedLastIterationRT) {
-                    pressedLastIterationRT = ButtonState;
                     return true;
                 }
-                pressedLastIterationRT = ButtonState;
                 break;
             case "RB":
                 if (!ButtonState && pressedLastIterationRB) {
