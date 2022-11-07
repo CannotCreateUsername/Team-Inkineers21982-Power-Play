@@ -23,8 +23,6 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
 
     // THESE VARIABLES ARE USED BY THIS IMPLEMENTATION OF DRIVE CONTROL
     private ElapsedTime intakeTimer = new ElapsedTime();
-    private LiftState liftState;
-    private IntakeState intakeState;
 
 //
 //    // THESE ARE VARIABLES INHERID FROM ABSTRACT CLASS
