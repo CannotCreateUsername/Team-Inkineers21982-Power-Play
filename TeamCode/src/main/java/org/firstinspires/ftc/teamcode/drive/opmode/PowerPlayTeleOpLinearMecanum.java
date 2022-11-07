@@ -89,7 +89,6 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("Was RB pressed?", intakeSlide.getLastIterationRB());
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
 
-
             // publish all the telemetry at once
             telemetry.update();
         }
