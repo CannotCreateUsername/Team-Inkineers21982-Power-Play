@@ -44,13 +44,14 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
      */
     private void strafe (SampleMecanumDrive drive, double distance) {
 
-        double yControl = 0 ;
-        double xControl;
+        double leftYControl = 0 ;
+        double leftXControl;
+        double rightXControl = 0;
 
         if (distance > 0 ){
-            xControl = 0.3;
+            leftXControl = 0.3;
         } else {
-            xControl = -0.3;
+            leftXControl = -0.3;
         }
         ElapsedTime controlTimer = new ElapsedTime();
 
@@ -59,9 +60,9 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
         while (controlTimer.seconds() < timeLimit){
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -yControl  ,
-                            -xControl  ,
-                            -xControl
+                            -leftYControl  ,
+                            -leftXControl  ,
+                            -rightXControl
                     )
             );
             drive.update();
