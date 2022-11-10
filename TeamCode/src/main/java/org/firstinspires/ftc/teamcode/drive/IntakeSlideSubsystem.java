@@ -76,7 +76,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 if (slides.getCurrentPosition() == currentTarget && gamepad2.left_trigger == 0) {
                     autoIn = false;
                 }
-                if (onRelease(gamepad1.right_bumper, "RB")) {
+                if (onPress(gamepad1.right_bumper, "RB")) {
                     // code here
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
@@ -100,14 +100,14 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = true;
-                } else if (onRelease(gamepad1.right_bumper, "RB")) {
+                } else if (onPress(gamepad1.right_bumper, "RB")) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
                 } else if (onRelease(gamepad1.left_bumper, "LB")) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = false;
-                } else if (slides.getCurrentPosition() < targetPositionLow) {
+                } else if (slides.getCurrentPosition() < targetPositionMedium) {
                     // add position to pick up from stack all the way to LOW
                     currentTarget += 2;
                 } else {
@@ -115,7 +115,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 }
                 break;
             case LOW:
-                if (onRelease(gamepad1.right_bumper, "RB")) {
+                if (onPress(gamepad1.right_bumper, "RB")) {
                     // code here
                     currentTarget = targetPositionMedium;
                     liftState = LiftState.MEDIUM;
@@ -131,7 +131,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 //}
                 break;
             case MEDIUM:
-                if (onRelease(gamepad1.right_bumper, "RB")) {
+                if (onPress(gamepad1.right_bumper, "RB")) {
                     // code here
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
@@ -193,10 +193,10 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 break;
                  */
         }
-        pressedLastIterationDU = gamepad1.dpad_up;
+        // update gamepad state
+        pressedLastIterationDU = gamepad2.dpad_up;
         pressedLastIterationRB = gamepad1.right_bumper;
         pressedLastIterationLB = gamepad1.left_bumper;
-        pressedLastIterationRT = gamepad1.right_trigger > 0;
         runToPosition(currentTarget, currentPower);
         runIntake(gamepad1);
         //runIntake();
@@ -211,7 +211,6 @@ public class IntakeSlideSubsystem extends IntakeSlide {
      */
     @Override
     public void runIntake(Gamepad controller){
-
         switch (intakeState) {
             case STOP:
                 intake.setPower(0);
@@ -240,9 +239,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
         }
     }
 
-
-
-    private boolean  onPress(boolean ButtonState, String ButtonName) {
+    private boolean onPress(boolean ButtonState, String ButtonName) {
         switch (ButtonName) {
             case "RT":
                 /**
@@ -252,6 +249,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 if (ButtonState && !pressedLastIterationRT) {
                     return true;
                 }
+                pressedLastIterationRT = ButtonState;
                 break;
             case "RB":
                 if (ButtonState && !pressedLastIterationRB) {
@@ -277,6 +275,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 if (!ButtonState && pressedLastIterationRT) {
                     return true;
                 }
+                pressedLastIterationRT = ButtonState;
                 break;
             case "RB":
                 if (!ButtonState && pressedLastIterationRB) {
