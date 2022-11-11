@@ -7,6 +7,9 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -19,6 +22,11 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
         telemetry.addData("init", "Drive creation completed");
         telemetry.addData("wait to start", "");
 
+        // intake
+        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
+        intakeSlide2.init(hardwareMap);
+
+
         waitForStart();
         telemetry.addData("starting", "");
 
@@ -27,7 +35,14 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
          Strafe left 24 inches
          */
         telemetry.addData("before strafe", "");
+        // strafe
         strafe(drive , -24);
+
+        // go to certain location
+        while (intakeSlide2.slides.isBusy()){
+            intakeSlide2.runToPosition(intakeSlide2.targetPositionPickup, 0.3);
+        }
+
 
 
         Pose2d poseEstimate = drive.getPoseEstimate();
