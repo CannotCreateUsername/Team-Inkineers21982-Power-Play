@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public abstract class IntakeSlide {
-
 
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
     public final int targetPositionHigh = 2500;
@@ -122,7 +122,7 @@ public abstract class IntakeSlide {
     // Abstract methods which will be
     // implemented by its subclass(es)
     abstract public void init(HardwareMap hardwareMap);
-    abstract public void run(Gamepad gamepad1, Gamepad gamepad2);
-    abstract public void runIntake(Gamepad controller);
+    abstract public void run(GamepadEx gamepad1, GamepadEx gamepad2);
+    abstract public void runIntake(GamepadEx controller);
 
 }

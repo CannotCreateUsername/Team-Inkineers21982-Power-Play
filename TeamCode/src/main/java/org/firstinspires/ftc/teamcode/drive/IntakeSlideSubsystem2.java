@@ -2,6 +2,9 @@ package org.firstinspires.ftc.teamcode.drive;
 
 import androidx.annotation.NonNull;
 
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -172,24 +175,25 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
      gamepad1.a = pickup
      gamepad1.left_bumper = rest
      gamepad1.right_bumper= release
+     * @param gamepad1
+     * @param gamepad2
      */
-    public void run(Gamepad gamepad1, Gamepad gamepad2){
-
+    public void run(GamepadEx gamepad1, GamepadEx gamepad2){
         switch (liftState) {
             case REST:
-                if (gamepad1.y) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
                     // y is pressed to to High postion
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
-                } else if (gamepad1.x) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.X)) {
                     // x is pressed, go to low position
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                } else if (gamepad1.b) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.B)) {
                     // b is pressed, go to medium position
                     currentTarget = targetPositionMedium;
                     liftState = LiftState.MEDIUM;
-                } else if (gamepad1.a) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.A)) {
                     // a is pressed, go to pickup position
                     currentTarget = targetPositionPickup;
                     liftState = LiftState.PICKUP;
@@ -198,7 +202,7 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
                 setSlidePower();
                 break;
             case PICKUP:
-                if (gamepad1.left_bumper) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // left_trigger is pressed, go to rest position and turn on the intake
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
@@ -215,12 +219,12 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
                 }
                 break;
             case HIGH: case MEDIUM: case LOW:
-                if (gamepad1.left_bumper) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // from high to rest state
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     setSlidePower();
-                } else if (gamepad1.right_bumper) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // release intake
                     intakeState = IntakeState.OUT;
                     intakeTimer.reset();
@@ -231,6 +235,7 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
                 break;
         }
 
+        gamepad1.readButtons();
         runToPosition(currentTarget, currentPower);
         runIntake(gamepad1);
 
@@ -244,7 +249,7 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
      *  steady state and transient state
      *  https://resources.pcb.cadence.com/blog/2020-steady-state-vs-transient-state-in-system-design-and-stability-analysis
      */
-    @Override public void runIntake(Gamepad controller){
+    @Override public void runIntake(GamepadEx controller){
 
         switch (intakeState) {
             case STOP:
