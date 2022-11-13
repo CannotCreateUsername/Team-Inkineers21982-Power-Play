@@ -36,13 +36,13 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
          */
         telemetry.addData("before strafe", "");
         // strafe
+        straight(drive, 48);
         strafe(drive , -24);
 
-        // go to certain location
-        while (intakeSlide2.slides.isBusy()){
-            intakeSlide2.runToPosition(intakeSlide2.targetPositionPickup, 0.3);
-        }
-
+        turn(drive, -45);
+        sleep(500);
+        turn(drive, -45);
+        moveSlide(intakeSlide2, intakeSlide2.targetPositionPickup);
 
 
         Pose2d poseEstimate = drive.getPoseEstimate();
@@ -70,7 +70,7 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
         }
         ElapsedTime controlTimer = new ElapsedTime();
 
-        double timeLimit = Math.abs(distance) / 8;
+        double timeLimit = Math.abs(distance) / 16;
 
         while (controlTimer.seconds() < timeLimit){
             drive.setWeightedDrivePower(
@@ -83,5 +83,81 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
             drive.update();
         }
 
+    }
+
+    /**
+     *
+     * @param drive
+     * @param distance is measured in inches
+     */
+    private void straight (SampleMecanumDrive drive, double distance){
+
+
+
+        double leftYControl = 0 ;
+        double leftXControl = 0 ;
+        double rightXControl = 0;
+
+        if (distance < 0 ){
+            leftYControl = 0.3;
+        } else {
+            leftYControl = -0.3;
+        }
+        ElapsedTime controlTimer = new ElapsedTime();
+
+        double timeLimit = Math.abs(distance) / 16;
+
+        while (controlTimer.seconds() < timeLimit) {
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -leftYControl,
+                            -leftXControl,
+                            -rightXControl
+                    )
+            );
+            drive.update();
+
+        }
+    }
+
+    /**
+     *
+     * @param drive implements the mecanum sample so we can use Pose2d aka Roadrunner
+     * @param angle Tells us how many degrees you want to turn.
+     *          Positive = counterclockwise. Negative = clockwise
+     */
+    private void turn (SampleMecanumDrive drive, double angle){
+
+        double leftYControl = 0 ;
+        double leftXControl = 0 ;
+        double rightXControl = 0;
+
+        if (angle < 0 ){
+            rightXControl = 0.3;
+        } else {
+            rightXControl = -0.3;
+        }
+        ElapsedTime controlTimer = new ElapsedTime();
+
+        double timeLimit = Math.abs(angle) / 64;
+
+        while (controlTimer.seconds() < timeLimit) {
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -leftYControl,
+                            -leftXControl,
+                            -rightXControl
+                    )
+            );
+            drive.update();
+
+        }
+    }
+
+    private void moveSlide (IntakeSlideSubsystem2 slides, int position) {
+        // go to certain location
+        //while (slides.slides.isBusy()){
+            slides.runToPosition(position, 0.3);
+        //}
     }
 }
