@@ -1,5 +1,11 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import androidx.annotation.NonNull;
+
+import com.arcrobotics.ftclib.gamepad.ButtonReader;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.arcrobotics.ftclib.gamepad.TriggerReader;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -19,8 +25,6 @@ public class IntakeSlideSubsystem extends IntakeSlide {
 
     // THESE VARIABLES ARE USED BY THIS IMPLEMENTATION OF DRIVE CONTROL
     // Declare OpMode members.
-    private ElapsedTime levelTimer = new ElapsedTime();
-    private ElapsedTime intakeTimer = new ElapsedTime();
 
     // Variable to detect on press and on release
     private int i = 0;
@@ -37,7 +41,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
      * @param hardwareMap from teleop
      */
     @Override
-    public void init(HardwareMap hardwareMap) {
+    public void init(@NonNull HardwareMap hardwareMap) {
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -51,8 +55,6 @@ public class IntakeSlideSubsystem extends IntakeSlide {
 
         intake = hardwareMap.get(CRServo.class, "intake");
 
-
-        currentPosition = slides.getCurrentPosition();
         currentCaption = "Lift Status";
         currentStatus = "Initialized";
         currentTarget = 0;
@@ -69,25 +71,26 @@ public class IntakeSlideSubsystem extends IntakeSlide {
     public Boolean getLastIterationRB() { return pressedLastIterationRB; }
 
     @Override
-    public void run(Gamepad gamepad1, Gamepad gamepad2){
+    public void run(GamepadEx gamepad1, GamepadEx gamepad2) {
+        TriggerReader rtReader1 = new TriggerReader(gamepad1, GamepadKeys.Trigger.RIGHT_TRIGGER);
         switch (liftState) {
             case REST:
                 // stops intake when slides hit rest
-                if (slides.getCurrentPosition() == currentTarget && gamepad2.left_trigger == 0) {
+                if (slides.getCurrentPosition() == currentTarget) {
                     autoIn = false;
                 }
-                if (onPress(gamepad1.right_bumper, "RB")) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                } else if (onPress(gamepad1.right_trigger > 0, "RT")) {
+                } else if (rtReader1.isDown()) {
                     // code here
                     autoIn = false;
                     currentTarget = targetPositionPickup;
                     liftState = LiftState.PICKUP;
-                } else if (onPress(gamepad1.left_bumper, "LB")) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     autoIn = false;
-                } else if (onRelease(gamepad1.dpad_up, "DU")) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                     i++;
                 }
                 setSlidePower();
@@ -96,14 +99,14 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 //}
                 break;
             case PICKUP:
-                if (onRelease(gamepad1.right_trigger > 0, "RT")) {
+                if (!rtReader1.isDown()) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = true;
-                } else if (onPress(gamepad1.right_bumper, "RB")) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                } else if (onRelease(gamepad1.left_bumper, "LB")) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = false;
@@ -115,11 +118,11 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 }
                 break;
             case LOW:
-                if (onPress(gamepad1.right_bumper, "RB")) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionMedium;
                     liftState = LiftState.MEDIUM;
-                } else if (onPress(gamepad1.left_bumper, "LB")) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
@@ -131,11 +134,11 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 //}
                 break;
             case MEDIUM:
-                if (onPress(gamepad1.right_bumper, "RB")) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
-                } else if (onPress(gamepad1.left_bumper, "LB")) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
@@ -148,7 +151,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                 break;
             case HIGH:
                 // DO SOMETHING TO MAKE DRIVING SLOWER WHILE THE CASE IS HIGH FOR BETTER CONTROL
-                if (onRelease(gamepad1.left_bumper, "LB")) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
@@ -171,20 +174,20 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                     currentTarget -= 1;
                 }
 
-                if ((onPress(gamepad1.right_bumper, "RB")) && (currentPosition < 300)) {
+                if ((gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) && (currentPosition < 300)) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
                     setSlidePower();
-                } else if ((onPress(gamepad1.right_bumper, "RB")) && (currentPosition >= 300 && currentPosition < 350)) {
+                } else if ((gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) && (currentPosition >= 300 && currentPosition < 350)) {
                     currentTarget = targetPositionMedium;
                     liftState = LiftState.MEDIUM;
                     setSlidePower();
-                } else if ((onPress(gamepad1.right_bumper, "RB")) && (currentPosition >= 350 && currentPosition < 2500)) {
+                } else if ((gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) && (currentPosition >= 350 && currentPosition < 2500)) {
                     currentTarget = targetPositionHigh;
                     liftState = LiftState.HIGH;
                     setSlidePower();
                 }
-                if (onPress(gamepad1.left_bumper, "LB")) {
+                if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
@@ -194,9 +197,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                  */
         }
         // update gamepad state
-        pressedLastIterationDU = gamepad2.dpad_up;
-        pressedLastIterationRB = gamepad1.right_bumper;
-        pressedLastIterationLB = gamepad1.left_bumper;
+        gamepad1.readButtons();
         runToPosition(currentTarget, currentPower);
         runIntake(gamepad1);
         //runIntake();
@@ -210,89 +211,87 @@ public class IntakeSlideSubsystem extends IntakeSlide {
      *  https://resources.pcb.cadence.com/blog/2020-steady-state-vs-transient-state-in-system-design-and-stability-analysis
      */
     @Override
-    public void runIntake(Gamepad controller){
+    public void runIntake(GamepadEx controller){
+        TriggerReader rtReader = new TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER);
         switch (intakeState) {
             case STOP:
                 intake.setPower(0);
-                if ((controller.left_trigger > 0) || controller.b) {
+                if (rtReader.isDown() || controller.isDown(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.OUT;
                 }
-                if (controller.a || autoIn) {
+                if (controller.isDown(GamepadKeys.Button.A) || autoIn) {
                     intakeState = IntakeState.IN;
                 }
                 break;
             case IN:
-                if (!controller.a && !autoIn) {
+                if (!controller.getButton(GamepadKeys.Button.A) && !autoIn) {
                     intakeState = IntakeState.STOP;
-                } else if (controller.left_trigger > 0 || controller.b) {
+                } else if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
                     autoIn = false;
                     intakeState = IntakeState.STOP;
                 }
                 intake.setPower(-1);
                 break;
             case OUT:
-                if (controller.left_trigger == 0 || !controller.b) {
+                if (!rtReader.isDown() || !controller.getButton(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.STOP;
                 }
                 intake.setPower(1);
                 break;
         }
     }
-
-    private boolean onPress(boolean ButtonState, String ButtonName) {
-        switch (ButtonName) {
-            case "RT":
-                /**
-                 *  ButtonState = true when right trigger is pressed i.e. trigger > 0
-                 *  ButtonState = false when trigger is not pressed i.e. trigger = 0
-                 */
-                if (ButtonState && !pressedLastIterationRT) {
-                    return true;
-                }
-                pressedLastIterationRT = ButtonState;
-                break;
-            case "RB":
-                if (ButtonState && !pressedLastIterationRB) {
-                    return true;
-                }
-                break;
-            case "LB":
-                if (ButtonState && !pressedLastIterationLB) {
-                    return true;
-                }
-                break;
-            case "DU":
-                if (ButtonState && !pressedLastIterationDU) {
-                    return true;
-                }
-                break;
-        }
-        return false;
-    }
-    private boolean onRelease(boolean ButtonState, String ButtonName) {
-        switch (ButtonName) {
-            case "RT":
-                if (!ButtonState && pressedLastIterationRT) {
-                    return true;
-                }
-                pressedLastIterationRT = ButtonState;
-                break;
-            case "RB":
-                if (!ButtonState && pressedLastIterationRB) {
-                    return true;
-                }
-                break;
-            case "LB":
-                if (!ButtonState && pressedLastIterationLB) {
-                    return true;
-                }
-                break;
-            case "DU":
-                if (!ButtonState && pressedLastIterationDU) {
-                    return true;
-                }
-                break;
-        }
-        return false;
-    }
+//    private boolean onPress(boolean ButtonState, String ButtonName) {
+//        switch (ButtonName) {
+//            case "RT":
+//                 // ButtonState = true when right trigger is pressed i.e. trigger > 0
+//                 // ButtonState = false when trigger is not pressed i.e. trigger = 0
+//                if (ButtonState && !pressedLastIterationRT) {
+//                    return true;
+//                }
+//                pressedLastIterationRT = ButtonState;
+//                break;
+//            case "RB":
+//                if (ButtonState && !pressedLastIterationRB) {
+//                    return true;
+//                }
+//                break;
+//            case "LB":
+//                if (ButtonState && !pressedLastIterationLB) {
+//                    return true;
+//                }
+//                break;
+//            case "DU":
+//                if (ButtonState && !pressedLastIterationDU) {
+//                    return true;
+//                }
+//                break;
+//        }
+//        return false;
+//    }
+//    private boolean onRelease(boolean ButtonState, String ButtonName) {
+//        switch (ButtonName) {
+//            case "RT":
+//                if (!ButtonState && pressedLastIterationRT) {
+//                    return true;
+//                }
+//                pressedLastIterationRT = ButtonState;
+//                break;
+//            case "RB":
+//                if (!ButtonState && pressedLastIterationRB) {
+//                    return true;
+//                }
+//                break;
+//            case "LB":
+//                if (!ButtonState && pressedLastIterationLB) {
+//                    return true;
+//                }
+//                break;
+//            case "DU":
+//                if (!ButtonState && pressedLastIterationDU) {
+//                    return true;
+//                }
+//                break;
+//        }
+//        return false;
+//    }
 }
