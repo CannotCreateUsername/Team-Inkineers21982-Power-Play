@@ -22,6 +22,8 @@ public class DriveConstants {
     /*
      * These are motor constants that should be listed online for your motors.
      */
+    //IY: these values are updated with the motor specf from goBilida motor used in strafer chassis
+    // https://www.gobilda.com/5202-series-yellow-jacket-planetary-gear-motor-19-2-1-ratio-312-rpm-3-3-5v-encoder/
     public static final double TICKS_PER_REV = 537.6;
     public static final double MAX_RPM = 312;
 
@@ -53,7 +55,7 @@ public class DriveConstants {
     // IY: initially measure by tape
     // IY: manually tune track width with TrackWidthTuner
     // https://learnroadrunner.com/trackwidth-tuning.html
-    public static double TRACK_WIDTH = 15.82;  // 16.34; // in
+    public static double TRACK_WIDTH = 13.75;  // 15.82;  // 16.34; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -63,8 +65,8 @@ public class DriveConstants {
      */
     // IY: These are your feedforward gains used to model your drive motors.
     // // https://learnroadrunner.com/feedforward-tuning.html#tuning tuned in XXX step
-    public static double kV = 0.017 ; // 1.0 / rpmToVelocity(MAX_RPM); //
-    public static double kA = 0.0019; // 0; //0.0019;
+    public static double kV =  0.017; // 1.0 / rpmToVelocity(MAX_RPM); // 0.017 ; //
+    public static double kA =  0.0021; // 0;  // 0.0019;
     public static double kStatic =  0.002; // 0; // 0.002;
 
     /*
@@ -95,13 +97,21 @@ public class DriveConstants {
      * You are free to raise this on your own if you would like. It is best determined through experimentation.
 
      */
-    public static double MAX_VEL = 52.48180821614297;
+    // IY: use MaxVelocityTuner to find Max Vel
+    // It is recommended that you keep your maximum velocity constraint not exceed 80% of the motors' max velocity. Your bot will most likely not be able to follow at 100% of the theoretical velocity due to a number of reasons: voltage dropping as your battery dies, weight, etc. You may push this limit closer to 100% but your trajectory following will suffer if your bot is not able to reach the given velocity.
+    // ref: https://learnroadrunner.com/drive-constants.html#base-constraints
+    public static double MAX_VEL = 52.48180821614297;      // MaxVelocityTuner MAX_VEL read 60. 2. so keep the lower default
     public static double MAX_ACCEL = 52.48180821614297;
-    // IY: set the max MAX_ANG_VEL by running MaxAngularVelocityTuner, but not working well, ignore
     // ref: https://learnroadrunner.com/trackwidth-tuning.html
-    public static double MAX_ANG_VEL =   Math.toRadians(184.02607784577722);
+    // IY: set the max MAX_ANG_VEL by running MaxAngularVelocityTuner: 298 degree
+    public static double MAX_ANG_VEL =  Math.toRadians(184.02607784577722); // Math.toRadians(298);  //
     public static double MAX_ANG_ACCEL = Math.toRadians(184.02607784577722);
 
+    public static double MAX_ANG_VEL_SLOW = MAX_ANG_VEL/4;
+    public static double MAX_ANG_ACCE_SLOW = MAX_ANG_ACCEL/4;
+
+    public static double MAX_ANG_VEL_MEDIUM = MAX_ANG_VEL/1.5;
+    public static double MAX_ANG_ACCE_MEDIUM = MAX_ANG_ACCEL/1.5;
 
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;

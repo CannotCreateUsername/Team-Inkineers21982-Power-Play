@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public abstract class IntakeSlide {
 
@@ -73,7 +74,7 @@ public abstract class IntakeSlide {
         slides.setPower(power);
     }
 
-    private void runToPosition(int position){
+    public void runToPosition(int position){
 
         runToPosition (position, defaultPower);
     }
@@ -117,6 +118,15 @@ public abstract class IntakeSlide {
     }
 
 
+    public void setIntakePower(IntakeState state ){
+        if (state == IntakeState.IN){
+            intake.setPower(-1);
+        } else if  (state == IntakeState.OUT){
+            intake.setPower(1);
+        } else {
+            intake.setPower(0);
+        }
+    }
 
     // ***********************************************
     // Abstract methods which will be

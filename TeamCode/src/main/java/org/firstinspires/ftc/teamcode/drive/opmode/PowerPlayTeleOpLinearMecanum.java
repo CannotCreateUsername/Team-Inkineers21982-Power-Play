@@ -56,7 +56,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
 
 
-        while (!isStopRequested()) {
+        while (opModeIsActive()) {
 
             // drivebase control loop
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);

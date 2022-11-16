@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -14,6 +15,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name="Auto Right Simple", group="Linear Opmode")
+@Disabled
 public class PowerPlayRightSideAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException  {
@@ -36,13 +38,16 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
          */
         telemetry.addData("before strafe", "");
         // strafe
-        straight(drive, 48);
-        strafe(drive , -24);
+        // straight(drive, 48);
+        // strafe(drive , -24);
 
-        turn(drive, -45);
-        sleep(500);
-        turn(drive, -45);
-        moveSlide(intakeSlide2, intakeSlide2.targetPositionPickup);
+        // turn(drive, -45);
+        // sleep(500);
+        // turn(drive, -45);
+
+
+        moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 10);
+        spinIntake(intakeSlide2, IntakeSlide.IntakeState.OUT, 3);
 
 
         Pose2d poseEstimate = drive.getPoseEstimate();
@@ -51,6 +56,11 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
         telemetry.addData("heading", poseEstimate.getHeading());
 
         telemetry.update();
+
+
+        // the last thing auto should do is move slide back to rest
+        moveSlide(intakeSlide2, intakeSlide2.targetPositionRest, 30);
+
     }
 
     /**
@@ -154,10 +164,56 @@ public class PowerPlayRightSideAuto extends LinearOpMode {
         }
     }
 
-    private void moveSlide (IntakeSlideSubsystem2 slides, int position) {
-        // go to certain location
-        //while (slides.slides.isBusy()){
-            slides.runToPosition(position, 0.3);
-        //}
+    /**
+     *
+     * @param slides
+     * @param inOrOut
+     * @param timeoutS
+     */
+    public void spinIntake(IntakeSlide slides, IntakeSlide.IntakeState inOrOut, double timeoutS){
+        ElapsedTime runtime = new ElapsedTime();
+
+        // NOTE all while loop in op mode should check for
+        // opModeIsActive
+        while ( opModeIsActive() &&
+                (runtime.seconds() < timeoutS)) {
+
+            // run and  keep the position until timeout
+            slides.setIntakePower(inOrOut);
+
+            // Display it for the driver.
+            telemetry.addData("Intake Spinning",  inOrOut.name());
+            telemetry.update();
+        }
+        // stop spinning
+        slides.setIntakePower(IntakeSlide.IntakeState.STOP);
+
     }
+
+    /**
+     *
+     * @param slides
+     * @param position
+     * @param timeoutS
+     */
+    public void moveSlide(IntakeSlide slides, int position, double timeoutS){
+
+        ElapsedTime runtime = new ElapsedTime();
+
+
+        // NOTE all while loop in op mode should check for
+        // opModeIsActive
+        while ( opModeIsActive() &&
+                (runtime.seconds() < timeoutS)) {
+
+            // run and  keep the position until timeout
+            slides.runToPosition(position);
+
+            // Display it for the driver.
+            telemetry.addData("Slide to",  " %7d", position);
+            telemetry.update();
+        }
+    }
+
+
 }

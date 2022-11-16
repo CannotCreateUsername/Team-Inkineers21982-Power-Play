@@ -213,6 +213,14 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
 
                     // use slow power when it get down
                     setSlidePower(0.09);
+
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    // release intake from pickup.
+                    // the goal is put it in ground junction
+                    // TO DO: need to test
+                    intakeState = IntakeState.OUT;
+                    intakeTimer.reset();
+
                 } else {
                     // hold to current position using default power
                     setSlidePower();
@@ -253,18 +261,18 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
 
         switch (intakeState) {
             case STOP:
-                intake.setPower(0);
+                setIntakePower(IntakeState.STOP);   //  // intake.setPower(0);
                 break;
             case IN:
                 if (intakeTimer.seconds() <= defaultIntakeTime) {
-                    intake.setPower(-1);
+                    setIntakePower(IntakeState.IN);   // intake.setPower(-1);
                 } else {
                     intakeState = IntakeState.STOP;
                 }
                 break;
             case OUT:
                 if (intakeTimer.seconds() <= defaultIntakeTime) {
-                    intake.setPower(1);
+                    setIntakePower(IntakeState.OUT);   // intake.setPower(1);
                 } else {
                     intakeState = IntakeState.STOP;
                 }

@@ -215,7 +215,7 @@ public class IntakeSlideSubsystem extends IntakeSlide {
         TriggerReader rtReader = new TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER);
         switch (intakeState) {
             case STOP:
-                intake.setPower(0);
+                setIntakePower(IntakeState.STOP);   // intake.setPower(0);
                 if (rtReader.isDown() || controller.isDown(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.OUT;
                 }
@@ -230,13 +230,13 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                     autoIn = false;
                     intakeState = IntakeState.STOP;
                 }
-                intake.setPower(-1);
+                setIntakePower(IntakeState.IN);   // intake.setPower(-1);
                 break;
             case OUT:
                 if (!rtReader.isDown() || !controller.getButton(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.STOP;
                 }
-                intake.setPower(1);
+                setIntakePower(IntakeState.OUT);   //  intake.setPower(1);
                 break;
         }
     }

@@ -28,6 +28,7 @@
  */
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -64,6 +65,7 @@ import java.util.List;
  */
 
 @TeleOp(name="POC: Vuforia Image", group ="Concept")
+@Disabled
 public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";

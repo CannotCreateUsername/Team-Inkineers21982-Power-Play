@@ -9,7 +9,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name="PowerPlay1", group="Linear Opmode")
+@Autonomous(name="Auto Test 1", group="Linear Opmode")
+@Disabled
 public class PowerPlayAuto extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException  {
@@ -31,7 +32,7 @@ public class PowerPlayAuto extends LinearOpMode {
          */
 
 
-        // We want to start A2 position
+        // We want to start A2/F5 position
         Pose2d startPose = new Pose2d(-60, -34, 0);
         drive.setPoseEstimate(startPose);
 

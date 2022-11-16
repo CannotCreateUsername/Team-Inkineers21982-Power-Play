@@ -60,7 +60,7 @@ import java.util.List;
  * is explained below.
  */
 @Autonomous(name = "Red & Blue Left Vuforia", group = "Concept")
-//@Disabled
+@Disabled
 public class AaLeftSideEV extends LinearOpMode {
     public static final String TAG = "Vuforia VuMark Sample";
 

@@ -55,8 +55,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     // IY: tune the pid with BackAndForth
     // ref: https://learnroadrunner.com/follower-pid-tuning.html
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(1.2, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(9, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(1, 0, 0);
 
     // IY tune the lateral multipler with StrafTest:
     // https://learnroadrunner.com/trackwidth-tuning.html
@@ -68,8 +68,14 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     private TrajectorySequenceRunner trajectorySequenceRunner;
 
-    private static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
-    private static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
+    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
+    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
+
+    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT_MEDIUM = getVelocityConstraint(MAX_VEL/10, MAX_ANG_VEL/10, TRACK_WIDTH);
+    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT_MEDIUM = getAccelerationConstraint(MAX_ACCEL/10);
+
+    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT_SLOW = getVelocityConstraint(MAX_VEL/20, MAX_ANG_VEL/20, TRACK_WIDTH);
+    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT_SLOW = getAccelerationConstraint(MAX_ACCEL/20);
 
     private TrajectoryFollower follower;
 
@@ -178,6 +184,14 @@ public class SampleMecanumDrive extends MecanumDrive {
                 startPose,
                 VEL_CONSTRAINT, ACCEL_CONSTRAINT,
                 MAX_ANG_VEL, MAX_ANG_ACCEL
+        );
+    }
+
+    public TrajectorySequenceBuilder trajectorySequenceBuilderSlow(Pose2d startPose) {
+        return new TrajectorySequenceBuilder(
+                startPose,
+                VEL_CONSTRAINT_SLOW, ACCEL_CONSTRAINT_SLOW,
+                MAX_ANG_VEL/10, MAX_ANG_ACCEL/10
         );
     }
 
