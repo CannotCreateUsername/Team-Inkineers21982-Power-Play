@@ -10,9 +10,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class IntakeSlide {
 
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
-    public final int targetPositionHigh = 2500;
-    public final int targetPositionMedium = 1200;
-    public final int targetPositionLow = 400;
+    public final int targetPositionHigh = 2900;
+    public final int targetPositionMedium = 2000;
+    public final int targetPositionLow = 1200;
     public final int targetPositionPickup = 130;
     public final int targetPositionRest = 0;  // ideally it should be zero !!!
 

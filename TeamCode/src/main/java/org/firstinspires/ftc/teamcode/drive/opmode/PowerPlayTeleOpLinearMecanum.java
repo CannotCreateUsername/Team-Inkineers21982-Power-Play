@@ -93,7 +93,6 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
             telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
-            telemetry.addData("Was RB pressed?", intakeSlide.getLastIterationRB());
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
             telemetry.addData("Current Control", currentIntakeSlide);
 

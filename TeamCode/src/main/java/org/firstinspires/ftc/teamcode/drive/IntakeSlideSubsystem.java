@@ -28,10 +28,6 @@ public class IntakeSlideSubsystem extends IntakeSlide {
 
     // Variable to detect on press and on release
     private int i = 0;
-    private boolean pressedLastIterationRT = false;
-    private boolean pressedLastIterationRB = false;
-    private boolean pressedLastIterationLB = false;
-    private boolean pressedLastIterationDU = false;
 
     // Variable to auto spin in intake
     private boolean autoIn = false;
@@ -67,8 +63,6 @@ public class IntakeSlideSubsystem extends IntakeSlide {
     }
 
     public int getDpadPressed() { return i; }
-
-    public Boolean getLastIterationRB() { return pressedLastIterationRB; }
 
     @Override
     public void run(GamepadEx gamepad1, GamepadEx gamepad2) {
@@ -157,6 +151,9 @@ public class IntakeSlideSubsystem extends IntakeSlide {
                     liftState = LiftState.REST;
                 } else {
                     setSlidePower();
+                }
+                if (rtReader1.isDown()) {
+                    autoIn = true;
                 }
                 //if (gamepad1.x || gamepad1.y) {
                 //   liftState = LiftState.MANUAL;

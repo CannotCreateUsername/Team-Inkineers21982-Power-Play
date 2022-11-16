@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
 @Autonomous(name="Auto Right (A2 or F5)", group="Linear Opmode")
 public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
@@ -57,51 +58,66 @@ public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
          */
 
 
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+//        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+//                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.IN);
+//                })
+//                .waitSeconds(2)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
+//                })
+//                .waitSeconds(.5)
+//                .strafeLeft(24)
+//                // .lineToLinearHeading(new Pose2d(43, 24, Math.toRadians(-45)))
+//                .forward(24)
+//                .turn( Math.toRadians(-140))
+//                .addTemporalMarker(() -> {
+//                    intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
+//                })
+//                .waitSeconds(3.1)
+//                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_SLOW ,SampleMecanumDrive.ACCEL_CONSTRAINT_SLOW)
+//                .waitSeconds(1)
+//                .lineToConstantHeading(new Vector2d(27,27))
+//                //.back(3)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
+//                })
+//                .waitSeconds(3)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
+//                })
+//                .waitSeconds(.5)
+//                .forward(3)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
+//                    intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
+//                })
+//                .waitSeconds(4)
+//                //.turn( Math.toRadians(45))
+//                .resetConstraints()
+//                //.back(46)
+//                .build();
+
+        TrajectorySequence backTest = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.IN);
-                })
+                .forward(3)
                 .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
-                })
-                .waitSeconds(.5)
-                .strafeLeft(24)
-                // .lineToLinearHeading(new Pose2d(43, 24, Math.toRadians(-45)))
-                .forward(46)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_SLOW ,SampleMecanumDrive.ACCEL_CONSTRAINT_SLOW)
-                .turn( Math.toRadians(-45))
+                .back(3)
+                .turn(Math.toRadians(45))
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3.1)
-                .back(5)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
-                })
-                .waitSeconds(3)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
-                })
-                .waitSeconds(.5)
-                .forward(7)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
-                    intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
-                })
-                .waitSeconds(4)
-                .turn( Math.toRadians(45))
-                .resetConstraints()
-                .back(46)
+                .forward(3)
+                .waitSeconds(2)
+                .back(3)
                 .build();
-
-
 
 
 
@@ -109,7 +125,7 @@ public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
 
         if(isStopRequested()) return;
 
-        drive.followTrajectorySequence(trajSeq);
+        drive.followTrajectorySequence(backTest);
 
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide2, intakeSlide2.targetPositionRest, 30);
