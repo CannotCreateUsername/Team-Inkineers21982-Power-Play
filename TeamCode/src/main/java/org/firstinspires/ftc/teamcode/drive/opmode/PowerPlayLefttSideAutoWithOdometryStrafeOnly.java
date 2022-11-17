@@ -1,12 +1,8 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.constraints.TrajectoryAccelerationConstraint;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
@@ -14,10 +10,9 @@ import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
-@Autonomous(name="Auto Right Turn (A2 or F5)", group="Linear Opmode")
-public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
+@Autonomous(name="Auto Left Strafe (A5 or F2)", group="Linear Opmode")
+public class PowerPlayLefttSideAutoWithOdometryStrafeOnly extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException  {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -61,7 +56,7 @@ public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
 
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM ,SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.IN);
@@ -72,16 +67,14 @@ public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
                 })
                 .waitSeconds(.5)
-                .strafeLeft(9)
-                // .forward(24)
-                // .turn( Math.toRadians(-140))
-                // .strafeLeft(10)
-                .lineToSplineHeading(new Pose2d(19, 9, Math.toRadians(-150)))
+                .strafeRight(24)
+                .forward(48)
+                .strafeRight(12)
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
-                .waitSeconds(3.1)
-                .back(6)
+                .waitSeconds(3)
+                .back(4)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
@@ -92,14 +85,15 @@ public class PowerPlayRightSideAutoWithOdometry extends LinearOpMode {
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
                 })
                 .waitSeconds(.5)
-                .forward(6)
+                .forward(5)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
                 })
-                .waitSeconds(4)
-                //.turn( Math.toRadians(45))
+                .waitSeconds(3)
+                .strafeLeft(12)
+                .back(48)
                 .resetConstraints()
                 //.back(46)
                 .build();

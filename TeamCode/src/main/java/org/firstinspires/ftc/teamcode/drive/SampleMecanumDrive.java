@@ -55,12 +55,14 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     // IY: tune the pid with BackAndForth
     // ref: https://learnroadrunner.com/follower-pid-tuning.html
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(9, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(1, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(12, 0, 0.05);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0.39, 0, 0);
 
     // IY tune the lateral multipler with StrafTest:
     // https://learnroadrunner.com/trackwidth-tuning.html
-    public static double LATERAL_MULTIPLIER = 1.28; // 1;
+    // reported y value / measured distance
+    // 60.445 / 61.5
+    public static double LATERAL_MULTIPLIER = 1;  // 1;
 
     public static double VX_WEIGHT = 1;
     public static double VY_WEIGHT = 1;
@@ -71,11 +73,11 @@ public class SampleMecanumDrive extends MecanumDrive {
     public static final TrajectoryVelocityConstraint VEL_CONSTRAINT = getVelocityConstraint(MAX_VEL, MAX_ANG_VEL, TRACK_WIDTH);
     public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT = getAccelerationConstraint(MAX_ACCEL);
 
-    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT_MEDIUM = getVelocityConstraint(MAX_VEL/10, MAX_ANG_VEL/10, TRACK_WIDTH);
-    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT_MEDIUM = getAccelerationConstraint(MAX_ACCEL/10);
+    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT_MEDIUM = getVelocityConstraint(MAX_VEL/1.5, MAX_ANG_VEL/1.5, TRACK_WIDTH);
+    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT_MEDIUM = getAccelerationConstraint(MAX_ACCEL/1.5);
 
-    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT_SLOW = getVelocityConstraint(MAX_VEL/20, MAX_ANG_VEL/20, TRACK_WIDTH);
-    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT_SLOW = getAccelerationConstraint(MAX_ACCEL/20);
+    public static final TrajectoryVelocityConstraint VEL_CONSTRAINT_SLOW = getVelocityConstraint(MAX_VEL/2.5, MAX_ANG_VEL/2.5, TRACK_WIDTH);
+    public static final TrajectoryAccelerationConstraint ACCEL_CONSTRAINT_SLOW = getAccelerationConstraint(MAX_ACCEL/2.5);
 
     private TrajectoryFollower follower;
 
