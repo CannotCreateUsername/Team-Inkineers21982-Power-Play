@@ -11,7 +11,7 @@ import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-@Autonomous(name="Auto Right Strafe (A2 or F5)", group="Linear Opmode")
+@Autonomous(name="Auto RIGHT Strafe (A2 or F5)", group="Linear Opmode")
 public class PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException  {
@@ -67,14 +67,16 @@ public class PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
                 })
                 .waitSeconds(.5)
+                .forward(1)
                 .strafeLeft(24)
-                .forward(48)
-                .strafeLeft(12)
+                .forward(49)
+                .strafeLeft(10)
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(4)
+                .back(4.5)
+                .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
@@ -85,14 +87,14 @@ public class PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
                 })
                 .waitSeconds(.5)
-                .forward(5)
+                .forward(7)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
                 })
                 .waitSeconds(3)
-                .strafeRight(12)
+                .strafeRight(9.75)
                 .back(48)
                 .resetConstraints()
                 //.back(46)
