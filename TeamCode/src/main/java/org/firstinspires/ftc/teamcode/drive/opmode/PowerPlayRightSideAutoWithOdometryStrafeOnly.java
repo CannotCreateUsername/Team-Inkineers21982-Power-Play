@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name="Auto RIGHT Strafe (A2 or F5)", group="Linear Opmode")
-public class PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
+public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException  {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
@@ -75,7 +75,7 @@ public class PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(4.5)
+                .back(5.0)
                 .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:

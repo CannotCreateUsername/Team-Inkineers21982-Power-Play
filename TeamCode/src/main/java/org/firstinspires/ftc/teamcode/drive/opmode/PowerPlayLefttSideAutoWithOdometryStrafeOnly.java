@@ -70,12 +70,12 @@ public class PowerPlayLefttSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(49)
-                .strafeRight(10)
+                .strafeRight(11)
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(4.5)
+                .back(5.5)
                 .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
