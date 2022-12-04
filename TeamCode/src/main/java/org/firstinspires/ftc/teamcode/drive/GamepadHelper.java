@@ -15,7 +15,7 @@ public class GamepadHelper {
         NEGATIVE
     }
 
-    private    double  minMultiplier = 0.1;
+    private    double  minMultiplier = 0.25;
     private    double  maxMultiplier = 1;
     private    double  incrementMultipler = 0.1;
     private    double gameStickMultipler;

@@ -10,10 +10,11 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public abstract class IntakeSlide {
 
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
-    public final int targetPositionHigh = 2900;
-    public final int targetPositionMedium = 2000;
-    public final int targetPositionLow = 1200;
+    public final int targetPositionHigh = 2842;
+    public final int targetPositionMedium = 2025;
+    public final int targetPositionLow = 1175;
     public final int targetPositionPickup = 130;
+    public final int targetPositionPickup2 = 300;
     public final int targetPositionRest = 0;  // ideally it should be zero !!!
 
     // distance error factor
@@ -42,6 +43,7 @@ public abstract class IntakeSlide {
     public enum LiftState {
         REST,   // all the way to the bottom
         PICKUP,  // level where the robot will pickup the cone
+        PICKUP2,
         LOW,
         MEDIUM,
         HIGH,

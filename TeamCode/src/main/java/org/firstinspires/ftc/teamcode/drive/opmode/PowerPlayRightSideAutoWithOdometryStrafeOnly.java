@@ -5,16 +5,65 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Autonomous(name="Auto RIGHT Strafe (A2 or F5)", group="Linear Opmode")
 public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    public static final String TAG = "Vuforia VuMark Sample";
+    OpenGLMatrix lastLocation = null;
+
+    /**
+     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * localization engine.
+     */
+    VuforiaLocalizer vuforia;
+    private static final String VUFORIA_KEY =
+            "AYP9k3r/////AAABmbsKp4S4+0RSpbJyMlJGbNQJWbthdpl1gIp8CO+DnDwIDkzifNXPuUMawrPbYmKwDfWtSi+PAKLOcvbHmHZxsTM24Sd32QsBy/RarvDqfIJgEIVDiUXpTlOvKCqFNCS5FGivU6Tz3C5FIhf5N/KapHhETsd2ExGtCtsZSE7QQw5SCjynKE+JvP/DnjZ8eBk6PYlS/TUdvQmonUSTkPwPCEXcL3HVO9Mw+QjvYT0eA93l7yn2NssK+37MjpJBn7kzME8FUmurwynqPJA5Ido5l/iafDl53Hndd+vl0H5ooXY0qVE1mc8HUK5lYoVXMygBDqa9Grkghg8bD791U09C20SnuKdwFCWH0Ic6zZUkeH9o";
+
     @Override
     public void runOpMode() throws InterruptedException  {
+        initVuforia();
+        /**
+         * Load the data set containing the VuMarks for Relic Recovery. There's only one trackable
+         * in this data set: all three of the VuMarks in the game were created from this one template,
+         * but differ in their instance id information.
+         * @see VuMarkInstanceId
+         */
+        VuforiaTrackables targets1 = this.vuforia.loadTrackablesFromAsset("PowerPlay1");
+        VuforiaTrackables targets2 = this.vuforia.loadTrackablesFromAsset("PowerPlay2");
+        VuforiaTrackables targets3 = this.vuforia.loadTrackablesFromAsset("PowerPlay3");
+
+        // For convenience, gather together all the trackable objects in one easily-iterable collection */
+        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+        allTrackables.addAll(targets1);
+        allTrackables.addAll(targets2);
+        allTrackables.addAll(targets3);
+
+        // VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
+        int label = 0;
+        int parkDistance = 0;
+
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
         // intake
@@ -95,19 +144,52 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                 })
                 .waitSeconds(3)
                 .strafeRight(9.75)
-                .back(48)
+                .back(24)
+                .strafeRight(parkDistance) // Label variable
                 .resetConstraints()
-                //.back(46)
                 .build();
+
 
 
         waitForStart();
 
         if(isStopRequested()) return;
 
+        //Vufrofia
+        targets1.activate();  // octopus
+        targets2.activate(); // triangle
+        targets3.activate(); // traffic
+
+        boolean targetVisible = false;
+        String targetName = "NOT FOUND";
+
+        runtime.reset();
+        while (runtime.time() < 2 && opModeIsActive()) {
+            if (!targetVisible) {
+                for (VuforiaTrackable trackable : allTrackables) {
+                    if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
+                        targetVisible = true;
+                        targetName = trackable.getName();
+                        if (targetName == "octopus") {
+                            label = 1;
+                            parkDistance = 1;
+                        } else if (targetName == "triangle") {
+                            label = 2;
+                            parkDistance = 24;
+                        } else if (targetName == "traffic") {
+                            label = 3;
+                            parkDistance = 48;
+                        }
+                        break;
+                    }
+                }
+            }
+            telemetry.addData("Visible Target", targetName);
+            telemetry.addData("Lable #", label);
+            telemetry.update();
+        }
+        telemetry.update();
         drive.followTrajectorySequence(trajSeq);
-
-
 
 
         // the last thing auto should do is move slide back to rest
@@ -140,6 +222,19 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
             telemetry.update();
         }
     }
+    /**
+     * Initialize the Vuforia localization engine.
+     */
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
 }

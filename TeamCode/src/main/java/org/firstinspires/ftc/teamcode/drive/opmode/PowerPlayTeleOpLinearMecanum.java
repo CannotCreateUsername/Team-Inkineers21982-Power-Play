@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem3;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -24,8 +25,6 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
 
-
-
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -38,9 +37,11 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         intakeSlide.init(hardwareMap);
         IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
         intakeSlide2.init(hardwareMap);
+        IntakeSlideSubsystem3 intakeSlide3 = new IntakeSlideSubsystem3();
+        intakeSlide3.init(hardwareMap);
 
         // by default , use Drive Control #1
-        IntakeSlide currentIntakeSlide = intakeSlide;
+        IntakeSlide currentIntakeSlide = intakeSlide3;
 
         double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX;
         GamepadHelper leftStickX = new GamepadHelper();
@@ -64,9 +65,9 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y * leftStickMultiplierY ,
-                            -gamepad1.left_stick_x * leftStickMultiplierX ,
-                            -gamepad1.right_stick_x * rightStickMultiplierX
+                            -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier,
+                            -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier,
+                            -gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier
                     )
             );
             drive.update();
@@ -82,9 +83,9 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
             // switch between two subsystem
             if (gamepad1.back || gamepad2.back){
-                currentIntakeSlide = intakeSlide;
+                currentIntakeSlide = intakeSlide3;
             } else if (gamepad1.start || gamepad2.start){
-                currentIntakeSlide = intakeSlide2;
+                currentIntakeSlide = intakeSlide;
             }
             // use the abstract class interface to call the run code. but the actual implementaiton
             // can vary between intakeSlide and intakeSlide2
@@ -95,6 +96,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
             telemetry.addData("Current Control", currentIntakeSlide);
+            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
 
             // publish all the telemetry at once
             telemetry.update();

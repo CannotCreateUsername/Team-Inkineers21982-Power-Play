@@ -137,7 +137,7 @@ public class AaRightSideEV extends LinearOpMode {
         if (opModeIsActive()) {
             int label = 0;
             runtime.reset();
-            while (runtime.time() < 8 && opModeIsActive()) {
+            while (runtime.time() < 2 && opModeIsActive()) {
                 if (!targetVisible) {
                     for (VuforiaTrackable trackable : allTrackables) {
                         if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
