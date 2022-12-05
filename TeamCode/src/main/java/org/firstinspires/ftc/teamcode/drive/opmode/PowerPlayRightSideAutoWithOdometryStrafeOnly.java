@@ -62,7 +62,7 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
         // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
         int label = 0;
-        int parkDistance = 0;
+        int parkDistance = 1;
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
@@ -119,12 +119,12 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                 .forward(1)
                 .strafeLeft(24)
                 .forward(49)
-                .strafeLeft(10)
+                .strafeLeft(9)
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(5.0)
+                .back(6.0)
                 .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
@@ -188,13 +188,13 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
-        telemetry.update();
+
         drive.followTrajectorySequence(trajSeq);
 
 
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide2, intakeSlide2.targetPositionRest, 30);
-
+        telemetry.update();
     }
 
 

@@ -77,6 +77,7 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
         TriggerReader rtReader1 = new TriggerReader(gamepad1, GamepadKeys.Trigger.RIGHT_TRIGGER);
         switch (liftState) {
             case REST:
+                autoIn = true;
                 dropOffMultiplier = 1;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
@@ -114,6 +115,7 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                 if (rtReader1.isDown()) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                    autoIn = true;
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
@@ -126,6 +128,11 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                 }
                 break;
             case LOW:
+                if (rtReader1.isDown()) {
+                    autoIn = true;
+                } else {
+                    autoIn = false;
+                }
                 dropOffMultiplier = 1;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
@@ -143,6 +150,11 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                 //}
                 break;
             case MEDIUM:
+                if (rtReader1.isDown()) {
+                    autoIn = true;
+                } else {
+                    autoIn = false;
+                }
                 dropOffMultiplier = 0.8;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
@@ -160,6 +172,11 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                 //}
                 break;
             case HIGH:
+                if (rtReader1.isDown()) {
+                    autoIn = true;
+                } else {
+                    autoIn = false;
+                }
                 dropOffMultiplier = 0.8;
                 // DO SOMETHING TO MAKE DRIVING SLOWER WHILE THE CASE IS HIGH FOR BETTER CONTROL
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
@@ -227,19 +244,18 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
     @Override
     public void runIntake(GamepadEx controller){
         TriggerReader rtReader = new TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER);
-        TriggerReader rtReader2 = new TriggerReader(controller, GamepadKeys.Trigger.RIGHT_TRIGGER);
         switch (intakeState) {
             case STOP:
                 setIntakePower(IntakeState.STOP);   // intake.setPower(0);
                 if (rtReader.isDown() || controller.isDown(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.OUT;
                 }
-                if (controller.isDown(GamepadKeys.Button.A) || autoIn || rtReader2.isDown()) {
+                if (controller.isDown(GamepadKeys.Button.A) || autoIn) {
                     intakeState = IntakeState.IN;
                 }
                 break;
             case IN:
-                if (!controller.getButton(GamepadKeys.Button.A) && !autoIn && !rtReader2.isDown()) {
+                if (!controller.getButton(GamepadKeys.Button.A) && !autoIn) {
                     intakeState = IntakeState.STOP;
                 } else if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
                     autoIn = false;
