@@ -85,7 +85,7 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                     liftState = LiftState.LOW;
                 } if (!rtReader1.isDown()) {
                     if (pickupStack) {
-                        currentTarget = targetPositionPickup2 + 600;
+                        currentTarget = targetPositionPickup2 + 400;
                     } else {
                         currentTarget = targetPositionPickup2;
                     }
@@ -110,7 +110,7 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                     currentTarget = targetPositionPickup2;
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
                     pickupStack = true;
-                    currentTarget = targetPositionPickup2 + 600;
+                    currentTarget = targetPositionPickup2 + 400;
                 }
                 if (rtReader1.isDown()) {
                     currentTarget = targetPositionRest;
@@ -186,9 +186,7 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                 } else {
                     setSlidePower();
                 }
-                if (rtReader1.isDown()) {
-                    autoIn = true;
-                }
+
                 //if (gamepad1.x || gamepad1.y) {
                 //   liftState = LiftState.MANUAL;
                 //}

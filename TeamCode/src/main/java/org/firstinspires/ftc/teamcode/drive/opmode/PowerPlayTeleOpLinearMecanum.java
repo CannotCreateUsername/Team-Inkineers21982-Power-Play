@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
@@ -23,10 +24,13 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 @TeleOp(name="Odyssea Drive", group = "Linear Opmode")
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
-
+    private AndroidTextToSpeech androidTextToSpeech;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        androidTextToSpeech = new AndroidTextToSpeech();
+        androidTextToSpeech.initialize();
+        androidTextToSpeech.setLanguage("en");
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
@@ -55,10 +59,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
         waitForStart();
 
-
-
         while (opModeIsActive()) {
-
+            androidTextToSpeech.speak("never gonna give you up never gonna let you down never gonna run around and desert you");
             // drivebase control loop
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
@@ -101,7 +103,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // publish all the telemetry at once
             telemetry.update();
         }
-
+        androidTextToSpeech.close();
     }
 
 

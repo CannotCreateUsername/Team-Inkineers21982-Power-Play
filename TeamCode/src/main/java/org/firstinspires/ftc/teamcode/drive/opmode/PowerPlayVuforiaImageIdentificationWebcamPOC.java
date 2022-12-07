@@ -62,10 +62,10 @@ import java.util.List;
  *
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained in {@link ConceptVuforiaNavigationWebcam}.
- */
+ * */
 
 @TeleOp(name="POC: Vuforia Image", group ="Concept")
-@Disabled
+//@Disabled
 public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";

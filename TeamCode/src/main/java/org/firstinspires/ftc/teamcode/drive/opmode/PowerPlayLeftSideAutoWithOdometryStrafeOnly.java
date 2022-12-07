@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
@@ -23,8 +22,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="Auto RIGHT Strafe (A2 or F5)", group="Linear Opmode")
-public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode {
+@Autonomous(name="Auto LEFT Strafe (A5 or F2)", group="Linear Opmode")
+public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -62,7 +61,7 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
         // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
         int label = 0;
-        int parkDistance = 48;
+        int parkDistance = 1;
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
@@ -113,13 +112,13 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 1;
+                            parkDistance = 48;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 48;
+                            parkDistance = 1;
                         }
                         break;
                     }
@@ -129,6 +128,19 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
+        /**
+         * Pickup Preload Cone
+         * Stafe Left 24 inches
+         * Straight 48 inches
+         * Turn 45 degree  clockwise ;
+         * Raise Intake to High Junction
+         * Move forward 3 inches
+         * Release Cone
+         * Back 3 inches
+         * Turn 45 degree  clockwise ;
+         */
+
+
         /**
          * Pickup Preload Cone
          * Stafe Left 24 inches
@@ -156,14 +168,14 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                 })
                 .waitSeconds(.5)
                 .forward(1)
-                .strafeLeft(24)
+                .strafeRight(24)
                 .forward(49)
-                .strafeLeft(11) //distance to be adjusted since most errors
+                .strafeRight(11) // to align with junction
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(8.0)
+                .back(7)
                 .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
@@ -182,9 +194,9 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
                 })
                 .waitSeconds(3)
-                .strafeRight(9.75)
+                .strafeLeft(9.75)
                 .back(24)
-                .strafeRight(parkDistance) // Label variable
+                .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();
 
