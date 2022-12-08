@@ -2,12 +2,15 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
@@ -24,10 +27,13 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 @TeleOp(name="Odyssea Drive", group = "Linear Opmode")
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
+
     private AndroidTextToSpeech androidTextToSpeech;
+    private DistanceSensor sensorRange;
 
     @Override
     public void runOpMode() throws InterruptedException {
+        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         androidTextToSpeech = new AndroidTextToSpeech();
         androidTextToSpeech.initialize();
         androidTextToSpeech.setLanguage("en");
@@ -57,6 +63,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorRange;
+
         waitForStart();
 
         while (opModeIsActive()) {
@@ -82,7 +90,6 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("GamePad leftStick x Input", gamepad1.left_stick_x);
             telemetry.addData("GamePad leftStick y Input", gamepad1.left_stick_y);
 
-
             // switch between two subsystem
             if (gamepad1.back || gamepad2.back){
                 currentIntakeSlide = intakeSlide3;
@@ -99,6 +106,10 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
             telemetry.addData("Current Control", currentIntakeSlide);
             telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
+
+            // Distance
+            telemetry.addData("range", String.format("%.01f mm", sensorRange.getDistance(DistanceUnit.MM)));
+            telemetry.addData("range", String.format("%.01f cm", sensorRange.getDistance(DistanceUnit.CM)));
 
             // publish all the telemetry at once
             telemetry.update();
