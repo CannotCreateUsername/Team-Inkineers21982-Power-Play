@@ -52,7 +52,7 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 @TeleOp(name="Position Test", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class SlideTest extends LinearOpMode {
 
     // Declare OpMode members.

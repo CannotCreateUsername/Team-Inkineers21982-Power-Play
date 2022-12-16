@@ -46,7 +46,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  */
 
 @TeleOp(name="Color Test", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class ColorSensorTest extends LinearOpMode {
 
     NormalizedColorSensor colorSensor;

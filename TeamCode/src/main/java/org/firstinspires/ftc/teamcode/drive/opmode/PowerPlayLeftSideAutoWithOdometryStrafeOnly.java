@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -25,6 +26,8 @@ import java.util.List;
 @Autonomous(name="Auto LEFT Strafe (A5 or F2)", group="Linear Opmode")
 public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
+    private DistanceSensor sensorRange;
+
     private ElapsedTime runtime = new ElapsedTime();
 
     public static final String TAG = "Vuforia VuMark Sample";
@@ -40,6 +43,11 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException  {
+
+        // Distance Sensor
+        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
+
+        // Vuforia
         initVuforia();
         /**
          * Load the data set containing the VuMarks for Relic Recovery. There's only one trackable
@@ -170,18 +178,18 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(49)
-                .strafeRight(11) // to align with junction
+                .strafeRight(12) // to align with junction
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(7)
+                .back(7.5)
                 .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
                 })
-                .waitSeconds(3)
+                .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
@@ -193,7 +201,7 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
                 })
-                .waitSeconds(3)
+                .waitSeconds(1)
                 .strafeLeft(9.75)
                 .back(24)
                 .strafeLeft(parkDistance)

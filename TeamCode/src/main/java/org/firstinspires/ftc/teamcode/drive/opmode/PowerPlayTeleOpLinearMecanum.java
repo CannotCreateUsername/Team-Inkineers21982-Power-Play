@@ -28,15 +28,11 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 @TeleOp(name="Odyssea Drive", group = "Linear Opmode")
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
-    private AndroidTextToSpeech androidTextToSpeech;
     private DistanceSensor sensorRange;
 
     @Override
     public void runOpMode() throws InterruptedException {
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-        androidTextToSpeech = new AndroidTextToSpeech();
-        androidTextToSpeech.initialize();
-        androidTextToSpeech.setLanguage("en");
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
@@ -68,7 +64,6 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            androidTextToSpeech.speak("never gonna give you up never gonna let you down never gonna run around and desert you");
             // drivebase control loop
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
@@ -82,13 +77,13 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             );
             drive.update();
             Pose2d poseEstimate = drive.getPoseEstimate();
-            telemetry.addData("X", poseEstimate.getX());
-            telemetry.addData("Y", poseEstimate.getY());
-            telemetry.addData("heading", poseEstimate.getHeading());
-            telemetry.addData("leftStick x Multiplier", leftStickMultiplierX);
-            telemetry.addData("leftStick y Multiplier", leftStickMultiplierY);
-            telemetry.addData("GamePad leftStick x Input", gamepad1.left_stick_x);
-            telemetry.addData("GamePad leftStick y Input", gamepad1.left_stick_y);
+//            telemetry.addData("X", poseEstimate.getX());
+//            telemetry.addData("Y", poseEstimate.getY());
+//            telemetry.addData("heading", poseEstimate.getHeading());
+//            telemetry.addData("leftStick x Multiplier", leftStickMultiplierX);
+//            telemetry.addData("leftStick y Multiplier", leftStickMultiplierY);
+//            telemetry.addData("GamePad leftStick x Input", gamepad1.left_stick_x);
+//            telemetry.addData("GamePad leftStick y Input", gamepad1.left_stick_y);
 
             // switch between two subsystem
             if (gamepad1.back || gamepad2.back){
@@ -100,12 +95,12 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // can vary between intakeSlide and intakeSlide2
             // so at any point in time, only one drive control logic is being used
             currentIntakeSlide.run(gamepadEx1, gamepadEx2);
-            telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
+//            telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
-            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
+//            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
             telemetry.addData("Current Control", currentIntakeSlide);
-            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
+//            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
 
             // Distance
             telemetry.addData("range", String.format("%.01f mm", sensorRange.getDistance(DistanceUnit.MM)));
@@ -114,7 +109,6 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // publish all the telemetry at once
             telemetry.update();
         }
-        androidTextToSpeech.close();
     }
 
 
