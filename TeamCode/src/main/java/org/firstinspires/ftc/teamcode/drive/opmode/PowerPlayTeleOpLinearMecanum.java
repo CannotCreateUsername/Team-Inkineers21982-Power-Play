@@ -6,7 +6,9 @@ import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.LED;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.android.AndroidTextToSpeech;
@@ -16,6 +18,7 @@ import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem3;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
+import org.firstinspires.ftc.teamcode.drive.AlignJunction;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 /**
@@ -28,11 +31,8 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 @TeleOp(name="Odyssea Drive", group = "Linear Opmode")
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
-    private DistanceSensor sensorRange;
-
     @Override
     public void runOpMode() throws InterruptedException {
-        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
@@ -49,7 +49,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         // by default , use Drive Control #1
         IntakeSlide currentIntakeSlide = intakeSlide3;
 
-        double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX;
+        double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX, alignMultiplierY;
         GamepadHelper leftStickX = new GamepadHelper();
         leftStickX.init();
         GamepadHelper leftStickY = new GamepadHelper();
@@ -57,9 +57,10 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         GamepadHelper rightStickX = new GamepadHelper();
         rightStickX.init();
 
-        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        AlignJunction alignStick = new AlignJunction();
+        alignStick.init(hardwareMap);
 
-        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorRange;
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
 
@@ -68,9 +69,10 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
+            alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier,
+                            -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier * alignMultiplierY,
                             -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier,
                             -gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier
                     )
@@ -103,8 +105,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 //            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
 
             // Distance
-            telemetry.addData("range", String.format("%.01f mm", sensorRange.getDistance(DistanceUnit.MM)));
-            telemetry.addData("range", String.format("%.01f cm", sensorRange.getDistance(DistanceUnit.CM)));
+            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingCM()));
+            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingMM()));
 
             // publish all the telemetry at once
             telemetry.update();
