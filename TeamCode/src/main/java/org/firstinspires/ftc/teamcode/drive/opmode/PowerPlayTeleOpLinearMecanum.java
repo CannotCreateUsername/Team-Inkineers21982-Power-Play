@@ -105,8 +105,10 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 //            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
 
             // Distance
-            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingCM()));
-            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingMM()));
+            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
+            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
+            telemetry.addData("Align State", alignStick.getAlignState());
+            telemetry.addData("Light State", alignStick.getLightState());
 
             // publish all the telemetry at once
             telemetry.update();

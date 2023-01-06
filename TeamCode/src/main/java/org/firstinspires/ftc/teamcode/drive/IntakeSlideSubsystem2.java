@@ -11,6 +11,9 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 /**
  * The IntakeSlideSubsystem class is a subsystem module that control
@@ -26,6 +29,7 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
 
     // THESE VARIABLES ARE USED BY THIS IMPLEMENTATION OF DRIVE CONTROL
     private ElapsedTime intakeTimer = new ElapsedTime();
+    private DistanceSensor sensorRange;
 
 //
 //    // THESE ARE VARIABLES INHERID FROM ABSTRACT CLASS
@@ -143,6 +147,8 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
+        // Distance Sensor
+        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         slides = hardwareMap.get(DcMotor.class, "slides");
         slides.setDirection(DcMotorSimple.Direction.REVERSE);
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -178,6 +184,7 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
      * @param gamepad1
      * @param gamepad2
      */
+    @Override
     public void run(GamepadEx gamepad1, GamepadEx gamepad2){
         switch (liftState) {
             case REST:
@@ -257,7 +264,7 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
      *  steady state and transient state
      *  https://resources.pcb.cadence.com/blog/2020-steady-state-vs-transient-state-in-system-design-and-stability-analysis
      */
-    @Override public void runIntake(GamepadEx controller){
+    @Override public void runIntake(GamepadEx controller) {
 
         switch (intakeState) {
             case STOP:
@@ -280,5 +287,4 @@ public class IntakeSlideSubsystem2 extends IntakeSlide {
         }
 
     }
-
 }

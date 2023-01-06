@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -26,7 +25,7 @@ import java.util.List;
 @Autonomous(name="Auto LEFT Strafe (A5 or F2)", group="Linear Opmode")
 public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
-    private DistanceSensor sensorRange;
+
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -43,9 +42,6 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException  {
-
-        // Distance Sensor
-        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
 
         // Vuforia
         initVuforia();

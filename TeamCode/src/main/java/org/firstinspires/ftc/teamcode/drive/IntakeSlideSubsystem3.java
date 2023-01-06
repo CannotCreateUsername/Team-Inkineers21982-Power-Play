@@ -71,7 +71,6 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
 
     public int getDpadPressed() { return i; }
     public boolean getIntakePressed() { return autoIn; }
-
     @Override
     public void run(GamepadEx gamepad1, GamepadEx gamepad2) {
         TriggerReader rtReader1 = new TriggerReader(gamepad1, GamepadKeys.Trigger.RIGHT_TRIGGER);
