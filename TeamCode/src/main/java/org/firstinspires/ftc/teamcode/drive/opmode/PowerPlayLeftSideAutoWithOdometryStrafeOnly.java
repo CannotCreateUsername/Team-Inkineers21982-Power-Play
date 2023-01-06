@@ -174,6 +174,9 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(49)
+                .resetConstraints()
+                .build();
+        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(startPose)
                 .strafeRight(12) // to align with junction
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
@@ -205,6 +208,8 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .build();
 
         drive.followTrajectorySequence(trajSeq);
+        // Put align code here? [import Cone.java and call a function to drop off cone]
+        drive.followTrajectorySequence(trajSeq2);
         telemetry.addData("Parking distance", parkDistance);
 
         // the last thing auto should do is move slide back to rest

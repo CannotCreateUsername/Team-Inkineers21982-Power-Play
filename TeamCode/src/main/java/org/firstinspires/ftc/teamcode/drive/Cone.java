@@ -8,15 +8,15 @@ import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class Cone extends IntakeSlide {
+public class Cone {
 
-
-    public enum PickupState {
+    private enum PickupState {
         ALIGNING,
         ALIGNED,
         LOADED
@@ -26,7 +26,7 @@ public class Cone extends IntakeSlide {
     private DistanceSensor sensorRange;
     PickupState pickupState;
 
-    @Override public void init(HardwareMap hardwareMap) {
+    public void init(HardwareMap hardwareMap) {
 
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
@@ -59,8 +59,7 @@ public class Cone extends IntakeSlide {
 
     }
 
-    @Override
-    public void run(GamepadEx gamepad1, GamepadEx gamepad2) {
+    public void run() {
         switch (liftState) {
             case REST:
                 currentTarget = targetPositionRest;
@@ -85,8 +84,7 @@ public class Cone extends IntakeSlide {
         }
     }
 
-    @Override
-    public void runIntake(GamepadEx controller) {
+    public void runIntake() {
         switch (intakeState) {
             case STOP:
                 setIntakePower(intakeState.STOP);
@@ -101,7 +99,6 @@ public class Cone extends IntakeSlide {
     }
 
     public void pickupCone() {
-
         switch (pickupState) {
             case ALIGNING:
                 liftState = LiftState.PICKUP2;
