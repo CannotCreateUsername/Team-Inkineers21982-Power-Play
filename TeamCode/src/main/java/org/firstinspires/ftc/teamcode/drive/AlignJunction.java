@@ -29,7 +29,7 @@ public class AlignJunction {
         ALIGNED
     }
 
-    private double gameStickMultipler;
+    private double gameStickMultiplier;
 
     /*
     Time Base Ramping
@@ -80,20 +80,20 @@ public class AlignJunction {
                     lightState = LightState.ALIGNING;
                 }
                 isStopped = false;
-                gameStickMultipler = 1;
+                gameStickMultiplier = 1;
                 break;
             case ALIGNING:
-                if (sensorRange.getDistance(DistanceUnit.CM) < 15 && sensorRange.getDistance(DistanceUnit.CM) > 10) {
+                if (sensorRange.getDistance(DistanceUnit.CM) < 13 && sensorRange.getDistance(DistanceUnit.CM) > 8) {
                     alignState = AlignState.ALIGNED;
                     lightState = LightState.ALIGNED;
                 } else if (sensorRange.getDistance(DistanceUnit.CM) > 50) {
                     alignState = AlignState.UNALIGNED;
                     lightState = LightState.OFF;
                 }
-                gameStickMultipler = 0.8;
+                gameStickMultiplier = 0.8;
                 break;
             case ALIGNED:
-                if ((sensorRange.getDistance(DistanceUnit.CM) > 15 || sensorRange.getDistance(DistanceUnit.CM) < 10) && sensorRange.getDistance(DistanceUnit.CM) < 50 ) {
+                if ((sensorRange.getDistance(DistanceUnit.CM) > 13 || sensorRange.getDistance(DistanceUnit.CM) < 8) && sensorRange.getDistance(DistanceUnit.CM) < 50 ) {
                     alignState = AlignState.ALIGNING;
                     lightState = LightState.ALIGNING;
                 } else if (sensorRange.getDistance(DistanceUnit.CM) > 50) {
@@ -102,10 +102,10 @@ public class AlignJunction {
                 }
                 isStopped = false;
                 if (currentGameStickState == previousGameStickState && !isStopped) {
-                    gameStickMultipler = 0;
+                    gameStickMultiplier = 0;
                 } else if (currentGameStickState != previousGameStickState) {
                     isStopped = true;
-                    gameStickMultipler = 1;
+                    gameStickMultiplier = 1;
                 }
                 break;
         }
@@ -125,14 +125,15 @@ public class AlignJunction {
                 break;
         }
 
-        return gameStickMultipler;
+        return gameStickMultiplier;
 
     }
 
     public String getAlignState() { return alignState.name(); }
     public String getLightState() { return lightState.name(); }
-
-
+    
     public double getDistanceReadingCM() { return sensorRange.getDistance(DistanceUnit.CM); }
     public double getDistanceReadingMM() { return sensorRange.getDistance(DistanceUnit.MM); }
+    
+    public double getGameStickMultiplier() { return gameStickMultiplier; }
 }
