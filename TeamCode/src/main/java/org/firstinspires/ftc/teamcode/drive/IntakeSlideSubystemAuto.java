@@ -72,4 +72,5 @@ public class IntakeSlideSubystemAuto extends IntakeSlide {
     }
 
     public int getSlidePosition() { return slides.getCurrentPosition(); }
+    public int getCurrentTarget() { return currentTarget; }
 }

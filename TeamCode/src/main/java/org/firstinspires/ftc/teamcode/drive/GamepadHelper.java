@@ -4,9 +4,6 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-
-
-
 public class GamepadHelper {
 
     public enum GamePadState {
@@ -70,9 +67,9 @@ public class GamepadHelper {
     public double  getGamepadStickRampingMultiplier(float gameStick) {
 
         prevoiusGameStickState = currentGameStickState;
-        if (gameStick < 0){
+        if (gameStick < 0) {
             currentGameStickState = GamePadState.NETURAL;
-        } else  if (gameStick > 0){
+        } else  if (gameStick > 0) {
             currentGameStickState = GamePadState.POSITIVE;
         } else {
             currentGameStickState = GamePadState.NETURAL;

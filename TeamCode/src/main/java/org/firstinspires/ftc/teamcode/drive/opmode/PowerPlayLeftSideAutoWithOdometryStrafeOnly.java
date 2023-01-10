@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.drive.Cone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,7 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
         int parkDistance = 1;
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        Cone cone = new Cone();
 
         // intake
         IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
@@ -158,6 +160,51 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
          */
 
 
+//        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+//                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+//                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.IN);
+//                })
+//                .waitSeconds(2)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
+//                })
+//                .waitSeconds(.5)
+//                .forward(1)
+//                .strafeRight(24)
+//                .forward(49)
+//                .strafeRight(14) // to align with junction //changed 1/7/2023
+//                .addTemporalMarker(() -> {
+//                    intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
+//                })
+//                .waitSeconds(3)
+//                .back(6)
+//                .waitSeconds(2)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
+//                })
+//                .waitSeconds(2)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
+//                })
+//                .waitSeconds(.5)
+//                .forward(7)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
+//                    intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
+//                })
+//                .waitSeconds(1)
+//                .strafeLeft(9.75)
+//                .back(24)
+//                .strafeLeft(parkDistance)
+//                .resetConstraints()
+//                .build();
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
@@ -174,30 +221,9 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(49)
-                .strafeRight(14) // to align with junction //changed 1/7/2023
                 .addTemporalMarker(() -> {
-                    intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
+                    cone.dropOffCone(0.3);
                 })
-                .waitSeconds(3)
-                .back(6)
-                .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
-                })
-                .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
-                })
-                .waitSeconds(.5)
-                .forward(7)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
-                    intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
-                })
-                .waitSeconds(1)
                 .strafeLeft(9.75)
                 .back(24)
                 .strafeLeft(parkDistance)

@@ -1,7 +1,10 @@
 package org.firstinspires.ftc.teamcode.drive;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Light;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubystemAuto;
@@ -22,17 +25,37 @@ public class Cone {
         UNLOADED
     }
 
+    private enum LightState {
+        OFF,
+        ALIGNING,
+        ALIGNED
+    }
+
+    ElapsedTime timer = new ElapsedTime();
+
     // Hardware
     private DistanceSensor sensorRange;
+    private DigitalChannel redLED;
+    private DigitalChannel greenLED;
+
     PickupState pickupState;
     DropOffState dropOffState;
+    LightState lightState;
 
     IntakeSlideSubystemAuto intakeSlideAuto;
     SampleMecanumDrive drive;
 
-    public void init (SampleMecanumDrive d, IntakeSlideSubystemAuto i) {
+    public void init (SampleMecanumDrive d, IntakeSlideSubystemAuto i, HardwareMap hardwareMap) {
         drive = d;
         intakeSlideAuto = i;
+
+        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
+        redLED = hardwareMap.get(DigitalChannel.class, "red");
+        greenLED = hardwareMap.get(DigitalChannel.class, "green");
+
+        pickupState = PickupState.ALIGNING;
+        dropOffState = DropOffState.ALIGNING;
+        lightState = LightState.OFF;
     }
 
 //    public void init(HardwareMap hardwareMap) {
@@ -107,37 +130,103 @@ public class Cone {
 //        }
 //    }
 
+    // variables to make typing more efficient
+    private int currentTarget = intakeSlideAuto.getCurrentTarget();
+
+    // PROBLEM: YOU HAVE TO CALL RUN FOR INTAKE SLIDES AND INIT GAMEPADS!! HOW TO SOLVE!?
     public void pickupCone() {
         switch (pickupState) {
             case ALIGNING:
-                intakeSlideAuto.liftState = IntakeSlide.LiftState.PICKUP2;
+                lightState = LightState.ALIGNING;
+                currentTarget = intakeSlideAuto.targetPositionPickup2+400;
+                intakeSlideAuto.runToPosition(currentTarget);
                 while (sensorRange.getDistance(DistanceUnit.CM) > 10) {
-                    driveStraight(0.3);
+                    driveStraight(-0.3);
                 }
                 if (8 < sensorRange.getDistance(DistanceUnit.CM) && sensorRange.getDistance(DistanceUnit.CM) > 10) {
                     pickupState = PickupState.ALIGNED;
                 }
                 break;
             case ALIGNED:
-                while (intakeSlideAuto.getSlidePosition() < intakeSlideAuto.currentTarget) {
-                    intakeSlideAuto.currentTarget = intakeSlideAuto.targetPositionRest+400;
-                    intakeSlideAuto.runToPosition(intakeSlideAuto.currentTarget);
+                lightState = LightState.ALIGNED;
+                while (intakeSlideAuto.getSlidePosition() < currentTarget) {
+                    currentTarget = intakeSlideAuto.targetPositionRest+400;
+                    intakeSlideAuto.runToPosition(currentTarget);
                     intakeSlideAuto.setIntakePower(intakeSlideAuto.intakeState.IN);
                 }
-                if (intakeSlideAuto.getSlidePosition() > intakeSlideAuto.currentTarget-2 && intakeSlideAuto.getSlidePosition() < intakeSlideAuto.currentTarget+2) {
+                if (intakeSlideAuto.getSlidePosition() > currentTarget-2 && intakeSlideAuto.getSlidePosition() < currentTarget+2) {
                     pickupState = PickupState.LOADED;
                 }
                 break;
             case LOADED:
-                intakeSlideAuto.liftState = IntakeSlide.LiftState.PICKUP2;
+                lightState = LightState.OFF;
+                currentTarget = intakeSlideAuto.targetPositionPickup2+400;
+                intakeSlideAuto.runToPosition(currentTarget);
+                while (sensorRange.getDistance(DistanceUnit.CM) < 15) {
+                    driveStraight(0.3);
+                }
                 break;
         }
-        
+        switch (lightState) {
+            case OFF:
+                greenLED.setState(false);
+                redLED.setState(false);
+                break;
+            case ALIGNING:
+                greenLED.setState(false);
+                redLED.setState(true);
+                break;
+            case ALIGNED:
+                greenLED.setState(true);
+                redLED.setState(false);
+                break;
+        }
     }
 
-    public void dropOffCone() {
-        switch (dropOffState) {
-            case ALIGNING:
+    // change speed (direction) for strafe right/left for different starting positions
+    public void dropOffCone(double speed) {
+        while (sensorRange.getDistance(DistanceUnit.CM) < 50) {
+            strafe(speed);
+        }
+        if (sensorRange.getDistance(DistanceUnit.CM) < 50) {
+            switch (dropOffState) {
+                case ALIGNING:
+                    lightState = LightState.ALIGNING;
+                    while (sensorRange.getDistance(DistanceUnit.CM) > 13) {
+                        driveStraight(0.3);
+                    }
+                    if (sensorRange.getDistance(DistanceUnit.CM) <= 13) {
+                        dropOffState = DropOffState.ALIGNED;
+                    }
+                case ALIGNED:
+                    lightState = LightState.ALIGNED;
+                    intakeSlideAuto.liftState = IntakeSlide.LiftState.HIGH;
+                    while (intakeSlideAuto.getSlidePosition() < currentTarget -2) {
+                        intakeSlideAuto.runToPosition(currentTarget);
+                    }
+                    while (sensorRange.getDistance(DistanceUnit.CM) > 13) {
+                        driveStraight(-0.3);
+                    }
+                    timer.reset();
+                    while (timer.seconds() < 2) {
+                        intakeSlideAuto.setIntakePower(IntakeSlide.IntakeState.IN);
+                    }
+                    intakeSlideAuto.setIntakePower(IntakeSlide.IntakeState.STOP);
+            }
+            switch (lightState) {
+                case OFF:
+                    greenLED.setState(false);
+                    redLED.setState(false);
+                    break;
+                case ALIGNING:
+                    greenLED.setState(false);
+                    redLED.setState(true);
+                    break;
+                case ALIGNED:
+                    greenLED.setState(true);
+                    redLED.setState(false);
+                    break;
+            }
         }
     }
 
