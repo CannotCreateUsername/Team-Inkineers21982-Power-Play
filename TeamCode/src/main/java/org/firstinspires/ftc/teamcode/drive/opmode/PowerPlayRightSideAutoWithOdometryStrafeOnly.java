@@ -14,6 +14,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
+import org.firstinspires.ftc.teamcode.cv.StickDriveMediator;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
@@ -130,6 +131,15 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
+
+        //   initialize camera,  pipeline and distance sensor
+        StickDriveMediator stickDrive = new StickDriveMediator(this);
+        stickDrive.setDrive(drive);
+        //      call the function to startStreaming
+        // 2023-01-11 turn off openCV until the second camera is installed in front of intake
+        // stickDrive.observeStick();
+
+
         /**
          * Pickup Preload Cone
          * Stafe Left 24 inches
@@ -141,7 +151,6 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
          * Back 3 inches
          * Turn 45 degree  clockwise ;
          */
-
 
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
@@ -161,6 +170,8 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                 .forward(49)
                 .strafeLeft(11) //distance to be adjusted since most errors
                 .addTemporalMarker(() -> {
+                    //2023-01-11 this is where we do the final adjustmnet using distance sensor and vision
+                    stickDrive.alignStick(2, 2);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)

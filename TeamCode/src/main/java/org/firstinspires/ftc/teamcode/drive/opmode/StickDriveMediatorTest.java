@@ -17,7 +17,7 @@ public class StickDriveMediatorTest extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
 
 
-//        initialize camera and pipeline
+//        initialize camera,  pipeline and distance sensor
         StickDriveMediator stickDrive = new StickDriveMediator(this);
         stickDrive.setDrive(drive);
 //      call the function to startStreaming
@@ -27,7 +27,7 @@ public class StickDriveMediatorTest extends LinearOpMode {
         waitForStart();
         while (opModeIsActive()) {
 
-            double error = stickDrive.alignStick(0.5);
+            double error = stickDrive.alignStickLateral(0.5);
             telemetry.addData("Error", error);
             telemetry.update();
 

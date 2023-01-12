@@ -3,8 +3,12 @@ package org.firstinspires.ftc.teamcode.cv;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.opencv.core.Rect;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -20,6 +24,14 @@ public class StickDriveMediator {
     private StickObserverPipeline opencv = null;
     private LinearOpMode op;
     private SampleMecanumDrive drive;
+    private DistanceSensor sensorRange;
+    private DigitalChannel redLED;
+    private DigitalChannel greenLED;
+
+    private double LATERAL_ERROR_THRESHOLD = 0.1;
+    private double DISTANCE_ERROR_THRESHOLD = 0.1;
+    private double DISTANCE_JUNCTION = 13; // cm
+    private double DISTANCE_JUNCTION_MAX = 20; // cm
 
 
     // Setter
@@ -31,7 +43,79 @@ public class StickDriveMediator {
         //you can input  a hardwareMap instead of linearOpMode if you want
         op = p_op;
         //initialize webcam
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 1"));
+        // note: assume that there is a second camera on top of intake
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"));
+
+        // initialize distance sensor
+        sensorRange = op.hardwareMap.get(DistanceSensor.class, "sensor_range");
+        redLED = op.hardwareMap.get(DigitalChannel.class, "red");
+        greenLED = op.hardwareMap.get(DigitalChannel.class, "green");
+
+    }
+
+    public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime){
+         ElapsedTime timer = new ElapsedTime();
+         double LateralError = 1;
+         double distanceError = 1;
+
+         while (timer.seconds() <= lateralAlignmentTime && LateralError > LATERAL_ERROR_THRESHOLD ){
+             LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
+         }
+
+         timer.reset();
+        while (timer.seconds() <= distanceAlignmentTime && distanceError > DISTANCE_ERROR_THRESHOLD ){
+            distanceError = alignStickLateral(DISTANCE_ERROR_THRESHOLD);
+        }
+
+    }
+
+    /**
+     *  approach the junction automtically ; assume that the left right lateral alignment is correct
+     *  using the PID approach
+     * @param targetDistance e.g. 13 cm
+     * @return
+     */
+    public double alignStickDistance(double targetDistance, double maxRange, double thresHold){
+        double error = 0;
+
+        // assume the robot is close to the junction/stack but not crazy far
+        // if the robot distance is really far, i.e. exceed max Range, don't do anything
+        error = (sensorRange.getDistance(DistanceUnit.CM) - targetDistance) / targetDistance ;
+        error = error > 1 ? 1: error; // cap as 1
+        if (error > thresHold &&  sensorRange.getDistance(DistanceUnit.CM) < maxRange ) {
+
+            double leftXControl = 0;
+            double leftYControl = 1 * error; // test and see if it needs to reduce the speed or not
+            double rightXControl = 0;
+
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -leftYControl,
+                            -leftXControl,
+                            -rightXControl
+                    )
+            );
+            drive.update();
+
+            greenLED.setState(false);
+            redLED.setState(true);
+        } else {
+            // stop
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            0,
+                            0,
+                            0
+                    )
+            );
+            drive.update();
+
+            greenLED.setState(true);
+            redLED.setState(false);
+        }
+
+
+        return error;
     }
 
     /**
@@ -40,44 +124,51 @@ public class StickDriveMediator {
      *  https://www.youtube.com/watch?v=_Hxn4fzfN7k
      * @return error from the observation
      */
-    public double  alignStick(double thresHold){
+    public double  alignStickLateral(double thresHold){
 
         double error = 0;
 
         // first observe stick location
-        Rect stick = opencv.getStickRect();
-        if (stick !=null && stick.width > 0 ){
-            // stick midpoint - screen midpoint
-            double stickMidpoint = stick.x + stick.width/2;
-            error = stickMidpoint - WIDTH/2;
-            error = (error / (WIDTH/2));
+        if (opencv != null ) {
+            Rect stick = opencv.getStickRect();
+            if (stick != null && stick.width > 0) {
+                // stick midpoint - screen midpoint
+                double stickMidpoint = stick.x + stick.width / 2;
+                error = stickMidpoint - WIDTH / 2;
+                error = (error / (WIDTH / 2));
 
-            // using the principle of PID
-            if (Math.abs(error) > thresHold) {
-                double leftXControl = error; // assume camera is mount at the back of robot
-                double leftYControl = 0;
-                double rightXControl = 0;
+                // using the principle of PID
+                if (Math.abs(error) > thresHold) {
+                    double leftXControl = error; // assume camera is mount at the back of robot
+                    double leftYControl = 0;
+                    double rightXControl = 0;
 
-                drive.setWeightedDrivePower(
-                        new Pose2d(
-                                -leftYControl,
-                                -leftXControl,
-                                -rightXControl
-                        )
-                );
-                drive.update();
-            } else {
-                // stop
-                drive.setWeightedDrivePower(
-                        new Pose2d(
-                                0,
-                                0,
-                                0
-                        )
-                );
-                drive.update();
+                    drive.setWeightedDrivePower(
+                            new Pose2d(
+                                    -leftYControl,
+                                    -leftXControl,
+                                    -rightXControl
+                            )
+                    );
+                    drive.update();
+
+                    greenLED.setState(false);
+                    redLED.setState(true);
+                } else {
+                    // stop
+                    drive.setWeightedDrivePower(
+                            new Pose2d(
+                                    0,
+                                    0,
+                                    0
+                            )
+                    );
+                    drive.update();
+
+                    greenLED.setState(true);
+                    redLED.setState(false);
+                }
             }
-
         }
 
 
