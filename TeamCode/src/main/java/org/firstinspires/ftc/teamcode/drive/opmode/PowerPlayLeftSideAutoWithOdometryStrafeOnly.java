@@ -244,30 +244,6 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 //                .strafeLeft(parkDistance)
 //                .resetConstraints()
 //                .build();
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.IN);
-                })
-                .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
-                })
-                .waitSeconds(.5)
-                .forward(1)
-                .strafeRight(24)
-                .forward(49)
-                .addTemporalMarker(() -> {
-                    cone.dropOffCone(0.3);
-                })
-                .strafeLeft(9.75)
-                .back(24)
-                .strafeLeft(parkDistance)
-                .resetConstraints()
-                .build();
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
