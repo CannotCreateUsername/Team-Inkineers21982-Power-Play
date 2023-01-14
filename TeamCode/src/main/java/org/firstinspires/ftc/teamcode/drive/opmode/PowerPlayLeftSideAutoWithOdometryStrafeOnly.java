@@ -13,12 +13,13 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.drive.Cone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,9 +70,15 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
         int parkDistance = 1;
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-        Cone cone = new Cone();
+
+//        // cone
+//        IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
+//        intakeSlide.init(hardwareMap);
+//        Cone cone = new Cone();
+//        cone.init(drive, intakeSlide, hardwareMap);
 
         // intake
+
         IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
         intakeSlide2.init(hardwareMap);
 
@@ -160,51 +167,6 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
          */
 
 
-//        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-//                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-//                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-//                .addTemporalMarker(() -> {
-//                    // intake code goes here:
-//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.IN);
-//                })
-//                .waitSeconds(2)
-//                .addTemporalMarker(() -> {
-//                    // intake code goes here:
-//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
-//                })
-//                .waitSeconds(.5)
-//                .forward(1)
-//                .strafeRight(24)
-//                .forward(49)
-//                .strafeRight(14) // to align with junction //changed 1/7/2023
-//                .addTemporalMarker(() -> {
-//                    intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
-//                })
-//                .waitSeconds(3)
-//                .back(6)
-//                .waitSeconds(2)
-//                .addTemporalMarker(() -> {
-//                    // intake code goes here:
-//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
-//                })
-//                .waitSeconds(2)
-//                .addTemporalMarker(() -> {
-//                    // intake code goes here:
-//                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
-//                })
-//                .waitSeconds(.5)
-//                .forward(7)
-//                .addTemporalMarker(() -> {
-//                    // intake code goes here:
-//                    // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
-//                    intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
-//                })
-//                .waitSeconds(1)
-//                .strafeLeft(9.75)
-//                .back(24)
-//                .strafeLeft(parkDistance)
-//                .resetConstraints()
-//                .build();
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
@@ -221,14 +183,65 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(49)
+                .strafeRight(12) // to align with junction //changed 1/7/2023
                 .addTemporalMarker(() -> {
-                    cone.dropOffCone(0.3);
+                    intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
-                .strafeLeft(9.75)
+                .waitSeconds(3)
+                .back(8)
+                .waitSeconds(2)
+                .addTemporalMarker(() -> {
+                    // intake code goes here:
+                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.OUT);
+                })
+                .waitSeconds(2)
+                .addTemporalMarker(() -> {
+                    // intake code goes here:
+                    intakeSlide2.setIntakePower(IntakeSlide.IntakeState.STOP);
+                })
+                .waitSeconds(.5)
+                .forward(7)
+                .addTemporalMarker(() -> {
+                    // intake code goes here:
+                    // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
+                    intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
+                })
+                .waitSeconds(1)
+                .strafeLeft(10)
                 .back(24)
                 .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();
+//        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+//                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+//                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
+//                })
+//                .waitSeconds(2)
+//                .addTemporalMarker(() -> {
+//                    // intake code goes here:
+//                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
+//                })
+//                .waitSeconds(.5)
+//                .forward(1)
+//                .strafeRight(24)
+//                .forward(49)
+//                .addTemporalMarker(() -> {
+//                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+//                    intakeSlide.run();
+//                })
+//                .waitSeconds(1)
+//                .addTemporalMarker(() -> {
+//                    cone.dropOffCone(0.3);
+//                })
+//                .waitSeconds(1)
+//                .strafeLeft(9.75)
+//                .back(24)
+//                .strafeLeft(parkDistance)
+//                .resetConstraints()
+//                .build();
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
@@ -241,12 +254,11 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
 
     /**
-     *
-     * @param slides
+     *  @param slides
      * @param position
      * @param timeoutS
      */
-    public void moveSlide(IntakeSlide slides, int position, double timeoutS){
+    public void moveSlide(IntakeSlideSubsystem2 slides, int position, double timeoutS){
 
         ElapsedTime runtime = new ElapsedTime();
 

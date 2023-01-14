@@ -104,6 +104,11 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("Light State", alignStick.getLightState());
             telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());
 
+            // lower back to rest if stopped
+            if (isStopRequested()) {
+                currentIntakeSlide.liftState = IntakeSlide.LiftState.REST;
+            }
+
             // publish all the telemetry at once
             telemetry.update();
         }
