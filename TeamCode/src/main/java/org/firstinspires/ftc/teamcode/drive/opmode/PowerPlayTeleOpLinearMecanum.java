@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -24,8 +25,18 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 @TeleOp(name="Odyssea Drive", group = "Linear Opmode")
 public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
+    private enum TurnState {
+        STRAIGHT,
+        ROTATED
+    }
+
+    private double LeftXInput;
+    private double LeftYInput;
+    private double RightXInput;
+
     @Override
     public void runOpMode() throws InterruptedException {
+        TurnState turnState;
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
@@ -58,16 +69,40 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+
             // drivebase control loop
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
             alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
+
+
+            // keeps controls the same if robot is rotated 90 degrees in any direction
+            if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                turnState = TurnState.ROTATED;
+            } else {
+                turnState = TurnState.STRAIGHT;
+            }
+            switch (turnState) {
+                case STRAIGHT:
+                    LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+                    LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
+                    break;
+                case ROTATED:
+                    LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+                    LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
+                    break;
+            }
+
+
+
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier * alignMultiplierY,
-                            -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier,
-                            -gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier
+                            -LeftXInput,
+                            -LeftYInput,
+                            -RightXInput
                     )
             );
             drive.update();
@@ -90,6 +125,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // can vary between intakeSlide and intakeSlide2
             // so at any point in time, only one drive control logic is being used
             currentIntakeSlide.run(gamepadEx1, gamepadEx2);
+            currentIntakeSlide.runIntake(gamepadEx1);
 //            telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
 //            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
@@ -103,6 +139,11 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("Align State", alignStick.getAlignState());
             telemetry.addData("Light State", alignStick.getLightState());
             telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());
+
+            // lower back to rest if stopped
+            if (isStopRequested()) {
+                currentIntakeSlide.liftState = IntakeSlide.LiftState.REST;
+            }
 
             // publish all the telemetry at once
             telemetry.update();
