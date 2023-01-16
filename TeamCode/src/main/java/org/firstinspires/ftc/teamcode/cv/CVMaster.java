@@ -20,7 +20,7 @@ public class CVMaster {
         //you can input  a hardwareMap instead of linearOpMode if you want
         op = p_op;
         //initialize webcam
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 1"));
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"));
     }
     public void observeStick(){
         //create the pipeline

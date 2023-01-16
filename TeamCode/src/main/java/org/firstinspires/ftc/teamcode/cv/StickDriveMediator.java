@@ -44,7 +44,24 @@ public class StickDriveMediator {
         op = p_op;
         //initialize webcam
         // note: assume that there is a second camera on top of intake
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"));
+
+        int cameraMonitorViewId = op.hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", op.hardwareMap.appContext.getPackageName());
+        /**
+         * This is the only thing you need to do differently when using multiple cameras.
+         * Instead of obtaining the camera monitor view and directly passing that to the
+         * camera constructor, we invoke {@link OpenCvCameraFactory#splitLayoutForMultipleViewports(int, int, OpenCvCameraFactory.ViewportSplitMethod)}
+         * on that view in order to split that view into multiple equal-sized child views,
+         * and then pass those child views to the constructor.
+         */
+        int[] viewportContainerIds = OpenCvCameraFactory.getInstance()
+                .splitLayoutForMultipleViewports(
+                        cameraMonitorViewId, //The container we're splitting
+                        2, //The number of sub-containers to create
+                        OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
+
+
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
+        // webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"));
 
         // initialize distance sensor
         sensorRange = op.hardwareMap.get(DistanceSensor.class, "sensor_range");
@@ -64,8 +81,9 @@ public class StickDriveMediator {
 
          timer.reset();
         while (timer.seconds() <= distanceAlignmentTime && distanceError > DISTANCE_ERROR_THRESHOLD ){
-            distanceError = alignStickLateral(DISTANCE_ERROR_THRESHOLD);
+            distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
         }
+
 
     }
 
@@ -203,7 +221,7 @@ public class StickDriveMediator {
                  */
                 webcam.setPipeline(opencv);
                 //start streaming the camera
-                webcam.startStreaming(WIDTH, HEIGHT, OpenCvCameraRotation.UPRIGHT);
+                webcam.startStreaming(WIDTH, HEIGHT, OpenCvCameraRotation.UPSIDE_DOWN);
                 //if you are using dashboard, update dashboard camera view
                 // dashboard : 192.168.43.1:8080/dash
                 FtcDashboard.getInstance().startCameraStream(webcam, 5);

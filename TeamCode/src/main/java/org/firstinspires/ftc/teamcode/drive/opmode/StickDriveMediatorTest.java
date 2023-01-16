@@ -25,13 +25,17 @@ public class StickDriveMediatorTest extends LinearOpMode {
 
 
         waitForStart();
+
         while (opModeIsActive()) {
 
-            double error = stickDrive.alignStickLateral(0.5);
-            telemetry.addData("Error", error);
-            telemetry.update();
+            // double error = stickDrive.alignStickLateral(0.5);
+            // telemetry.addData("Error", error);
+            // telemetry.update();
+
+            stickDrive.alignStick(2, 2);
 
         }
+
 //        stopStreaming
         stickDrive.stopCamera();
     }

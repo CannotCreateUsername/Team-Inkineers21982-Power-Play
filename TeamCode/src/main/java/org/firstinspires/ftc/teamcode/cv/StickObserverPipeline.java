@@ -91,6 +91,9 @@ public class StickObserverPipeline extends OpenCvPipeline {
         //find contours, input scaledThresh because it has hard edges
         Imgproc.findContours(scaledThresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
+        // draw the contours in green for debug purpose
+        Imgproc.drawContours(scaledThresh, contours, -1, new Scalar(0.0, 255.0, 0.0), 3);
+
         // inspired by the logic fromm 2021-2022 Ultmiate goal
         // ref: https://docs.ftclib.org/ftclib/vision/ring-stack-detection
         int maxWidth = 0;
@@ -122,7 +125,7 @@ public class StickObserverPipeline extends OpenCvPipeline {
         // thresh.copyTo(input); // for debug only - first HSV rough filter
         // masked.copyTo(input); // for debug only - a masked
         // scaledMask.copyTo(input); // for debug only - weighted mask
-        scaledThresh.copyTo(input);  // final result
+        // scaledThresh.copyTo(input);  // final result
         // finalMask.copyTo(input);
         // edges.copyTo(input);
 
