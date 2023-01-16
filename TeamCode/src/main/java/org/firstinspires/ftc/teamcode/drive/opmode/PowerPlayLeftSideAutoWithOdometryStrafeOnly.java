@@ -184,12 +184,12 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(49)
-                .strafeRight(12) // to align with junction //changed 1/7/2023
+                .strafeRight(11) // to align with junction //changed 1/7/2023
                 .addTemporalMarker(() -> {
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
-                .back(8)
+                .back(7.5)
                 .waitSeconds(2)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
@@ -207,8 +207,8 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     // moveSlide(intakeSlide2, intakeSlide2.targetPositionHigh, 4);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionRest);
                 })
-                .waitSeconds(1)
-                .strafeLeft(10)
+                .waitSeconds(3)
+                .strafeLeft(9.75)
                 .back(24)
                 .strafeLeft(parkDistance)
                 .resetConstraints()

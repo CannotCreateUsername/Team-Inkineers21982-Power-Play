@@ -183,23 +183,24 @@ public class Cone {
     // change speed (direction) for strafe right/left for different starting positions
     public void dropOffCone(double speed) {
         strafe(speed);
-        while (loaded) {
-            dropOff();
-            switch (lightState) {
-                case OFF:
-                    greenLED.setState(false);
-                    redLED.setState(false);
-                    break;
-                case ALIGNING:
-                    greenLED.setState(false);
-                    redLED.setState(true);
-                    break;
-                case ALIGNED:
-                    greenLED.setState(true);
-                    redLED.setState(false);
-                    break;
-            }
-        }
+        // troubleshooting
+//        while (loaded) {
+//            dropOff();
+//            switch (lightState) {
+//                case OFF:
+//                    greenLED.setState(false);
+//                    redLED.setState(false);
+//                    break;
+//                case ALIGNING:
+//                    greenLED.setState(false);
+//                    redLED.setState(true);
+//                    break;
+//                case ALIGNED:
+//                    greenLED.setState(true);
+//                    redLED.setState(false);
+//                    break;
+//            }
+//        }
     }
 
     private void dropOff() {

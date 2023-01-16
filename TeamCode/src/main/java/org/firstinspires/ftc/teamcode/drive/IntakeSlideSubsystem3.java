@@ -227,7 +227,6 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
         // update gamepad state
         gamepad1.readButtons();
         runToPosition(currentTarget, currentPower);
-        runIntake(gamepad1);
         //runIntake();
     }
 

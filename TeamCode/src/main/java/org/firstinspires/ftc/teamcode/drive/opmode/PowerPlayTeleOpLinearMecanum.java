@@ -90,6 +90,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // can vary between intakeSlide and intakeSlide2
             // so at any point in time, only one drive control logic is being used
             currentIntakeSlide.run(gamepadEx1, gamepadEx2);
+            currentIntakeSlide.runIntake(gamepadEx1);
 //            telemetry.addData("Current Slide Position 1", currentIntakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", currentIntakeSlide.getCurrentState());
 //            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
