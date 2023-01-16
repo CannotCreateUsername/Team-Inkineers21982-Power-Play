@@ -10,17 +10,22 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.opencv.core.Mat;
 import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
+import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
 public class StickDriveMediator {
 
     public final int WIDTH = 640;
     public final int HEIGHT = 480;
-    private OpenCvWebcam webcam;
+    // private OpenCvWebcam webcamFront;
+    private OpenCvWebcam webcamBack;
     private StickObserverPipeline opencv = null;
     private LinearOpMode op;
     private SampleMecanumDrive drive;
@@ -32,6 +37,7 @@ public class StickDriveMediator {
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_JUNCTION = 13; // cm
     private double DISTANCE_JUNCTION_MAX = 20; // cm
+
 
 
     // Setter
@@ -60,8 +66,8 @@ public class StickDriveMediator {
                         OpenCvCameraFactory.ViewportSplitMethod.VERTICALLY); //Whether to split the container vertically or horizontally
 
 
-        webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
-        // webcam = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"));
+        // webcamFront = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 1"), viewportContainerIds[0]);
+        webcamBack = OpenCvCameraFactory.getInstance().createWebcam(op.hardwareMap.get(WebcamName.class, "Webcam 2"), viewportContainerIds[1]);
 
         // initialize distance sensor
         sensorRange = op.hardwareMap.get(DistanceSensor.class, "sensor_range");
@@ -75,12 +81,12 @@ public class StickDriveMediator {
          double LateralError = 1;
          double distanceError = 1;
 
-         while (timer.seconds() <= lateralAlignmentTime && LateralError > LATERAL_ERROR_THRESHOLD ){
+         while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
              LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
          }
 
          timer.reset();
-        while (timer.seconds() <= distanceAlignmentTime && distanceError > DISTANCE_ERROR_THRESHOLD ){
+        while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
             distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
         }
 
@@ -157,7 +163,7 @@ public class StickDriveMediator {
 
                 // using the principle of PID
                 if (Math.abs(error) > thresHold) {
-                    double leftXControl = error; // assume camera is mount at the back of robot
+                    double leftXControl = -error / 2; // assume camera is mount at the back of robot
                     double leftYControl = 0;
                     double rightXControl = 0;
 
@@ -198,7 +204,7 @@ public class StickDriveMediator {
         //create the pipeline
         opencv = new StickObserverPipeline();
 
-        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+        webcamBack.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
         {
             @Override
             public void onOpened()
@@ -219,12 +225,12 @@ public class StickDriveMediator {
                  * For a rear facing camera or a webcam, rotation is defined assuming the camera is facing
                  * away from the user.
                  */
-                webcam.setPipeline(opencv);
+                webcamBack.setPipeline(opencv);
                 //start streaming the camera
-                webcam.startStreaming(WIDTH, HEIGHT, OpenCvCameraRotation.UPSIDE_DOWN);
+                webcamBack.startStreaming(WIDTH, HEIGHT, OpenCvCameraRotation.UPRIGHT);
                 //if you are using dashboard, update dashboard camera view
                 // dashboard : 192.168.43.1:8080/dash
-                FtcDashboard.getInstance().startCameraStream(webcam, 5);
+                FtcDashboard.getInstance().startCameraStream(webcamBack, 5);
 
             }
 
@@ -236,10 +242,44 @@ public class StickDriveMediator {
                  */
             }
         });
-    }
+
+
+//        webcamFront.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener()
+//        {
+//            @Override
+//            public void onOpened()
+//            {
+//                webcamFront.setPipeline(new DummyPipeline());
+//                webcamFront.startStreaming(WIDTH, HEIGHT, OpenCvCameraRotation.UPRIGHT);
+//            }
+//
+//            @Override
+//            public void onError(int errorCode)
+//            {
+//                /*
+//                 * This will be called if the camera could not be opened
+//                 */
+//            }
+//        });
+
+
+   }
 
     //stop streaming
     public void stopCamera(){
-        webcam.stopStreaming();
+
+        // webcamFront.stopStreaming();
+        webcamBack.stopStreaming();
+    }
+
+
+    class DummyPipeline extends OpenCvPipeline
+    {
+        @Override
+        public Mat processFrame(Mat input)
+        {
+
+            return input;
+        }
     }
 }

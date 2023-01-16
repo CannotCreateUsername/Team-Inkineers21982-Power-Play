@@ -15,29 +15,35 @@ public class StickDriveMediatorTest extends LinearOpMode {
     public void runOpMode() {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
-
-//        initialize camera,  pipeline and distance sensor
+        // initialize camera,  pipeline and distance sensor
         StickDriveMediator stickDrive = new StickDriveMediator(this);
         stickDrive.setDrive(drive);
-//      call the function to startStreaming
-        stickDrive.observeStick();
+        stickDrive.observeStick(); // call the function to startStreaming
+
 
 
         waitForStart();
+        if (opModeIsActive()) {
 
-        while (opModeIsActive()) {
+            stickDrive.alignStick(6, 1);
 
-            // double error = stickDrive.alignStickLateral(0.5);
-            // telemetry.addData("Error", error);
-            // telemetry.update();
+//            while (opModeIsActive()) {
+//
+//                double error = stickDrive.alignStickLateral(0.5);
+//                telemetry.addData("Error", error);
+//                telemetry.update();
+//
+//
+//
+//            }
 
-            stickDrive.alignStick(2, 2);
+//
 
         }
-
-//        stopStreaming
-        stickDrive.stopCamera();
+        // stopStreaming
+        if (opModeIsActive()) {
+            stickDrive.stopCamera();
+        }
     }
 }
 

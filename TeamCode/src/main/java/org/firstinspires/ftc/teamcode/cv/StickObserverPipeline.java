@@ -50,12 +50,18 @@ public class StickObserverPipeline extends OpenCvPipeline {
         }
 
         // lenient bounds will filter out near yellow, this should filter out all near yellow things(tune this if needed)
-        Scalar lowHSV = new Scalar(20, 70, 80); // lenient lower bound HSV for yellow
-        Scalar highHSV = new Scalar(32, 255, 255); // lenient higher bound HSV for yellow
+        Scalar lowHSV = new Scalar(20, 70, 80); // new  Scalar(23,50,70); // new Scalar(20, 70, 80); // lenient lower bound HSV for yellow
+        Scalar highHSV = new Scalar(32, 255, 255); // new Scalar(32,255,255); // new Scalar(32, 255, 255); // lenient higher bound HSV for yellow
 
         Mat thresh = new Mat();
 
         // Get a black and white image of yellow objects
+        // ref: https://www.reddit.com/r/FTC/comments/u71pzb/easyopencv_scalar_color_question/
+        /*
+        Scalars don't have an inherent color space to them. The InRange function just takes the image matrix and compares it directly to the scalars, so in that context they are effectively in the same color space as the image being compared.
+        For example, InRange(RGBImage, lowHSV, highHSV) would treat them as RGB values,
+        while InRange(HSVImage, lowHSV, highHSV) would treat them like HSV values
+         */
         Core.inRange(mat, lowHSV, highHSV, thresh);
 
         Mat masked = new Mat();
@@ -91,8 +97,9 @@ public class StickObserverPipeline extends OpenCvPipeline {
         //find contours, input scaledThresh because it has hard edges
         Imgproc.findContours(scaledThresh, contours, hierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        // draw the contours in green for debug purpose
-        Imgproc.drawContours(scaledThresh, contours, -1, new Scalar(0.0, 255.0, 0.0), 3);
+
+        /**drawing contours to ret in green**/
+        Imgproc.drawContours(input, contours, -1, new Scalar(0.0, 255.0, 0.0), 3);
 
         // inspired by the logic fromm 2021-2022 Ultmiate goal
         // ref: https://docs.ftclib.org/ftclib/vision/ring-stack-detection
@@ -112,10 +119,14 @@ public class StickObserverPipeline extends OpenCvPipeline {
             copy.release(); // releasing the buffer of the copy of the contour, since after use, it is no longer needed
         }
 
+        /**drawing target rectange in red **/
+        Imgproc.rectangle(input, maxRect, new Scalar(255.0, 0, 0.0), 5 );
+
         //list of frames to reduce inconsistency, not too many so that it is still real-time, change the number from 5 if you want
         if (frameList.size() > 5) {
             frameList.remove(0);
         }
+
 
 
 
