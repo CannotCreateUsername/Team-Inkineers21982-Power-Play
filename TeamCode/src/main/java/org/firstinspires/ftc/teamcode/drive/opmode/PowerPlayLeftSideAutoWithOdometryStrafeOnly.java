@@ -109,6 +109,8 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
         if(isStopRequested()) return;
 
+
+
         //Vufrofia
         targets1.activate();  // octopus
         targets2.activate(); // triangle
@@ -118,7 +120,7 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (runtime.time() < 2 && opModeIsActive()) {
+        while (runtime.time() < 1 && opModeIsActive()) {
             if (!targetVisible) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
@@ -225,18 +227,12 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                .waitSeconds(.5)
                 .forward(1)
                 .strafeRight(24)
-                .forward(49)
-                .strafeRight(14) // to align with junction //changed 1/7/2023
+                .forward(72)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
-                })
-                .waitSeconds(1)
-                .addTemporalMarker(() -> {
-                    cone.dropOffCone(0.3);
                 })
                 .waitSeconds(1)
                 .resetConstraints()
@@ -245,15 +241,19 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-
+        cone.dropOffCone(this,-0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
-                .strafeLeft(9.75)
-                .back(24)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .back(1)
+                .strafeLeft(1)
+                .back(48)
                 .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();
-        drive.followTrajectorySequence(trajSeq2);
 
+
+        drive.followTrajectorySequence(trajSeq2);
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();

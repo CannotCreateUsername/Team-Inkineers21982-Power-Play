@@ -37,6 +37,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         TurnState turnState;
+        turnState = TurnState.STRAIGHT;
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
@@ -78,21 +79,22 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 
 
             // keeps controls the same if robot is rotated 90 degrees in any direction
-            if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                turnState = TurnState.ROTATED;
-            } else {
-                turnState = TurnState.STRAIGHT;
-            }
             switch (turnState) {
                 case STRAIGHT:
                     LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
                     LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
+                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                        turnState = TurnState.ROTATED;
+                    }
                     break;
                 case ROTATED:
-                    LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+                    LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
                     LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
+                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+                        turnState = TurnState.STRAIGHT;
+                    }
                     break;
             }
 
@@ -132,6 +134,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData(intakeSlide.getCurrentCaption(), currentIntakeSlide.getCurrentStatus());
             telemetry.addData("Current Control", currentIntakeSlide);
 //            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
+            telemetry.addData("Rotation", turnState.name());
 
             // Distance
             telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
