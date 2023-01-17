@@ -152,11 +152,10 @@ public class Cone {
     public void pickupCone() {
         switch (pickupState) {
             case ALIGNING:
-                lightState = LightState.ALIGNING;
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
-                while (sensorRange.getDistance(DistanceUnit.CM) > 10) {
-                    driveStraight(-0.2);
+                while (sensorRange.getDistance(DistanceUnit.CM) > 9) {
+                    driveStraight(0.2);
                 }
                 // vvv change condition to include touch sensor vvv
                 if (8 < sensorRange.getDistance(DistanceUnit.CM) && sensorRange.getDistance(DistanceUnit.CM) > 10) {
@@ -164,7 +163,6 @@ public class Cone {
                 }
                 break;
             case ALIGNED:
-                lightState = LightState.ALIGNED;
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
                 intakeSlide.run();
                 while (intakeSlide.getSlidePosition() < intakeSlide.currentTarget) {
@@ -174,11 +172,10 @@ public class Cone {
                 pickupState = PickupState.LOADED;
                 break;
             case LOADED:
-                lightState = LightState.OFF;
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
                 while (sensorRange.getDistance(DistanceUnit.CM) < 15) {
-                    driveStraight(0.3);
+                    driveStraight(-0.3);
                 }
                 loaded = true;
                 break;
@@ -214,20 +211,6 @@ public class Cone {
             // troubleshooting
             while (loaded && op.opModeIsActive()) {
                 dropOff(height);
-                switch (lightState) {
-                    case OFF:
-                        greenLED.setState(false);
-                        redLED.setState(false);
-                        break;
-                    case ALIGNING:
-                        greenLED.setState(false);
-                        redLED.setState(true);
-                        break;
-                    case ALIGNED:
-                        greenLED.setState(true);
-                        redLED.setState(false);
-                        break;
-                }
             }
             stopMovement();
         }
@@ -240,20 +223,18 @@ public class Cone {
             case ALIGNING:
                 intakeSlide.liftState = height;
                 intakeSlide.run();
-                lightState = LightState.ALIGNING;
                 timer.reset();
-                while (sensorRange.getDistance(DistanceUnit.CM) < 800 && sensorRange.getDistance(DistanceUnit.CM) > 9 && timer.seconds() < 2 && op.opModeIsActive()) {
-                    driveStraight(0.2);
+                while (sensorRange.getDistance(DistanceUnit.CM) < 800 && sensorRange.getDistance(DistanceUnit.CM) > 8 && timer.seconds() < 2 && op.opModeIsActive()) {
+                    driveStraight(0.1);
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State:", dropOffState.name());
                     op.telemetry.update();
                 }
-                if (sensorRange.getDistance(DistanceUnit.CM) < 10 || sensorRange.getDistance(DistanceUnit.CM) > 40) {
+                if (sensorRange.getDistance(DistanceUnit.CM) < 8 || sensorRange.getDistance(DistanceUnit.CM) > 40) {
                     dropOffState = DropOffState.ALIGNED;
                 }
                 break;
             case ALIGNED:
-                lightState = LightState.ALIGNED;
                 timer.reset();
                 while (timer.seconds() < 2 && op.opModeIsActive()) {
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
@@ -278,7 +259,6 @@ public class Cone {
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.update();
                 }
-                lightState = lightState.ALIGNING;
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
                 op.telemetry.addData("Drop Off:", "Completed");

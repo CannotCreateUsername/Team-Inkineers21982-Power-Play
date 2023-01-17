@@ -93,7 +93,7 @@ public class AlignJunction {
                 gameStickMultiplier = 0.8;
                 break;
             case ALIGNED:
-                if (sensorRange.getDistance(DistanceUnit.CM) > 13 && sensorRange.getDistance(DistanceUnit.CM) < 50) {
+                if (sensorRange.getDistance(DistanceUnit.CM) > 8 && sensorRange.getDistance(DistanceUnit.CM) < 50) {
                     alignState = AlignState.ALIGNING;
                     lightState = LightState.ALIGNING;
                 } else if (sensorRange.getDistance(DistanceUnit.CM) > 50) {
