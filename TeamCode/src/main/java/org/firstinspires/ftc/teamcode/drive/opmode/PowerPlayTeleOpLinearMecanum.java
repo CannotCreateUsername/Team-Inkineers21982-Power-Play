@@ -139,9 +139,9 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             // Distance
             telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
             telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
-            telemetry.addData("Align State", alignStick.getAlignState());
-            telemetry.addData("Light State", alignStick.getLightState());
-            telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());
+//            telemetry.addData("Align State", alignStick.getAlignState());
+//            telemetry.addData("Light State", alignStick.getLightState());
+//            telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());
 
             // lower back to rest if stopped
             if (isStopRequested()) {
