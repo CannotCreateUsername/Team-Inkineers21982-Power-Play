@@ -62,8 +62,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         GamepadHelper rightStickX = new GamepadHelper();
         rightStickX.init();
 
-        AlignJunction alignStick = new AlignJunction();
-        alignStick.init(hardwareMap);
+//        AlignJunction alignStick = new AlignJunction();
+//        alignStick.init(hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -75,21 +75,21 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
-            alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
+            // alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
 
 
             // keeps controls the same if robot is rotated 90 degrees in any direction
             switch (turnState) {
                 case STRAIGHT:
                     LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
-                    LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+                    LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
                     if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
                         turnState = TurnState.ROTATED;
                     }
                     break;
                 case ROTATED:
-                    LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+                    LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier;
                     LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
                     if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
@@ -137,8 +137,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("Rotation", turnState.name());
 
             // Distance
-            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
-            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
+//            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
+//            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
 //            telemetry.addData("Align State", alignStick.getAlignState());
 //            telemetry.addData("Light State", alignStick.getLightState());
 //            telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());

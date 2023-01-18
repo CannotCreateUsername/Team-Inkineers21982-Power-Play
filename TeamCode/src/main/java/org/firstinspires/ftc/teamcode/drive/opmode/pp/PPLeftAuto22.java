@@ -22,8 +22,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="1(Auto LEFT Strafe [A5 or F2])", group="Linear Opmode")
-public class PPLeftAuto1 extends LinearOpMode {
+@Autonomous(name="22(Auto LEFT Strafe [A5 or F2])", group="Linear Opmode")
+public class PPLeftAuto22 extends LinearOpMode {
 
 
 
@@ -95,7 +95,7 @@ public class PPLeftAuto1 extends LinearOpMode {
          */
 
         // we assume A2/F5 is starting point, the robot back is facing the wall
-        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
+        Pose2d startPose = new Pose2d(0, 0, 0);
 
         drive.setPoseEstimate(startPose);
 
@@ -139,7 +139,8 @@ public class PPLeftAuto1 extends LinearOpMode {
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
-        // run to left high junction
+
+        // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
@@ -152,28 +153,42 @@ public class PPLeftAuto1 extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                //turns
-                .turn(Math.toRadians(-90))
-                .strafeLeft(1)
-                .forward(24)
-                .strafeLeft(48)
+                .forward(1)
+                .strafeRight(24)
+                .forward(48)
+                .strafeRight(11)
                 .addTemporalMarker(() -> {
-                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.HIGH;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(3)
                 .resetConstraints()
                 .build();
 
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,-0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        cone.smallAlign();
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .strafeLeft(1)
-                .back(parkDistance)
+                .addTemporalMarker(() -> {
+                    // intake code goes here:
+                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.OUT);
+                })
+                .waitSeconds(2)
+                .addTemporalMarker(() -> {
+                    // intake code goes here:
+                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
+                })
+                .back(1)
+                .addTemporalMarker(() -> {
+                    // intake code goes here:
+                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+                    intakeSlide.run();
+                })
+                .waitSeconds(2)
+                .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();
 
