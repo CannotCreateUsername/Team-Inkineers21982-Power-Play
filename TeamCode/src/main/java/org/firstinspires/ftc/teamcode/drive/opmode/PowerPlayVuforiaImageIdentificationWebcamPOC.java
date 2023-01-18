@@ -65,7 +65,7 @@ import java.util.List;
  * */
 
 @TeleOp(name="POC: Vuforia Image", group ="Concept")
-//@Disabled
+@Disabled
 public class PowerPlayVuforiaImageIdentificationWebcamPOC extends LinearOpMode {
 
     public static final String TAG = "Vuforia VuMark Sample";

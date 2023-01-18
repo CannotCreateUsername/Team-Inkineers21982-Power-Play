@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -15,18 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.drive.Cone;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="Auto LEFT Strafe (A5 or F2)", group="Linear Opmode")
-public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
+@Autonomous(name="2(Auto LEFT Strafe [A5 or F2])", group="Linear Opmode")
+public class PPLeftAuto2 extends LinearOpMode {
 
 
 
@@ -142,32 +139,8 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
-        /**
-         * Pickup Preload Cone
-         * Stafe Left 24 inches
-         * Straight 48 inches
-         * Turn 45 degree  clockwise ;
-         * Raise Intake to High Junction
-         * Move forward 3 inches
-         * Release Cone
-         * Back 3 inches
-         * Turn 45 degree  clockwise ;
-         */
 
-
-        /**
-         * Pickup Preload Cone
-         * Stafe Left 24 inches
-         * Straight 48 inches
-         * Turn 45 degree  clockwise ;
-         * Raise Intake to High Junction
-         * Move forward 3 inches
-         * Release Cone
-         * Back 3 inches
-         * Turn 45 degree  clockwise ;
-         */
-
-
+        // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
@@ -182,7 +155,7 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                 })
                 .forward(1)
                 .strafeRight(24)
-                .forward(72)
+                .forward(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -194,13 +167,11 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,-0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        cone.dropOffCone(this,0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .back(1)
-                .strafeLeft(1)
-                .back(48)
                 .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();

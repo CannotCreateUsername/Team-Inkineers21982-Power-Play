@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -15,18 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.drive.Cone;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="Auto LEFT Strafe (A5 or F2)", group="Linear Opmode")
-public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
+@Autonomous(name="1(Auto LEFT Strafe [A5 or F2])", group="Linear Opmode")
+public class PPLeftAuto1 extends LinearOpMode {
 
 
 
@@ -98,7 +95,7 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
          */
 
         // we assume A2/F5 is starting point, the robot back is facing the wall
-        Pose2d startPose = new Pose2d(0, 0, 0);
+        Pose2d startPose = new Pose2d(0, 0, Math.toRadians(0));
 
         drive.setPoseEstimate(startPose);
 
@@ -142,32 +139,7 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
-        /**
-         * Pickup Preload Cone
-         * Stafe Left 24 inches
-         * Straight 48 inches
-         * Turn 45 degree  clockwise ;
-         * Raise Intake to High Junction
-         * Move forward 3 inches
-         * Release Cone
-         * Back 3 inches
-         * Turn 45 degree  clockwise ;
-         */
-
-
-        /**
-         * Pickup Preload Cone
-         * Stafe Left 24 inches
-         * Straight 48 inches
-         * Turn 45 degree  clockwise ;
-         * Raise Intake to High Junction
-         * Move forward 3 inches
-         * Release Cone
-         * Back 3 inches
-         * Turn 45 degree  clockwise ;
-         */
-
-
+        // run to left high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
@@ -180,9 +152,11 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                .forward(1)
-                .strafeRight(24)
-                .forward(72)
+                //turns
+                .turn(Math.toRadians(-90))
+                .strafeLeft(1)
+                .forward(24)
+                .strafeLeft(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -198,10 +172,8 @@ public class  PowerPlayLeftSideAutoWithOdometryStrafeOnly extends LinearOpMode {
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .back(1)
                 .strafeLeft(1)
-                .back(48)
-                .strafeLeft(parkDistance)
+                .back(parkDistance)
                 .resetConstraints()
                 .build();
 
