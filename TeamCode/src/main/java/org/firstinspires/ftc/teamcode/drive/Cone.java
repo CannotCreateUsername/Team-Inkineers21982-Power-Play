@@ -47,7 +47,7 @@ public class Cone {
     private double lastDistance;
     
     // Constants
-    private final int minimumPositives = 8;
+    private final int MINIMUM_POSITIVES = 8;
 
     private LinearOpMode op;
 
@@ -285,7 +285,7 @@ public class Cone {
             checks++;
         }
         // if positives is greater than the minimum positives needed to be aligned
-        if (positives > minimumPositives) {
+        if (positives > MINIMUM_POSITIVES) {
             return true;
         } else {
             return false;
@@ -300,7 +300,7 @@ public class Cone {
             strafeDistance(-0.3, -1);
             pIterations++;
         }
-        for (s = 0; s < pIterations; s++) {
+        for (s = 0; s < pIterations/2; s++) {
             strafeDistance(0.3, 1);
         }
     }

@@ -172,10 +172,9 @@ public class PPLeftAuto22 extends LinearOpMode {
 
         // IY 2023-01-18 - since the cone.smallAign move the drivetrain , the last coordinate of trajSeq is no longer valid.
         // please try this instead:
-        // Pose2d afterAdjPose = drive.getPoseEstimate();
-        // TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
+        Pose2d afterAdjPose = drive.getPoseEstimate();
 
-        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
+        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .addTemporalMarker(() -> {
