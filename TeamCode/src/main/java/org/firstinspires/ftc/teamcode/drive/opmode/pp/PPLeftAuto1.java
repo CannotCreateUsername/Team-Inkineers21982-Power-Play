@@ -15,6 +15,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -22,7 +23,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="1(Auto LEFT Strafe [A5 or F2])", group="Linear Opmode")
+@Autonomous(name="1(Auto LEFT Left [A5 or F2])", group="Linear Opmode")
 public class PPLeftAuto1 extends LinearOpMode {
 
 
@@ -140,7 +141,7 @@ public class PPLeftAuto1 extends LinearOpMode {
             telemetry.update();
         }
         // run to left high junction
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .addTemporalMarker(() -> {
@@ -164,21 +165,38 @@ public class PPLeftAuto1 extends LinearOpMode {
                 .waitSeconds(1)
                 .resetConstraints()
                 .build();
-
-
-        drive.followTrajectorySequence(trajSeq);
-        // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,-0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
-        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
+        //pick up stack cone
+        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .strafeLeft(1)
+                //.strafeLeft(1) to make sure is back at position
+                .back(24)
+                .resetConstraints()
+                .build();
+        //drop stack cone
+        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .forward(24)
+                .resetConstraints()
+                .build();
+        //park
+        TrajectorySequence park = drive.trajectorySequenceBuilder(preloadDrop.end())
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                //.strafeLeft(1) to make sure is back at position
                 .back(parkDistance)
                 .resetConstraints()
                 .build();
 
-
-        drive.followTrajectorySequence(trajSeq2);
+        drive.followTrajectorySequence(preloadDrop);
+        // Put align code here? [import Cone.java and call a function to drop off cone]
+        cone.dropOffCone(this,-0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        drive.followTrajectorySequence(stackPickup);
+        cone.pickUpCone();
+        drive.followTrajectorySequence(stackDrop);
+        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        drive.followTrajectorySequence(park);
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();
