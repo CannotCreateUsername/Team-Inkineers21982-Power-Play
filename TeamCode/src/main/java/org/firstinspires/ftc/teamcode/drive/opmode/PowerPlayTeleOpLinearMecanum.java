@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -62,53 +63,61 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         GamepadHelper rightStickX = new GamepadHelper();
         rightStickX.init();
 
-//        AlignJunction alignStick = new AlignJunction();
-//        alignStick.init(hardwareMap);
+        AlignJunction alignStick = new AlignJunction();
+        alignStick.init(hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         waitForStart();
 
         while (opModeIsActive()) {
+            Pose2d poseEstimate = drive.getPoseEstimate();
 
             // drivebase control loop
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
-            // alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
+            alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
 
 
-            // keeps controls the same if robot is rotated 90 degrees in any direction
-            switch (turnState) {
-                case STRAIGHT:
-                    LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
-                    LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier;
-                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
-                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                        turnState = TurnState.ROTATED;
-                    }
-                    break;
-                case ROTATED:
-                    LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier;
-                    LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
-                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
-                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
-                        turnState = TurnState.STRAIGHT;
-                    }
-                    break;
-            }
+//            // keeps controls the same if robot is rotated 90 degrees in any direction
+//            switch (turnState) {
+//                case STRAIGHT:
+//                    LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+//                    LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+//                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
+//                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//                        turnState = TurnState.ROTATED;
+//                    }
+//                    break;
+//                case ROTATED:
+//                    LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+//                    LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+//                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
+//                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//                        turnState = TurnState.STRAIGHT;
+//                    }
+//                    break;
+//            }
+            LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+            LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+            RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
 
-
+            // Field centric view
+            Vector2d input = new Vector2d(
+                    -LeftYInput,
+                    -LeftXInput
+            ).rotated(-poseEstimate.getHeading());
 
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -LeftXInput,
-                            -LeftYInput,
+                            -input.getX(),
+                            -input.getX(),
                             -RightXInput
                     )
             );
             drive.update();
-            Pose2d poseEstimate = drive.getPoseEstimate();
+
 //            telemetry.addData("X", poseEstimate.getX());
 //            telemetry.addData("Y", poseEstimate.getY());
 //            telemetry.addData("heading", poseEstimate.getHeading());
@@ -137,8 +146,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("Rotation", turnState.name());
 
             // Distance
-//            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
-//            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
+            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
+            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
 //            telemetry.addData("Align State", alignStick.getAlignState());
 //            telemetry.addData("Light State", alignStick.getLightState());
 //            telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());
