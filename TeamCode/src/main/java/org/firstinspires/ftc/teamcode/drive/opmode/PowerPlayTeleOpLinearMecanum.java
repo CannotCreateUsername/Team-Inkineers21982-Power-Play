@@ -83,36 +83,36 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 //            // keeps controls the same if robot is rotated 90 degrees in any direction
 //            switch (turnState) {
 //                case STRAIGHT:
-//                    LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
-//                    LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+//                    LeftXInput = gamepad1.left_stick_x * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+//                    LeftYInput = gamepad1.left_stick_y * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
 //                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
-//                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
 //                        turnState = TurnState.ROTATED;
 //                    }
 //                    break;
 //                case ROTATED:
-//                    LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
-//                    LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
+//                    LeftXInput = gamepad1.left_stick_y * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+//                    LeftYInput = -gamepad1.left_stick_x * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
 //                    RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
-//                    if (gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
+//                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_LEFT) || gamepadEx1.wasJustPressed(GamepadKeys.Button.DPAD_RIGHT)) {
 //                        turnState = TurnState.STRAIGHT;
 //                    }
 //                    break;
 //            }
-            LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
-            LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier  * alignMultiplierY;
+            LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier;
+            LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier * alignMultiplierY;
             RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
-
-            // Field centric view
-            Vector2d input = new Vector2d(
-                    -LeftYInput,
-                    -LeftXInput
-            ).rotated(-poseEstimate.getHeading());
+//
+//            // Field centric view
+//            Vector2d input = new Vector2d(
+//                    -LeftYInput,
+//                    -LeftXInput
+//            ).rotated(-poseEstimate.getHeading());
 
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -input.getX(),
-                            -input.getX(),
+                            -LeftYInput,
+                            -LeftXInput,
                             -RightXInput
                     )
             );

@@ -158,43 +158,75 @@ public class Cone {
 //    private int currentTarget = intakeSlide.getCurrentTarget();
 //
     // PROBLEM: YOU HAVE TO CALL RUN FOR INTAKE SLIDES AND INIT GAMEPADS!! HOW TO SOLVE!?
-    public void pickupCone() {
+    public void pickCone(LinearOpMode p_op) {
+        op = p_op;
         switch (pickupState) {
             case ALIGNING:
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
-                while (sensorRange.getDistance(DistanceUnit.CM) > 9) {
-                    straight(0.2);
+                timer.reset();
+                while (sensorRange.getDistance(DistanceUnit.CM) > 6 && timer.seconds() < 5 && op.opModeIsActive()) {
+                    straight(0.3);
+                    op.telemetry.addData("State", pickupState.name());
+                    op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                    op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
+                    op.telemetry.update();
                 }
+                stopMovement();
                 // vvv change condition to include touch sensor vvv
-                if (8 < sensorRange.getDistance(DistanceUnit.CM) && sensorRange.getDistance(DistanceUnit.CM) > 10) {
-                    pickupState = PickupState.ALIGNED;
+                timer.reset();
+                while (timer.seconds() < 3) {
+                    if (8 > sensorRange.getDistance(DistanceUnit.CM)) {
+                        pickupState = PickupState.ALIGNED;
+                        break;
+                    }
                 }
+
                 break;
             case ALIGNED:
+                timer.reset();
+
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
                 intakeSlide.run();
-                while (intakeSlide.getSlidePosition() < intakeSlide.currentTarget) {
+
+                while (intakeSlide.getSlidePosition() > intakeSlide.currentTarget || timer.seconds() < 2) {
+
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
                     intakeSlide.runIntake();
+
+                    op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                    op.telemetry.addData("State", pickupState.name());
+                    op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
+                    op.telemetry.update();
                 }
                 pickupState = PickupState.LOADED;
                 break;
             case LOADED:
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
-                while (sensorRange.getDistance(DistanceUnit.CM) < 15) {
+                timer.reset();
+                while (timer.seconds() < 1 && op.opModeIsActive()) {
+                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
+                    intakeSlide.runIntake();
+                }
+                while (sensorRange.getDistance(DistanceUnit.CM) < 15 && op.opModeIsActive()) {
                     straight(-0.3);
+                    op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                    op.telemetry.addData("State", pickupState.name());
+                    op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
+                    op.telemetry.update();
                 }
                 loaded = true;
                 break;
         }
     }
 
-    public void pickUpCone() {
-        while (!loaded) {
+    public void pickUpCone(LinearOpMode p_op) {
+        loaded = false;
+        op = p_op;
+        while (!loaded && op.opModeIsActive()) {
             intakeSlide.stack = true;
-            pickupCone();
+            pickCone(op);
         }
     }
 
@@ -203,25 +235,27 @@ public class Cone {
         op = p_op;
         if (op.opModeIsActive()) {
             timer.reset();
-            while (s < 2) {
-                while ((sensorRange.getDistance(DistanceUnit.CM) > 40 && timer.seconds() < 5) && op.opModeIsActive() ) {
-                    strafe(speed);
-                    op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
-                    op.telemetry.addData("State:", dropOffState.name());
-                    op.telemetry.update();
-                    lastDistance = sensorRange.getDistance(DistanceUnit.CM);
-                }
-                if (sensorRange.getDistance(DistanceUnit.CM) < lastDistance+5) {
-                    s++;
-                }
+//            while (s<2) {
+//
+//                if (sensorRange.getDistance(DistanceUnit.CM) < lastDistance+5) {
+//                    s++;
+//                }
+//            }
+            while ((sensorRange.getDistance(DistanceUnit.CM) > 40 && timer.seconds() < 5) && op.opModeIsActive() ) {
+                strafe(speed);
+                op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                op.telemetry.update();
+                lastDistance = sensorRange.getDistance(DistanceUnit.CM);
             }
             dropOffState = DropOffState.ALIGNING;
             s = 0;
             // troubleshooting
             while (loaded && op.opModeIsActive()) {
                 dropOff(height);
+                if (!loaded) {
+                    stopMovement();
+                }
             }
-            stopMovement();
         }
     }
 
@@ -232,13 +266,16 @@ public class Cone {
             case ALIGNING:
                 intakeSlide.liftState = height;
                 intakeSlide.run();
-                straightDistance(0.2, -2);
                 timer.reset();
-                while (sensorRange.getDistance(DistanceUnit.CM) < 800 && sensorRange.getDistance(DistanceUnit.CM) > 8 && timer.seconds() < 2 && op.opModeIsActive()) {
-                    straight(0.1);
-                    op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
-                    op.telemetry.addData("State:", dropOffState.name());
-                    op.telemetry.update();
+                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
+                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > 7)&& timer.seconds() < 2 && op.opModeIsActive()) {
+                        straight(0.1);
+                        op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                        op.telemetry.addData("State:", dropOffState.name());
+                        op.telemetry.update();
+                    }
+                } else {
+                    straightDistance(0.1, 3);
                 }
                 if (sensorRange.getDistance(DistanceUnit.CM) < 8 || sensorRange.getDistance(DistanceUnit.CM) > 40) {
                     dropOffState = DropOffState.ALIGNED;
@@ -246,7 +283,7 @@ public class Cone {
                 break;
             case ALIGNED:
                 timer.reset();
-                while (timer.seconds() < 2 && op.opModeIsActive()) {
+                while (timer.seconds() < 1 && op.opModeIsActive()) {
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State:", dropOffState.name());
                     op.telemetry.update();
@@ -260,17 +297,25 @@ public class Cone {
                 dropOffState = DropOffState.UNLOADED;
                 break;
             case UNLOADED:
-                loaded = false;
                 intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 intakeSlide.runIntake();
                 timer.reset();
-                while (timer.seconds() < 1 && op.opModeIsActive()) {
-                    straight(-0.3);
-                    op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
-                    op.telemetry.update();
+
+                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
+                    while (sensorRange.getDistance(DistanceUnit.CM) < 15 && timer.seconds() < 2 && op.opModeIsActive()) {
+                        straight(-0.3);
+                        op.telemetry.addData("Time", timer.seconds());
+                        op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                        op.telemetry.update();
+                    }
+                } else {
+                    straightDistance(0.3, -3);
                 }
+
+                loaded = false;
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
+                dropOffState = DropOffState.UNALIGNED;
                 op.telemetry.addData("Drop Off:", "Completed");
                 op.telemetry.update();
                 break;

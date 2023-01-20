@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="3(Auto LEFT Bottom/Left [A5 or F2])", group="Linear Opmode")
-@Disabled
+//@Disabled
 public class PPLeftAuto3 extends LinearOpMode {
 
 
@@ -108,6 +108,7 @@ public class PPLeftAuto3 extends LinearOpMode {
 
         if(isStopRequested()) return;
 
+
         //Vufrofia
         targets1.activate();  // octopus
         targets2.activate(); // triangle
@@ -142,8 +143,8 @@ public class PPLeftAuto3 extends LinearOpMode {
             telemetry.update();
         }
 
-        // run to bottom high junction
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+        // run to left high junction
+        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .addTemporalMarker(() -> {
@@ -155,9 +156,11 @@ public class PPLeftAuto3 extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                .forward(1)
-                .strafeRight(24)
-                .forward(48)
+                .forward(2)
+                .turn(Math.toRadians(-90))
+                .strafeRight(2)
+                .forward(28)
+                .strafeLeft(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -165,21 +168,38 @@ public class PPLeftAuto3 extends LinearOpMode {
                 .waitSeconds(1)
                 .resetConstraints()
                 .build();
-
-
-        drive.followTrajectorySequence(trajSeq);
-        // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
-        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
+        //pick up stack cone
+        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .back(1)
-                .strafeLeft(parkDistance)
+                .strafeRight(3) //to make sure is back at position
+                .back(24)
+                .resetConstraints()
+                .build();
+        //drop stack cone
+        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .forward(24)
+                .resetConstraints()
+                .build();
+        //park
+        TrajectorySequence park = drive.trajectorySequenceBuilder(stackDrop.end())
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .strafeLeft(1) //to make sure is back at position
+                .back(parkDistance)
                 .resetConstraints()
                 .build();
 
+        drive.followTrajectorySequence(preloadDrop);
+        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        drive.followTrajectorySequence(stackPickup);
+        cone.pickUpCone(this);
+        drive.followTrajectorySequence(stackDrop);
+        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        drive.followTrajectorySequence(park);
 
-        drive.followTrajectorySequence(trajSeq2);
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();

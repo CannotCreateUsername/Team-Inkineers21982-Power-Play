@@ -153,11 +153,9 @@ public class PPLeftAuto1 extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                //turns
-                .turn(Math.toRadians(-90))
-                .strafeLeft(1)
-                .forward(24)
-                .strafeLeft(48)
+                .forward(1)
+                .strafeRight(24)
+                .forward(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -165,35 +163,51 @@ public class PPLeftAuto1 extends LinearOpMode {
                 .waitSeconds(1)
                 .resetConstraints()
                 .build();
-        //pick up stack cone
-        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
+
+        drive.followTrajectorySequence(preloadDrop);
+        // Put align code here? [import Cone.java and call a function to drop off cone]
+        cone.dropOffCone(this,0.25, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        drive.turn(Math.toRadians(-90));
+        Pose2d newLastPose = preloadDrop.end().plus(new Pose2d(0,0,Math.toRadians(-90)));
+        // Go to start of next code
+        TrajectorySequence toLeft = drive.trajectorySequenceBuilder(newLastPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                //.strafeLeft(1) to make sure is back at position
+                //.turn(Math.toRadians(-90))
+                .waitSeconds(1)
                 .back(24)
+                .strafeLeft(1)
+                .waitSeconds(1)
                 .resetConstraints()
                 .build();
         //drop stack cone
-        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
+        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(toLeft.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .forward(24)
                 .resetConstraints()
                 .build();
-        //park
-        TrajectorySequence park = drive.trajectorySequenceBuilder(preloadDrop.end())
+        //pick up stack cone
+        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(toLeft.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                //.strafeLeft(1) to make sure is back at position
+                //.strafeRight(1) //to make sure is back at position
+                .back(24)
+                .waitSeconds(1)
+                .resetConstraints()
+                .build();
+        //park
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(toLeft.end())
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .strafeLeft(1) //to make sure is back at position
                 .back(parkDistance)
                 .resetConstraints()
                 .build();
-
-        drive.followTrajectorySequence(preloadDrop);
-        // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,-0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        drive.followTrajectorySequence(toLeft);
         drive.followTrajectorySequence(stackPickup);
-        cone.pickUpCone();
+        cone.pickUpCone(this);
         drive.followTrajectorySequence(stackDrop);
         cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
         drive.followTrajectorySequence(park);
