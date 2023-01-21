@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class IntakeSlideSubsystemAuto {
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
@@ -35,6 +36,8 @@ public class IntakeSlideSubsystemAuto {
 
     public DcMotor slides = null;
     public CRServo intake = null;
+
+    ElapsedTime timer = new ElapsedTime();
 
     // 2022-10-19: REVIEW THE STATE !!!
     public enum LiftState {
@@ -160,6 +163,7 @@ public class IntakeSlideSubsystemAuto {
                 } else {
                     currentTarget = targetPositionRest;
                 }
+                timer.reset();
                 break;
             case PICKUP:
                 currentTarget = targetPositionPickup;

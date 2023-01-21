@@ -75,7 +75,7 @@ public class AlignJunction {
 
         switch (alignState) {
             case UNALIGNED:
-                if (sensorRange.getDistance(DistanceUnit.CM) < 50) {
+                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
                     alignState = AlignState.ALIGNING;
                     lightState = LightState.ALIGNING;
                 }
@@ -83,20 +83,20 @@ public class AlignJunction {
                 gameStickMultiplier = 1;
                 break;
             case ALIGNING:
-                if (sensorRange.getDistance(DistanceUnit.CM) < 13) {
+                if (sensorRange.getDistance(DistanceUnit.CM) < 8) {
                     alignState = AlignState.ALIGNED;
                     lightState = LightState.ALIGNED;
-                } else if (sensorRange.getDistance(DistanceUnit.CM) > 50) {
+                } else if (sensorRange.getDistance(DistanceUnit.CM) > 40) {
                     alignState = AlignState.UNALIGNED;
                     lightState = LightState.OFF;
                 }
                 gameStickMultiplier = 0.8;
                 break;
             case ALIGNED:
-                if (sensorRange.getDistance(DistanceUnit.CM) > 8 && sensorRange.getDistance(DistanceUnit.CM) < 50) {
+                if (sensorRange.getDistance(DistanceUnit.CM) > 8 && sensorRange.getDistance(DistanceUnit.CM) < 40) {
                     alignState = AlignState.ALIGNING;
                     lightState = LightState.ALIGNING;
-                } else if (sensorRange.getDistance(DistanceUnit.CM) > 50) {
+                } else if (sensorRange.getDistance(DistanceUnit.CM) > 40) {
                     alignState = AlignState.UNALIGNED;
                     lightState = LightState.OFF;
                 }
@@ -127,6 +127,58 @@ public class AlignJunction {
 
         return gameStickMultiplier;
 
+    }
+
+    public void run() {
+        switch (alignState) {
+            case UNALIGNED:
+                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
+                    alignState = AlignState.ALIGNING;
+                    lightState = LightState.ALIGNING;
+                }
+                isStopped = false;
+                break;
+            case ALIGNING:
+                if (sensorRange.getDistance(DistanceUnit.CM) < 8) {
+                    alignState = AlignState.ALIGNED;
+                    lightState = LightState.ALIGNED;
+                } else if (sensorRange.getDistance(DistanceUnit.CM) > 40) {
+                    alignState = AlignState.UNALIGNED;
+                    lightState = LightState.OFF;
+                }
+                break;
+            case ALIGNED:
+                if (sensorRange.getDistance(DistanceUnit.CM) > 8 && sensorRange.getDistance(DistanceUnit.CM) < 40) {
+                    alignState = AlignState.ALIGNING;
+                    lightState = LightState.ALIGNING;
+                } else if (sensorRange.getDistance(DistanceUnit.CM) > 40) {
+                    alignState = AlignState.UNALIGNED;
+                    lightState = LightState.OFF;
+                }
+//                isStopped = false;
+//                if (currentGameStickState == previousGameStickState && !isStopped) {
+//                    gameStickMultiplier = 0;
+//                } else if (currentGameStickState != previousGameStickState) {
+//                    isStopped = true;
+//                    gameStickMultiplier = 1;
+//                }
+                break;
+        }
+
+        switch (lightState) {
+            case OFF:
+                greenLED.setState(false);
+                redLED.setState(false);
+                break;
+            case ALIGNING:
+                greenLED.setState(false);
+                redLED.setState(true);
+                break;
+            case ALIGNED:
+                greenLED.setState(true);
+                redLED.setState(false);
+                break;
+        }
     }
 
     public String getAlignState() { return alignState.name(); }

@@ -264,7 +264,6 @@ public class IntakeSlideSubsystem3 extends IntakeSlide {
                 if (!rtReader.isDown() || !controller.getButton(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.STOP;
                 }
-                setIntakePower(IntakeState.OUT);   //  intake.setPower(1);
                 break;
         }
     }

@@ -186,14 +186,10 @@ public class Cone {
             case ALIGNED:
                 timer.reset();
 
+                intakeSlide.intake.setPower(-1);
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
                 intakeSlide.run();
-
-                while (intakeSlide.getSlidePosition() > intakeSlide.currentTarget || timer.seconds() < 2) {
-
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
-                    intakeSlide.runIntake();
-
+                while (timer.seconds() < 2) {
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
@@ -202,15 +198,17 @@ public class Cone {
                 pickupState = PickupState.LOADED;
                 break;
             case LOADED:
-                intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+                intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.LOW;
                 intakeSlide.run();
                 timer.reset();
                 while (timer.seconds() < 1 && op.opModeIsActive()) {
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
+                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
                     intakeSlide.runIntake();
                 }
                 while (sensorRange.getDistance(DistanceUnit.CM) < 15 && op.opModeIsActive()) {
                     straight(-0.3);
+                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
+                    intakeSlide.runIntake();
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
@@ -268,29 +266,30 @@ public class Cone {
                 intakeSlide.run();
                 timer.reset();
                 if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
-                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > 7)&& timer.seconds() < 2 && op.opModeIsActive()) {
+                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > 9)&& timer.seconds() < 3 && op.opModeIsActive()) {
                         straight(0.1);
                         op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                         op.telemetry.addData("State:", dropOffState.name());
                         op.telemetry.update();
                     }
                 } else {
-                    straightDistance(0.1, 3);
+                    straightDistance(3);
                 }
-                if (sensorRange.getDistance(DistanceUnit.CM) < 8 || sensorRange.getDistance(DistanceUnit.CM) > 40) {
+                if (sensorRange.getDistance(DistanceUnit.CM) < 9 || sensorRange.getDistance(DistanceUnit.CM) > 40) {
                     dropOffState = DropOffState.ALIGNED;
                 }
                 break;
             case ALIGNED:
                 timer.reset();
-                while (timer.seconds() < 1 && op.opModeIsActive()) {
+                while (timer.seconds() < 1) {
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State:", dropOffState.name());
                     op.telemetry.update();
                     stopMovement();
                 }
+
                 timer.reset();
-                while (timer.seconds() < 2 && op.opModeIsActive()) {
+                while (timer.seconds() < 1.5 && op.opModeIsActive()) {
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.OUT);
                     intakeSlide.runIntake();
                 }
@@ -309,7 +308,7 @@ public class Cone {
                         op.telemetry.update();
                     }
                 } else {
-                    straightDistance(0.3, -3);
+                    straightDistance(-3);
                 }
 
                 loaded = false;
@@ -338,26 +337,30 @@ public class Cone {
     }
     public void align() {
         while (!checkForAlign()) {
-            strafeDistance(-0.3, -1);
+            strafeDistance(-1);
         }
         pIterations++;
         while (checkForAlign()) {
-            strafeDistance(-0.3, -1);
+            strafeDistance(-1);
             pIterations++;
         }
         for (s = 0; s < pIterations/2; s++) {
-            strafeDistance(0.3, 1);
+            strafeDistance(1);
         }
     }
 
+    public void smallAlignL() {
+        strafeDistance2(20);
+    }
+
     // only stops overshoot
-    public void smallAlign() {
-        straightDistance(-0.3, -2);
-        if (sensorRange.getDistance(DistanceUnit.CM) < 8) {
+    public void smallAlignV() {
+        straightDistance(5);
+        if (sensorRange.getDistance(DistanceUnit.CM) < 5) {
             stopMovement();
         }
     }
-    
+
     // Negative speed for forwards
     private void straight(double speed) {
 
@@ -411,16 +414,16 @@ public class Cone {
         drive.update();
     }
 
-    private void strafeDistance (double speed, double distance) {
+    private void strafeDistance (double distance) {
 
         double leftYControl = 0 ;
-        double leftXControl = Math.abs(speed);
+        double leftXControl;
         double rightXControl = 0;
 
         if (distance > 0 ){
-            leftXControl = leftXControl * 1;
+            leftXControl = 0.3;
         } else {
-            leftXControl = leftXControl * -1;
+            leftXControl = -0.3;
         }
         ElapsedTime controlTimer = new ElapsedTime();
 
@@ -439,16 +442,16 @@ public class Cone {
 
     }
 
-    private void straightDistance (double speed, double distance) {
+    private void straightDistance (double distance) {
 
-        double leftYControl = Math.abs(speed);
+        double leftYControl;
         double leftXControl = 0;
         double rightXControl = 0;
 
         if (distance > 0 ){
-            leftYControl = leftYControl * 1;
+            leftYControl = 0.3;
         } else {
-            leftYControl = leftYControl * -1;
+            leftYControl = -0.3;
         }
         ElapsedTime controlTimer = new ElapsedTime();
 
@@ -467,4 +470,31 @@ public class Cone {
 
     }
 
+    private void strafeDistance2 (double distance) {
+
+        double leftYControl = 0 ;
+        double leftXControl;
+        double rightXControl = 0;
+
+        if (distance > 0 ){
+            leftXControl = 0.3;
+        } else {
+            leftXControl = -0.3;
+        }
+        ElapsedTime controlTimer = new ElapsedTime();
+
+        double timeLimit = Math.abs(distance) / 16;
+
+        while (controlTimer.seconds() < timeLimit && sensorRange.getDistance(DistanceUnit.CM) > 50){
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -leftYControl  ,
+                            -leftXControl  ,
+                            -rightXControl
+                    )
+            );
+            drive.update();
+        }
+
+    }
 }

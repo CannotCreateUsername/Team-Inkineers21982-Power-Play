@@ -167,11 +167,15 @@ public class PPLeftAuto2 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
-        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq.end())
+        cone.dropOffCone(this, 0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+
+        // IY 2023-01-18 - since the cone.smallAign move the drivetrain , the last coordinate of trajSeq is no longer valid.
+        // please try this instead:
+        Pose2d afterAdjPose = drive.getPoseEstimate();
+
+        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .back(1)
                 .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();

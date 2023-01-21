@@ -168,7 +168,7 @@ public class PPLeftAuto22 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.smallAlign();
+        cone.smallAlignV();
 
         // IY 2023-01-18 - since the cone.smallAign move the drivetrain , the last coordinate of trajSeq is no longer valid.
         // please try this instead:
@@ -186,13 +186,15 @@ public class PPLeftAuto22 extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                .back(1)
+                .forward(5)
+                .waitSeconds(1)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
                     intakeSlide.run();
                 })
-                .waitSeconds(2)
+                .waitSeconds(1)
+                .strafeLeft(9.75)
                 .strafeLeft(parkDistance)
                 .resetConstraints()
                 .build();

@@ -108,7 +108,6 @@ public class PPLeftAuto3 extends LinearOpMode {
 
         if(isStopRequested()) return;
 
-
         //Vufrofia
         targets1.activate();  // octopus
         targets2.activate(); // triangle
@@ -143,7 +142,7 @@ public class PPLeftAuto3 extends LinearOpMode {
             telemetry.update();
         }
 
-        // run to left high junction
+        // run to left high junction, REMEMBER TO CHANGE vvv TO FASTER (BECAUSE GITHUBU DIES NOT UPDSAT EIT P)
         TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
@@ -172,7 +171,7 @@ public class PPLeftAuto3 extends LinearOpMode {
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .strafeRight(3) //to make sure is back at position
+                .strafeRight(2) //to make sure is back at position
                 .back(24)
                 .resetConstraints()
                 .build();

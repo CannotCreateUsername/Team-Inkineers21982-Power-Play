@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
+import android.graphics.Paint;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -8,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.AlignJunction;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
@@ -31,13 +34,14 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         ROTATED
     }
 
+    TurnState turnState;
+
     private double LeftXInput;
     private double LeftYInput;
     private double RightXInput;
 
     @Override
     public void runOpMode() throws InterruptedException {
-        TurnState turnState;
         turnState = TurnState.STRAIGHT;
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
@@ -55,7 +59,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         // by default , use Drive Control #1
         IntakeSlide currentIntakeSlide = intakeSlide3;
 
-        double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX, alignMultiplierY;
+        double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX;
         GamepadHelper leftStickX = new GamepadHelper();
         leftStickX.init();
         GamepadHelper leftStickY = new GamepadHelper();
@@ -77,7 +81,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
-            alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
+            //alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
 
 
 //            // keeps controls the same if robot is rotated 90 degrees in any direction
@@ -100,7 +104,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
 //                    break;
 //            }
             LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide3.dropOffMultiplier;
-            LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier * alignMultiplierY;
+            LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide3.dropOffMultiplier;
             RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide3.dropOffMultiplier;
 //
 //            // Field centric view
@@ -118,6 +122,8 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             );
             drive.update();
 
+            alignStick.run();
+
 //            telemetry.addData("X", poseEstimate.getX());
 //            telemetry.addData("Y", poseEstimate.getY());
 //            telemetry.addData("heading", poseEstimate.getHeading());
@@ -132,6 +138,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             } else if (gamepad1.start || gamepad2.start){
                 currentIntakeSlide = intakeSlide;
             }
+
             // use the abstract class interface to call the run code. but the actual implementaiton
             // can vary between intakeSlide and intakeSlide2
             // so at any point in time, only one drive control logic is being used
@@ -150,16 +157,13 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
             telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
 //            telemetry.addData("Align State", alignStick.getAlignState());
 //            telemetry.addData("Light State", alignStick.getLightState());
-//            telemetry.addData("Align Mutiplier", alignStick.getGameStickMultiplier());
-
-            // lower back to rest if stopped
-            if (isStopRequested()) {
-                currentIntakeSlide.liftState = IntakeSlide.LiftState.REST;
-            }
+//            telemetry.addData("Align Multiplier", alignStick.getGameStickMultiplier());
 
             // publish all the telemetry at once
             telemetry.update();
         }
+        // lower back to rest if stopped
+        currentIntakeSlide.liftState = IntakeSlide.LiftState.REST;
     }
 
 
