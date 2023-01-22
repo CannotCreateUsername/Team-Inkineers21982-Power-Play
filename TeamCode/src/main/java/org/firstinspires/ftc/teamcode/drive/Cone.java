@@ -49,6 +49,10 @@ public class Cone {
     // Constants
     private final int MINIMUM_POSITIVES = 8;
 
+    private final double JUNCTION_DISTANCE = 8;
+    private final double CONE_DISTANCE = 6;
+    private final double LATERAL_DISTANCE = 40;
+
     private LinearOpMode op;
 
     // Hardware
@@ -165,7 +169,7 @@ public class Cone {
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
                 timer.reset();
-                while (sensorRange.getDistance(DistanceUnit.CM) > 6 && timer.seconds() < 5 && op.opModeIsActive()) {
+                while (sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE && timer.seconds() < 5 && op.opModeIsActive()) {
                     straight(0.3);
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
@@ -205,6 +209,7 @@ public class Cone {
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
                     intakeSlide.runIntake();
                 }
+                // back out
                 while (sensorRange.getDistance(DistanceUnit.CM) < 15 && op.opModeIsActive()) {
                     straight(-0.3);
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
@@ -229,7 +234,7 @@ public class Cone {
     }
 
     // change speed (direction) for strafe right/left for different starting positions
-    public void dropOffCone(LinearOpMode p_op, double speed, IntakeSlideSubsystemAuto.LiftState height) {
+    public void dropOffCone(LinearOpMode p_op, double speed, IntakeSlideSubsystemAuto.LiftState height, boolean cone) {
         op = p_op;
         if (op.opModeIsActive()) {
             timer.reset();
@@ -239,7 +244,7 @@ public class Cone {
 //                    s++;
 //                }
 //            }
-            while ((sensorRange.getDistance(DistanceUnit.CM) > 40 && timer.seconds() < 5) && op.opModeIsActive() ) {
+            while ((sensorRange.getDistance(DistanceUnit.CM) > LATERAL_DISTANCE && timer.seconds() < 5) && op.opModeIsActive() ) {
                 strafe(speed);
                 op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                 op.telemetry.update();
@@ -249,7 +254,7 @@ public class Cone {
             s = 0;
             // troubleshooting
             while (loaded && op.opModeIsActive()) {
-                dropOff(height);
+                dropOff(height, cone);
                 if (!loaded) {
                     stopMovement();
                 }
@@ -257,7 +262,7 @@ public class Cone {
         }
     }
 
-    private void dropOff(IntakeSlideSubsystemAuto.LiftState height) {
+    private void dropOff(IntakeSlideSubsystemAuto.LiftState height, boolean cone) {
         switch (dropOffState) {
             case UNALIGNED:
                 break;
@@ -265,8 +270,17 @@ public class Cone {
                 intakeSlide.liftState = height;
                 intakeSlide.run();
                 timer.reset();
-                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
-                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > 9)&& timer.seconds() < 3 && op.opModeIsActive()) {
+
+                // whether a cone has already been dropped
+                if (!cone && sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
+                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > JUNCTION_DISTANCE)&& timer.seconds() < 3 && op.opModeIsActive()) {
+                        straight(0.1);
+                        op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+                        op.telemetry.addData("State:", dropOffState.name());
+                        op.telemetry.update();
+                    }
+                } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
+                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE) && timer.seconds() < 3 && op.opModeIsActive()) {
                         straight(0.1);
                         op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                         op.telemetry.addData("State:", dropOffState.name());
@@ -275,7 +289,8 @@ public class Cone {
                 } else {
                     straightDistance(3);
                 }
-                if (sensorRange.getDistance(DistanceUnit.CM) < 9 || sensorRange.getDistance(DistanceUnit.CM) > 40) {
+
+                if (sensorRange.getDistance(DistanceUnit.CM) < 15 || sensorRange.getDistance(DistanceUnit.CM) > LATERAL_DISTANCE) {
                     dropOffState = DropOffState.ALIGNED;
                 }
                 break;
@@ -300,7 +315,7 @@ public class Cone {
                 intakeSlide.runIntake();
                 timer.reset();
 
-                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
+                if (sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
                     while (sensorRange.getDistance(DistanceUnit.CM) < 15 && timer.seconds() < 2 && op.opModeIsActive()) {
                         straight(-0.3);
                         op.telemetry.addData("Time", timer.seconds());
@@ -312,18 +327,20 @@ public class Cone {
                 }
 
                 loaded = false;
+                cone = true;
+
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
-                dropOffState = DropOffState.UNALIGNED;
                 op.telemetry.addData("Drop Off:", "Completed");
                 op.telemetry.update();
+                dropOffState = DropOffState.UNALIGNED;
                 break;
         }
     }
 
     public boolean checkForAlign() {
         while (checks<=10) {
-            if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
+            if (sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
                 positives++;
             }
             checks++;
@@ -355,7 +372,7 @@ public class Cone {
 
     // only stops overshoot
     public void smallAlignV() {
-        straightDistance(5);
+        straightDistance(8);
         if (sensorRange.getDistance(DistanceUnit.CM) < 5) {
             stopMovement();
         }

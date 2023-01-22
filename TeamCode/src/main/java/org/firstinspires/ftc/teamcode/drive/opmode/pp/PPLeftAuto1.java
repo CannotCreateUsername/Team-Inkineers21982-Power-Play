@@ -166,7 +166,7 @@ public class PPLeftAuto1 extends LinearOpMode {
 
         drive.followTrajectorySequence(preloadDrop);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this,0.25, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        cone.dropOffCone(this,0.25, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.turn(Math.toRadians(-90));
         Pose2d newLastPose = preloadDrop.end().plus(new Pose2d(0,0,Math.toRadians(-90)));
         // Go to start of next code
@@ -209,7 +209,7 @@ public class PPLeftAuto1 extends LinearOpMode {
         drive.followTrajectorySequence(stackPickup);
         cone.pickUpCone(this);
         drive.followTrajectorySequence(stackDrop);
-        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH);
+        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
         drive.followTrajectorySequence(park);
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);

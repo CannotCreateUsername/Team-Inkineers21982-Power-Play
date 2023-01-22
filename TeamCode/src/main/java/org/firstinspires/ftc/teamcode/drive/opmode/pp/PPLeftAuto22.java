@@ -156,7 +156,7 @@ public class PPLeftAuto22 extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(48)
-                .strafeRight(11)
+                .strafeRight(13)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.HIGH;
                     intakeSlide.run();
@@ -186,7 +186,7 @@ public class PPLeftAuto22 extends LinearOpMode {
                     // intake code goes here:
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 })
-                .forward(5)
+                .forward(7)
                 .waitSeconds(1)
                 .addTemporalMarker(() -> {
                     // intake code goes here:
