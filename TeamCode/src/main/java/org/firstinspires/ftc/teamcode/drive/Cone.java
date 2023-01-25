@@ -207,13 +207,11 @@ public class Cone {
                 timer.reset();
                 while (timer.seconds() < 1 && op.opModeIsActive()) {
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
-                    intakeSlide.runIntake();
                 }
                 // back out
                 while (sensorRange.getDistance(DistanceUnit.CM) < 15 && op.opModeIsActive()) {
                     straight(-0.3);
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
-                    intakeSlide.runIntake();
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
@@ -306,7 +304,6 @@ public class Cone {
                 timer.reset();
                 while (timer.seconds() < 1.5 && op.opModeIsActive()) {
                     intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.OUT);
-                    intakeSlide.runIntake();
                 }
                 dropOffState = DropOffState.UNLOADED;
                 break;
