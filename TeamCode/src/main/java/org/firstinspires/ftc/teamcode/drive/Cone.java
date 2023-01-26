@@ -84,6 +84,7 @@ public class Cone {
         pickupState = PickupState.ALIGNING;
         dropOffState = DropOffState.UNALIGNED;
         lightState = LightState.OFF;
+
     }
 
 //    public void init(HardwareMap hardwareMap) {
@@ -189,8 +190,7 @@ public class Cone {
                 break;
             case ALIGNED:
                 timer.reset();
-
-                intakeSlide.intake.setPower(-1);
+                intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
                 intakeSlide.run();
                 while (timer.seconds() < 2) {
@@ -206,12 +206,11 @@ public class Cone {
                 intakeSlide.run();
                 timer.reset();
                 while (timer.seconds() < 1 && op.opModeIsActive()) {
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
+                    // wait
                 }
                 // back out
                 while (sensorRange.getDistance(DistanceUnit.CM) < 15 && op.opModeIsActive()) {
                     straight(-0.3);
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
@@ -303,12 +302,11 @@ public class Cone {
 
                 timer.reset();
                 while (timer.seconds() < 1.5 && op.opModeIsActive()) {
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.OUT);
+                    intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
                 }
                 dropOffState = DropOffState.UNLOADED;
                 break;
             case UNLOADED:
-                intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
                 intakeSlide.runIntake();
                 timer.reset();
 
@@ -324,7 +322,6 @@ public class Cone {
                 }
 
                 loaded = false;
-                cone = true;
 
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();

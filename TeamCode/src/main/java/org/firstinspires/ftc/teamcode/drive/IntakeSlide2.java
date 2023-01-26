@@ -1,19 +1,19 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class IntakeSlideSubsystemAuto {
+public abstract class IntakeSlide2 {
+
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
     public final int targetPositionHigh = 2842;
     public final int targetPositionMedium = 2025;
     public final int targetPositionLow = 1175;
-    public final int targetPositionPickup = 300;
-    public final int targetPositionPickup2 = 700;
+    public final int targetPositionPickup = 130;
+    public final int targetPositionPickup2 = 300;
     public final int targetPositionRest = 0;  // ideally it should be zero !!!
-    public final int stackDiff = 400;
 
     // distance error factor
     // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
@@ -35,9 +35,8 @@ public class IntakeSlideSubsystemAuto {
     public IntakeState intakeState;
 
     public DcMotor slides = null;
+    // Regular servo
     public Servo intake = null;
-
-    ElapsedTime timer = new ElapsedTime();
 
     // 2022-10-19: REVIEW THE STATE !!!
     public enum LiftState {
@@ -55,7 +54,7 @@ public class IntakeSlideSubsystemAuto {
         OUT
     }
 
-    public boolean stack = false;
+
 
 
     // ***********************************************
@@ -118,79 +117,22 @@ public class IntakeSlideSubsystemAuto {
         setSlidePower(defaultPower);
     }
 
-    public void init(HardwareMap hardwareMap) {
-        // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
-        // step (using the FTC Robot Controller app on the phone).
 
-        slides = hardwareMap.get(DcMotor.class, "slides");
-        slides.setDirection(DcMotor.Direction.REVERSE);
-        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        // initialize the hardware map of intake
-        intake = hardwareMap.get(Servo.class, "intake");
-
-
-        currentCaption = "Lift Status";
-        currentStatus = "Initialized";
-        currentTarget = 0;
-        currentPower = 0;
-
-        intakeState = IntakeState.IN;
-        liftState = LiftState.REST;
-
-    }
-
-    public void setIntakePosition(IntakeState state ){
+    public void setIntakePower(IntakeState state ){
         if (state == IntakeState.IN){
-            intake.setPosition(1);
-        } else if  (state == IntakeState.OUT){
             intake.setPosition(-1);
+        } else if  (state == IntakeState.OUT){
+            intake.setPosition(1);
+        } else {
+            intake.setPosition(0);
         }
     }
 
-    public void run() {
-        switch (liftState) {
-            case REST:
-                if (stack) {
-                    currentTarget = targetPositionRest+stackDiff;
-                } else {
-                    currentTarget = targetPositionRest;
-                }
-                timer.reset();
-                break;
-            case PICKUP:
-                currentTarget = targetPositionPickup;
-                break;
-            case PICKUP2:
-                currentTarget = targetPositionPickup2;
-                break;
-            case LOW:
-                currentTarget = targetPositionLow;
-                break;
-            case MEDIUM:
-                currentTarget = targetPositionMedium;
-                break;
-            case HIGH:
-                currentTarget = targetPositionHigh;
-                break;
-        }
-        runToPosition(currentTarget);
-    }
+    // ***********************************************
+    // Abstract methods which will be
+    // implemented by its subclass(es)
+    abstract public void init(HardwareMap hardwareMap);
+    abstract public void run(GamepadEx gamepad1, GamepadEx gamepad2);
+    abstract public void runIntake(GamepadEx controller);
 
-    public void runIntake() {
-        switch (intakeState) {
-            case IN:
-                setIntakePosition(intakeState.IN);
-                break;
-            case OUT:
-                setIntakePosition(intakeState.OUT);
-                break;
-        }
-    }
-
-    public int getSlidePosition() { return slides.getCurrentPosition(); }
-    public int getCurrentTarget() { return currentTarget; }
 }

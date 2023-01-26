@@ -135,12 +135,11 @@ public class PPLeftAuto22 extends LinearOpMode {
                     }
                 }
             }
-            intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
+            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
             telemetry.addData("Visible Target", targetName);
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
-        intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
 
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
@@ -172,13 +171,9 @@ public class PPLeftAuto22 extends LinearOpMode {
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .addTemporalMarker(() -> {
                     // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.OUT);
+                    intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
                 })
                 .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
-                })
                 .forward(7)
                 .waitSeconds(1)
                 .addTemporalMarker(() -> {

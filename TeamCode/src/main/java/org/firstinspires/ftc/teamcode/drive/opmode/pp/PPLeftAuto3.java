@@ -137,6 +137,7 @@ public class PPLeftAuto3 extends LinearOpMode {
                     }
                 }
             }
+            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
             telemetry.addData("Visible Target", targetName);
             telemetry.addData("Lable #", label);
             telemetry.update();
@@ -146,15 +147,6 @@ public class PPLeftAuto3 extends LinearOpMode {
         TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
-                })
-                .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
-                })
                 .forward(2)
                 .turn(Math.toRadians(-90))
                 .strafeRight(2)

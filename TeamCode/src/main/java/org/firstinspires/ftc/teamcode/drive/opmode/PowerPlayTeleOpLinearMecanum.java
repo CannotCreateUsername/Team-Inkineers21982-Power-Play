@@ -164,6 +164,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         }
         // lower back to rest if stopped
         currentIntakeSlide.liftState = IntakeSlide.LiftState.REST;
+        currentIntakeSlide.run(gamepadEx1, gamepadEx2);
     }
 
 

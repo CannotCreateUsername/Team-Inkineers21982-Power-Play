@@ -135,6 +135,7 @@ public class PPRightAuto22 extends LinearOpMode {
                     }
                 }
             }
+            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
             telemetry.addData("Visible Target", targetName);
             telemetry.addData("Lable #", label);
             telemetry.update();
@@ -144,15 +145,6 @@ public class PPRightAuto22 extends LinearOpMode {
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
-                })
-                .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
-                })
                 .forward(1)
                 .strafeLeft(24)
                 .forward(48)
@@ -179,13 +171,9 @@ public class PPRightAuto22 extends LinearOpMode {
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .addTemporalMarker(() -> {
                     // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.OUT);
+                    intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
                 })
                 .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
-                })
                 .forward(7)
                 .waitSeconds(1)
                 .addTemporalMarker(() -> {

@@ -10,9 +10,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
-
 /**
  * The IntakeSlideSubsystem class is a subsystem module that control
  * the elevator and roller intake used in PowerPlay
@@ -21,7 +18,7 @@ import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
  * @version 1.0
  * @since   2022-10-20
  */
-public class IntakeSlideSubsystem4 extends IntakeSlide {
+public class IntakeSlideSubsystem4 extends IntakeSlide2 {
 
     // THESE VARIABLES ARE USED BY THIS IMPLEMENTATION OF DRIVE CONTROL
     // Declare OpMode members.
@@ -38,7 +35,6 @@ public class IntakeSlideSubsystem4 extends IntakeSlide {
 
     // New Variables
     private ElapsedTime intakeTimer = new ElapsedTime();
-    private int savedPosition = 0;
 
     /**
      *
@@ -64,7 +60,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide {
         currentTarget = 0;
         currentPower = 0;
 
-        intakeState = IntakeState.STOP;
+        intakeState = IntakeState.OUT;
         liftState = LiftState.REST;
 
 
@@ -72,12 +68,13 @@ public class IntakeSlideSubsystem4 extends IntakeSlide {
 
     public int getDpadPressed() { return i; }
     public boolean getIntakePressed() { return autoIn; }
+    public double getServoPosition() { return intake.getPosition(); }
+    public String getIntakeState() { return intakeState.name(); }
     @Override
     public void run(GamepadEx gamepad1, GamepadEx gamepad2) {
         TriggerReader rtReader1 = new TriggerReader(gamepad1, GamepadKeys.Trigger.RIGHT_TRIGGER);
         switch (liftState) {
             case REST:
-                autoIn = true;
                 dropOffMultiplier = 1;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
@@ -242,31 +239,22 @@ public class IntakeSlideSubsystem4 extends IntakeSlide {
     public void runIntake(GamepadEx controller){
         TriggerReader rtReader = new TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER);
         switch (intakeState) {
-            case STOP:
-                if (rtReader.wasJustPressed() || controller.isDown(GamepadKeys.Button.B)) {
-                    intakeState = IntakeState.OUT;
-                }
-                if (controller.isDown(GamepadKeys.Button.A) || autoIn) {
-                    intakeState = IntakeState.IN;
-                }
-                break;
             case IN:
-                // set servo position to spin in
-                if (!controller.getButton(GamepadKeys.Button.A) && !autoIn) {
-                    intakeState = IntakeState.STOP;
-                } else if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
+                intake.setPosition(-1);
+                if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
                     autoIn = false;
                     intakeState = IntakeState.OUT;
                 }
                 break;
             case OUT:
-                // set servo position to spin out
-                if (!rtReader.isDown() || !controller.getButton(GamepadKeys.Button.B)) {
-                    intakeState = IntakeState.STOP;
+                intake.setPosition(1);
+                if (autoIn || controller.getButton(GamepadKeys.Button.A)) {
+                    intakeState = IntakeState.IN;
                 }
                 break;
         }
     }
+
 //    private boolean onPress(boolean ButtonState, String ButtonName) {
 //        switch (ButtonName) {
 //            case "RT":

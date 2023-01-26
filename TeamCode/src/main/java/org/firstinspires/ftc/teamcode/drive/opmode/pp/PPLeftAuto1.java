@@ -100,12 +100,36 @@ public class PPLeftAuto1 extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
 
+        // run to left high junction
+        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .forward(1)
+                .strafeRight(24)
+                .forward(48)
+                .addTemporalMarker(() -> {
+                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+                    intakeSlide.run();
+                })
+                .waitSeconds(1)
+                .build();
+
+        TrajectorySequence test = drive.trajectorySequenceBuilder(startPose)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
+                .forward(48)
+                .back(48)
+                .resetConstraints()
+                .build();
+
         telemetry.addData("Check to see if camera is aligned?", "Can it detect well?");
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
         waitForStart();
 
         if(isStopRequested()) return;
+
+        drive.followTrajectorySequence(test);
 
         //Vufrofia
         targets1.activate();  // octopus
@@ -136,33 +160,11 @@ public class PPLeftAuto1 extends LinearOpMode {
                     }
                 }
             }
+            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
             telemetry.addData("Visible Target", targetName);
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
-        // run to left high junction
-        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.IN);
-                })
-                .waitSeconds(2)
-                .addTemporalMarker(() -> {
-                    // intake code goes here:
-                    intakeSlide.setIntakePower(IntakeSlideSubsystemAuto.IntakeState.STOP);
-                })
-                .forward(1)
-                .strafeRight(24)
-                .forward(48)
-                .addTemporalMarker(() -> {
-                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
-                    intakeSlide.run();
-                })
-                .waitSeconds(1)
-                .resetConstraints()
-                .build();
 
         drive.followTrajectorySequence(preloadDrop);
         // Put align code here? [import Cone.java and call a function to drop off cone]
@@ -178,14 +180,12 @@ public class PPLeftAuto1 extends LinearOpMode {
                 .back(24)
                 .strafeLeft(1)
                 .waitSeconds(1)
-                .resetConstraints()
                 .build();
         //drop stack cone
         TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(toLeft.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .forward(24)
-                .resetConstraints()
                 .build();
         //pick up stack cone
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(toLeft.end())
@@ -203,7 +203,6 @@ public class PPLeftAuto1 extends LinearOpMode {
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .strafeLeft(1) //to make sure is back at position
                 .back(parkDistance)
-                .resetConstraints()
                 .build();
         drive.followTrajectorySequence(toLeft);
         drive.followTrajectorySequence(stackPickup);
