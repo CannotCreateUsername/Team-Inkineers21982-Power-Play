@@ -50,13 +50,13 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
 
         // by default , use Drive Control #1
 
-//        double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX;
-//        GamepadHelper leftStickX = new GamepadHelper();
-//        leftStickX.init();
-//        GamepadHelper leftStickY = new GamepadHelper();
-//        leftStickY.init();
-//        GamepadHelper rightStickX = new GamepadHelper();
-//        rightStickX.init();
+        double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX;
+        GamepadHelper leftStickX = new GamepadHelper();
+        leftStickX.init();
+        GamepadHelper leftStickY = new GamepadHelper();
+        leftStickY.init();
+        GamepadHelper rightStickX = new GamepadHelper();
+        rightStickX.init();
 
         AlignJunction alignStick = new AlignJunction();
         alignStick.init(hardwareMap);
@@ -69,9 +69,9 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
             Pose2d poseEstimate = drive.getPoseEstimate();
 
             // drivebase control loop
-//            leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
-//            leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
-//            rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
+            leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
+            leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
+            rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
             // alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
 
 
@@ -127,9 +127,9 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
 //                    break;
 //            }
 
-            LeftXInput = gamepad1.left_stick_x * intakeSlide.dropOffMultiplier;
-            LeftYInput = gamepad1.left_stick_y * intakeSlide.dropOffMultiplier;
-            RightXInput = gamepad1.right_stick_x * intakeSlide.dropOffMultiplier;
+            LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
+            LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
+            RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
 //
 //            // Field centric view
 //            Vector2d input = new Vector2d(

@@ -65,7 +65,7 @@ public class GamepadHelper {
      */
     
     public double  getGamepadStickRampingMultiplier(float gameStick) {
-
+        prevoiusGameStickState = currentGameStickState;
 
         if (gameStick < 0) {
             currentGameStickState = GamePadState.NETURAL;
@@ -80,7 +80,7 @@ public class GamepadHelper {
             gameStickMultipler = minMultiplier;
             xGamePadTimer.reset();
         }
-        prevoiusGameStickState = currentGameStickState;
+
 
         if (isRamping && xGamePadTimer.milliseconds() > timeIncrementInMs) {
             if (gameStickMultipler <= maxMultiplier) {
