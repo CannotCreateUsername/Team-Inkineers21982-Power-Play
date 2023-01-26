@@ -138,16 +138,16 @@ public class IntakeSlideSubsystemAuto {
         currentTarget = 0;
         currentPower = 0;
 
-        intakeState = IntakeState.IN;
+        intakeState = IntakeState.OUT;
         liftState = LiftState.REST;
 
     }
 
     public void setIntakePosition(IntakeState state ){
         if (state == IntakeState.IN){
-            intake.setPosition(1);
-        } else if  (state == IntakeState.OUT){
             intake.setPosition(-1);
+        } else if  (state == IntakeState.OUT){
+            intake.setPosition(1);
         }
     }
 

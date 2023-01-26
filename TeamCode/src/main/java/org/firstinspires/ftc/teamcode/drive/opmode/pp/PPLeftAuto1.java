@@ -129,8 +129,6 @@ public class PPLeftAuto1 extends LinearOpMode {
 
         if(isStopRequested()) return;
 
-        drive.followTrajectorySequence(test);
-
         //Vufrofia
         targets1.activate();  // octopus
         targets2.activate(); // triangle

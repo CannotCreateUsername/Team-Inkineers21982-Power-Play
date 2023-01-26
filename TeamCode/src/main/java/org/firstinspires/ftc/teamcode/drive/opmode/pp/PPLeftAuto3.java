@@ -101,6 +101,8 @@ public class PPLeftAuto3 extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
 
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+
         telemetry.addData("Check to see if camera is aligned?", "Can it detect well?");
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
@@ -184,7 +186,7 @@ public class PPLeftAuto3 extends LinearOpMode {
                 .build();
 
         drive.followTrajectorySequence(preloadDrop);
-        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, -0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(stackPickup);
         cone.pickUpCone(this);
         drive.followTrajectorySequence(stackDrop);
