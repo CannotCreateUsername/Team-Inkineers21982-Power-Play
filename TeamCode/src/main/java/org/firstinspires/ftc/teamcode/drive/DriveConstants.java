@@ -55,7 +55,7 @@ public class DriveConstants {
     // IY: initially measure by tape
     // IY: manually tune track width with TrackWidthTuner
     // https://learnroadrunner.com/trackwidth-tuning.html
-    public static double TRACK_WIDTH =  10.77;  // 15.82;  // 16.34; // in
+    public static double TRACK_WIDTH =  14.01;  // 15.82;  // 16.34; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -65,9 +65,9 @@ public class DriveConstants {
      */
     // IY: These are your feedforward gains used to model your drive motors.
     // // https://learnroadrunner.com/feedforward-tuning.html#tuning tuned in XXX step
-    public static double kV =  0.01622; // 0.017; // 1.0 / rpmToVelocity(MAX_RPM); // 0.017 ; //
-    public static double kA =  0.00001; // 0.0021; // 0;  // 0.0019;
-    public static double kStatic =  0.05110; // 0.002; // 0; // 0.002;
+    public static double kV =  1.0 / rpmToVelocity(MAX_RPM); // 0.1763; // 0.017; // 1.0 / rpmToVelocity(MAX_RPM); // 0.017 ; //
+    public static double kA = 0.0025; // 0.00001; // 0.0021; // 0;  // 0.0019;
+    public static double kStatic = 0.002; // 0.002; // 0; // 0.002;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -104,14 +104,14 @@ public class DriveConstants {
     public static double MAX_ACCEL = 52.48180821614297;
     // ref: https://learnroadrunner.com/trackwidth-tuning.html
     // IY: set the max MAX_ANG_VEL by running MaxAngularVelocityTuner: 298 degree
-    public static double MAX_ANG_VEL =  Math.toRadians(303);  // Math.toRadians(184.02607784577722); //  //
+    public static double MAX_ANG_VEL =  Math.toRadians(291.02607784577722);  // Math.toRadians(184.02607784577722); //  //
     public static double MAX_ANG_ACCEL = Math.toRadians(184.02607784577722);
 
-    public static double MAX_ANG_VEL_SLOW = MAX_ANG_VEL/4;
-    public static double MAX_ANG_ACCE_SLOW = MAX_ANG_ACCEL/4;
+    public static double MAX_ANG_VEL_SLOW = MAX_ANG_VEL/1.5;
+    public static double MAX_ANG_ACCE_SLOW = MAX_ANG_ACCEL/1.5;
 
-    public static double MAX_ANG_VEL_MEDIUM = MAX_ANG_VEL/1.5;
-    public static double MAX_ANG_ACCE_MEDIUM = MAX_ANG_ACCEL/1.5;
+    public static double MAX_ANG_VEL_MEDIUM = MAX_ANG_VEL/1.1;
+    public static double MAX_ANG_ACCE_MEDIUM = MAX_ANG_ACCEL/1.1;
 
     public static double encoderTicksToInches(double ticks) {
         return WHEEL_RADIUS * 2 * Math.PI * GEAR_RATIO * ticks / TICKS_PER_REV;

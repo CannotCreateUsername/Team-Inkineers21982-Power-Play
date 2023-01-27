@@ -101,14 +101,29 @@ public class PPLeftAuto3 extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
 
-        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+        // run to left high junction, REMEMBER TO CHANGE vvv TO FASTER (BECAUSE GITHUBU DIES NOT UPDSAT EIT P)
+        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
+                .forward(2)
+                .turn(Math.toRadians(-90))
+                .strafeRight(2)
+                .forward(28)
+                .strafeLeft(48)
+                .addTemporalMarker(() -> {
+                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+                    intakeSlide.run();
+                })
+                .waitSeconds(1)
+                .build();
+        //pick up stack cone
+        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
+                .strafeRight(3) //to make sure is back at position
+                .back(24)
+                .build();
+        //drop stack cone
+        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
+                .forward(24)
+                .build();
 
-        telemetry.addData("Check to see if camera is aligned?", "Can it detect well?");
-        telemetry.addData(">", "Press Play to start");
-        telemetry.update();
-        waitForStart();
-
-        if(isStopRequested()) return;
 
         //Vufrofia
         targets1.activate();  // octopus
@@ -119,7 +134,7 @@ public class PPLeftAuto3 extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (runtime.time() < 1 && opModeIsActive()) {
+        while (!opModeIsActive()) {
             if (!targetVisible) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
@@ -144,45 +159,20 @@ public class PPLeftAuto3 extends LinearOpMode {
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
 
-        // run to left high junction, REMEMBER TO CHANGE vvv TO FASTER (BECAUSE GITHUBU DIES NOT UPDSAT EIT P)
-        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .forward(2)
-                .turn(Math.toRadians(-90))
-                .strafeRight(2)
-                .forward(28)
-                .strafeLeft(48)
-                .addTemporalMarker(() -> {
-                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
-                    intakeSlide.run();
-                })
-                .waitSeconds(1)
-                .resetConstraints()
-                .build();
-        //pick up stack cone
-        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .strafeRight(2) //to make sure is back at position
-                .back(24)
-                .resetConstraints()
-                .build();
-        //drop stack cone
-        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
-                .forward(24)
-                .resetConstraints()
-                .build();
+        telemetry.addData(">", "Press Play to start");
+        telemetry.update();
+        waitForStart();
+
+        if(isStopRequested()) return;
+
+
+
         //park
         TrajectorySequence park = drive.trajectorySequenceBuilder(stackDrop.end())
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL_MEDIUM, DriveConstants.MAX_ANG_ACCE_MEDIUM)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT ,SampleMecanumDrive.ACCEL_CONSTRAINT) // max speed
                 .strafeLeft(1) //to make sure is back at position
                 .back(parkDistance)
-                .resetConstraints()
                 .build();
 
         drive.followTrajectorySequence(preloadDrop);

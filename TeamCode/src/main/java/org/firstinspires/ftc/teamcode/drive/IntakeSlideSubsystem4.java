@@ -32,6 +32,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
 
     // Variable to auto spin in intake
     private boolean autoIn = false;
+    private boolean rest = false;
 
     // New Variables
     private ElapsedTime intakeTimer = new ElapsedTime();
@@ -66,8 +67,9 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
 
     }
 
-    public int getDpadPressed() { return i; }
-    public boolean getIntakePressed() { return autoIn; }
+//    public int getDpadPressed() { return i; }
+//    public boolean getIntakePressed() { return autoIn; }
+
     public double getServoPosition() { return intake.getPosition(); }
     public String getIntakeState() { return intakeState.name(); }
     @Override
@@ -80,26 +82,25 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     // code here
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                } if (!rtReader1.isDown()) {
+                }
+                if (!rtReader1.isDown() && !rest) {
                     if (pickupStack) {
                         currentTarget = targetPositionPickup2 + 400;
                     } else {
                         currentTarget = targetPositionPickup2;
                     }
                     liftState = LiftState.PICKUP2;
-                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     currentTarget = targetPositionPickup2;
                     liftState = LiftState.PICKUP2;
                     autoIn = false;
+                    rest = false;
                 }
                 setSlidePower();
-                //if (gamepad1.x || gamepad1.y) {
-                //   liftState = LiftState.MANUAL;
-                //}
                 break;
             case PICKUP2:
                 dropOffMultiplier = 1;
-                if (slides.getCurrentPosition() > currentTarget-5) {
+                if (slides.getCurrentPosition() > currentTarget - 5) {
                     autoIn = false;
                 }
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
@@ -116,13 +117,16 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-//              } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
-//                    currentTarget = targetPositionRest;
-//                    liftState = LiftState.REST;
-//                    autoIn = false;
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                    // to rest
+                    rest = true;
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
+
+
                 break;
             case LOW:
                 if (rtReader1.isDown()) {
@@ -139,12 +143,15 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                    // to rest
+                    rest = true;
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
-                //if (gamepad1.x || gamepad1.y) {
-                //  liftState = LiftState.MANUAL;
-                //}
+
                 break;
             case MEDIUM:
                 if (rtReader1.isDown()) {
@@ -161,12 +168,15 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                    // to rest
+                    rest = true;
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
-                //if (gamepad1.x || gamepad1.y) {
-                //   liftState = LiftState.MANUAL;
-                //}
+
                 break;
             case HIGH:
                 if (rtReader1.isDown()) {
@@ -180,13 +190,15 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
+                    // to rest
+                    rest = true;
+                    currentTarget = targetPositionRest;
+                    liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
 
-                //if (gamepad1.x || gamepad1.y) {
-                //   liftState = LiftState.MANUAL;
-                //}
                 break;
 
                 /*
