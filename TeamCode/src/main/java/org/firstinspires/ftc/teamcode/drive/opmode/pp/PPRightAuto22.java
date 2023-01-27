@@ -160,7 +160,7 @@ public class PPRightAuto22 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.smallAlignV();
+        cone.smallAlignV(false);
 
         // IY 2023-01-18 - since the cone.smallAign move the drivetrain , the last coordinate of trajSeq is no longer valid.
         // please try this instead:

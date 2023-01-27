@@ -45,6 +45,7 @@ public class Cone {
     private int pIterations = 0;
     private boolean alignedL = false;
     private double lastDistance;
+
     
     // Constants
     private final int MINIMUM_POSITIVES = 8;
@@ -319,7 +320,7 @@ public class Cone {
                         op.telemetry.update();
                     }
                 } else {
-                    straightDistance(-3);
+                    straightDistance(-5);
                 }
 
                 loaded = false;
@@ -366,9 +367,11 @@ public class Cone {
     }
 
     // only stops overshoot
-    public void smallAlignV() {
+    public void smallAlignV(boolean cone) {
         straightDistance(8);
-        if (sensorRange.getDistance(DistanceUnit.CM) < 5) {
+        if (!cone && sensorRange.getDistance(DistanceUnit.CM) < JUNCTION_DISTANCE) {
+            stopMovement();
+        } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < CONE_DISTANCE) {
             stopMovement();
         }
     }
