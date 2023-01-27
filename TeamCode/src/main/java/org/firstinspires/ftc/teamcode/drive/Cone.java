@@ -256,6 +256,7 @@ public class Cone {
                     stopMovement();
                 }
             }
+            intakeSlide.stackDiff = intakeSlide.stackDiff - 200;
         }
     }
 

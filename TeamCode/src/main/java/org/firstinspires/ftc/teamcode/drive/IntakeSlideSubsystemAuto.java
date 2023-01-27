@@ -13,7 +13,7 @@ public class IntakeSlideSubsystemAuto {
     public final int targetPositionPickup = 300;
     public final int targetPositionPickup2 = 700;
     public final int targetPositionRest = 0;  // ideally it should be zero !!!
-    public final int stackDiff = 400;
+    public int stackDiff = 400;
 
     // distance error factor
     // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
