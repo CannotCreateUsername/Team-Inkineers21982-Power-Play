@@ -116,7 +116,7 @@ public class PPLeftAuto3 extends LinearOpMode {
                 .build();
         //pick up stack cone
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
-                .strafeRight(5) //to make sure is back at position
+                .strafeRight(3) //to make sure is back at position
                 .back(24)
                 .build();
         //drop stack cone
