@@ -93,8 +93,24 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     currentTarget = targetPositionPickup2;
                     liftState = LiftState.PICKUP2;
+                    slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     autoIn = false;
                     rest = false;
+                }
+                if (rest) {
+                    if (gamepad1.isDown(GamepadKeys.Button.A)) {
+                        slides.setPower(-0.5);
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                        slides.setPower(0);
+                        intakeTimer.reset();
+                        while(intakeTimer.seconds() < 1) {
+                            // wait to finish
+                        }
+                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    } else {
+                        slides.setPower(0);
+                    }
                 }
                 setSlidePower();
                 break;
@@ -120,12 +136,12 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
                     // to rest
                     rest = true;
+                    slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
-
 
                 break;
             case LOW:
@@ -192,9 +208,10 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     liftState = LiftState.REST;
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
                     // to rest
-                    rest = true;
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                    runToPosition(currentTarget);
+                    rest = true;
                 } else {
                     setSlidePower();
                 }
@@ -236,7 +253,9 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         }
         // update gamepad state
         gamepad1.readButtons();
-        runToPosition(currentTarget, currentPower);
+        if (!rest) {
+            runToPosition(currentTarget, currentPower);
+        }
         //runIntake();
     }
 
