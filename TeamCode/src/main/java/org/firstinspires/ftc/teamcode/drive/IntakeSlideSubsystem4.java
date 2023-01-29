@@ -33,6 +33,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
     // Variable to auto spin in intake
     private boolean autoIn = false;
     private boolean rest = false;
+    private boolean reset = true;
 
     // New Variables
     private ElapsedTime intakeTimer = new ElapsedTime();
@@ -103,13 +104,15 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     } else if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
                         slides.setPower(0);
                         intakeTimer.reset();
+                    } else {
+                        slides.setPower(0);
+                    }
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
                         while(intakeTimer.seconds() < 1) {
                             // wait to finish
                         }
                         slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                    } else {
-                        slides.setPower(0);
                     }
                 }
                 setSlidePower();

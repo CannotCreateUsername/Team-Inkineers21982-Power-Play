@@ -29,12 +29,6 @@ public class Cone {
         UNLOADED
     }
 
-    private enum LightState {
-        OFF,
-        ALIGNING,
-        ALIGNED
-    }
-
     ElapsedTime timer = new ElapsedTime();
     private boolean loaded = true;
     
@@ -58,14 +52,11 @@ public class Cone {
 
     // Hardware
     private DistanceSensor sensorRange;
-//    private TouchSensor sensorTouch1;
-//    private TouchSensor sensorTouch2;
-    private DigitalChannel redLED;
-    private DigitalChannel greenLED;
+    private TouchSensor sensorTouch1;
+    private TouchSensor sensorTouch2;
 
     PickupState pickupState;
     DropOffState dropOffState;
-    LightState lightState;
 
     IntakeSlideSubsystemAuto intakeSlide;
     SampleMecanumDrive drive;
@@ -76,93 +67,22 @@ public class Cone {
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-//        sensorTouch1 = hardwareMap.get(TouchSensor.class, "sensor_touch_right");
-//        sensorTouch2 = hardwareMap.get(TouchSensor.class, "sensor_touch_left");
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-        redLED = hardwareMap.get(DigitalChannel.class, "red");
-        greenLED = hardwareMap.get(DigitalChannel.class, "green");
+//        sensorTouch1 = hardwareMap.get(TouchSensor.class, "touch1");
+//        sensorTouch2 = hardwareMap.get(TouchSensor.class, "touch2");
 
         pickupState = PickupState.ALIGNING;
         dropOffState = DropOffState.UNALIGNED;
-        lightState = LightState.OFF;
 
     }
 
-//    public void init(HardwareMap hardwareMap) {
-//
-//        // Initialize the hardware variables. Note that the strings used here as parameters
-//        // to 'get' must correspond to the names assigned during the robot configuration
-//        // step (using the FTC Robot Controller app on the phone).
-//
-//        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-//
-//        // Distance Sensor
-//        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-//
-//        slides = hardwareMap.get(DcMotor.class, "slides");
-//        slides.setDirection(DcMotor.Direction.REVERSE);
-//        slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-//        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//
-//        // initialize the hardware map of intake
-//        intake = hardwareMap.get(CRServo.class, "intake");
-//
-//
-//        currentCaption = "Lift Status";
-//        currentStatus = "Initialized";
-//        currentTarget = 0;
-//        currentPower = 0;
-//
-//        intakeState = IntakeSlide.IntakeState.STOP;
-//        liftState = IntakeSlide.LiftState.REST;
-//        pickupState = PickupState.ALIGNING;
-//
-//
-//    }
-//
-//    public void run() {
-//        switch (liftState) {
-//            case REST:
-//                currentTarget = targetPositionRest;
-//                runToPosition(currentTarget);
-//                break;
-//            case PICKUP2:
-//                currentTarget = targetPositionPickup2 + 400;
-//                runToPosition(currentTarget);
-//                break;
-//            case LOW:
-//                currentTarget = targetPositionLow;
-//                runToPosition(currentTarget);
-//                break;
-//            case MEDIUM:
-//                currentTarget = targetPositionMedium;
-//                runToPosition(currentTarget);
-//                break;
-//            case HIGH:
-//                currentTarget = targetPositionHigh;
-//                runToPosition(currentTarget);
-//                break;
-//        }
-//    }
-//
-//    public void runIntake() {
-//        switch (intakeState) {
-//            case STOP:
-//                setIntakePower(intakeState.STOP);
-//                break;
-//            case IN:
-//                setIntakePower(intakeState.IN);
-//                break;
-//            case OUT:
-//                setIntakePower(intakeState.OUT);
-//                break;
-//        }
-//    }
-
-//    // variables to make typing more efficient
-//    private int currentTarget = intakeSlide.getCurrentTarget();
-//
+    private boolean againstWall() {
+        if (sensorTouch1.isPressed() && sensorTouch2.isPressed()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // PROBLEM: YOU HAVE TO CALL RUN FOR INTAKE SLIDES AND INIT GAMEPADS!! HOW TO SOLVE!?
     public void pickCone(LinearOpMode p_op) {
         op = p_op;
@@ -171,7 +91,8 @@ public class Cone {
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
                 timer.reset();
-                while (sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE && timer.seconds() < 5 && op.opModeIsActive()) {
+                //|| (sensorTouch1.isPressed() && sensorTouch2.isPressed())
+                while ((sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE || !againstWall()) && timer.seconds() < 5 && op.opModeIsActive()) {
                     straight(0.3);
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
@@ -180,12 +101,8 @@ public class Cone {
                 }
                 stopMovement();
                 // vvv change condition to include touch sensor vvv
-                timer.reset();
-                while (timer.seconds() < 3) {
-                    if (8 > sensorRange.getDistance(DistanceUnit.CM)) {
-                        pickupState = PickupState.ALIGNED;
-                        break;
-                    }
+                if (8 > sensorRange.getDistance(DistanceUnit.CM) || timer.seconds() > 6) {
+                    pickupState = PickupState.ALIGNED;
                 }
 
                 break;
