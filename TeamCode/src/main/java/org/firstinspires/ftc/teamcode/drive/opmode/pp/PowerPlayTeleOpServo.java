@@ -52,9 +52,6 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
         // by default , use Drive Control #1
 
         double leftStickMultiplierX, leftStickMultiplierY, rightStickMultiplierX;
-//        leftStickMultiplierX = 1;
-//        leftStickMultiplierY = 1;
-//        rightStickMultiplierX = 1;
         GamepadHelper leftStickX = new GamepadHelper();
         leftStickX.init();
         GamepadHelper leftStickY = new GamepadHelper();
