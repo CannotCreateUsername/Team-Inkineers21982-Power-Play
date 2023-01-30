@@ -52,8 +52,8 @@ public class Cone {
 
     // Hardware
     private DistanceSensor sensorRange;
-    private TouchSensor sensorTouch1;
-    private TouchSensor sensorTouch2;
+//    private TouchSensor sensorTouch1;
+//    private TouchSensor sensorTouch2;
 
     PickupState pickupState;
     DropOffState dropOffState;
@@ -76,13 +76,13 @@ public class Cone {
 
     }
 
-    private boolean againstWall() {
-        if (sensorTouch1.isPressed() && sensorTouch2.isPressed()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    private boolean againstWall() {
+//        if (sensorTouch1.isPressed() && sensorTouch2.isPressed()) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
     // PROBLEM: YOU HAVE TO CALL RUN FOR INTAKE SLIDES AND INIT GAMEPADS!! HOW TO SOLVE!?
     public void pickCone(LinearOpMode p_op) {
         op = p_op;
@@ -91,8 +91,9 @@ public class Cone {
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                 intakeSlide.run();
                 timer.reset();
+                //|| !againstWall()
                 //|| (sensorTouch1.isPressed() && sensorTouch2.isPressed())
-                while ((sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE || !againstWall()) && timer.seconds() < 5 && op.opModeIsActive()) {
+                while ((sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE) && timer.seconds() < 5 && op.opModeIsActive()) {
                     straight(0.3);
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
@@ -196,7 +197,7 @@ public class Cone {
                         op.telemetry.update();
                     }
                 } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
-                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE) && timer.seconds() < 3 && op.opModeIsActive()) {
+                    while ((sensorRange.getDistance(DistanceUnit.CM) < 400 && sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE) && timer.seconds() < 3 && op.opModeIsActive()) {
                         straight(0.1);
                         op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                         op.telemetry.addData("State:", dropOffState.name());
@@ -428,5 +429,25 @@ public class Cone {
             drive.update();
         }
 
+    }
+
+    // counter clcoksiwse = positive power
+    public void turnAlign (double power) {
+
+        double leftYControl = 0 ;
+        double leftXControl = 0 ;
+        double rightXControl = power;
+
+        while (sensorRange.getDistance(DistanceUnit.CM) < 50) {
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -leftYControl,
+                            -leftXControl,
+                            -rightXControl
+                    )
+            );
+            drive.update();
+
+        }
     }
 }
