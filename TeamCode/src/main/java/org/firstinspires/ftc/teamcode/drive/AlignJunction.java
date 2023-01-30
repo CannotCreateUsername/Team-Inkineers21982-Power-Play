@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -46,7 +49,11 @@ public class AlignJunction {
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
 
-    public void init(HardwareMap hardwareMap) {
+    SampleMecanumDrive drive;
+
+    public void init(SampleMecanumDrive d, HardwareMap hardwareMap) {
+        drive = d;
+
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         redLED = hardwareMap.get(DigitalChannel.class, "red");
         greenLED = hardwareMap.get(DigitalChannel.class, "green");
@@ -179,6 +186,27 @@ public class AlignJunction {
                 redLED.setState(false);
                 break;
         }
+    }
+
+    // positive counter clockwise
+    public void turnAlign (GamepadEx gamepad1, double power) {
+
+        double leftYControl = 0 ;
+        double leftXControl = 0 ;
+        double rightXControl = power;
+
+        while (sensorRange.getDistance(DistanceUnit.CM) > 50 && !gamepad1.wasJustPressed(GamepadKeys.Button.Y)) {
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -leftYControl,
+                            -leftXControl,
+                            -rightXControl
+                    )
+            );
+            drive.update();
+
+        }
+
     }
 
     public String getAlignState() { return alignState.name(); }

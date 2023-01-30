@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.drive.AlignJunction;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide2;
@@ -60,7 +61,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
         rightStickX.init();
 
         AlignJunction alignStick = new AlignJunction();
-        alignStick.init(hardwareMap);
+        alignStick.init(drive, hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -149,6 +150,11 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
             drive.update();
 
             alignStick.run();
+            if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
+                alignStick.turnAlign(gamepadEx1,0.5);
+            } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.B)) {
+                alignStick.turnAlign(gamepadEx1,-0.5);
+            }
 
 //            telemetry.addData("X", poseEstimate.getX());
 //            telemetry.addData("Y", poseEstimate.getY());
@@ -181,5 +187,4 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
             telemetry.update();
         }
     }
-
 }
