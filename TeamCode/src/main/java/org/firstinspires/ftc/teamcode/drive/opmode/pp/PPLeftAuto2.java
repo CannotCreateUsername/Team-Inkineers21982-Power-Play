@@ -161,21 +161,20 @@ public class PPLeftAuto2 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, 0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeLeft(9.75)
                 .turn(Math.toRadians(-90))
                 .back(24)
-                .strafeRight(2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(12)
-                .turn(Math.toRadians(45))
+                .turn(Math.toRadians(120))
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .turn(Math.toRadians(-45))
+                .turn(Math.toRadians(-120))
                 .back(12)
                 .build();
 
@@ -183,6 +182,7 @@ public class PPLeftAuto2 extends LinearOpMode {
         while (runtime.seconds() < 25 && opModeIsActive()) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
+            cone.turnAlign(0.2);
             cone.dropOffCone(this, 0, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             drive.followTrajectorySequence(rotateBack);
             coneThere = true;
