@@ -161,7 +161,7 @@ public class PPLeftAuto4 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, 0.25, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, 0.24, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
@@ -171,25 +171,31 @@ public class PPLeftAuto4 extends LinearOpMode {
                 .strafeLeft(2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(30)
+                .forward(25)
+                .strafeRight(8)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .back(30)
+                .strafeLeft(9.75)
+                .back(25)
                 .build();
-        TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
-                .back(parkDistance)
-                .turn(Math.toRadians(90))
-                .build();
+
 
         drive.followTrajectorySequence(trajSeq2);
 
         for (int i = 0; i < 1; i++) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(this, 0.3, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
-            drive.followTrajectorySequence(rotateBack);
+            cone.dropOffCone(this, 0.25, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+            //drive.followTrajectorySequence(rotateBack);
             coneThere = true;
         }
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
+                .strafeLeft(2)
+                .back(parkDistance)
+                .turn(Math.toRadians(90))
+                .back(5)
+                .build();
         drive.followTrajectorySequence(park);
 
         // the last thing auto should do is move slide back to rest
