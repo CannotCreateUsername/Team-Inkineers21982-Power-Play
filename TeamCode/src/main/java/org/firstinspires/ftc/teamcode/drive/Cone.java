@@ -102,7 +102,8 @@ public class Cone {
                 }
                 stopMovement();
                 // vvv change condition to include touch sensor vvv
-                if (8 > sensorRange.getDistance(DistanceUnit.CM) || timer.seconds() > 6) {
+                // touch sensor 1 || 2 is pressed
+                if (8 > sensorRange.getDistance(DistanceUnit.CM) || timer.seconds() < 6) {
                     pickupState = PickupState.ALIGNED;
                 }
 
@@ -154,12 +155,6 @@ public class Cone {
         op = p_op;
         if (op.opModeIsActive()) {
             timer.reset();
-//            while (s<2) {
-//
-//                if (sensorRange.getDistance(DistanceUnit.CM) < lastDistance+5) {
-//                    s++;
-//                }
-//            }
             while ((sensorRange.getDistance(DistanceUnit.CM) > LATERAL_DISTANCE && timer.seconds() < 5) && op.opModeIsActive() ) {
                 strafe(speed);
                 op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
@@ -431,7 +426,7 @@ public class Cone {
 
     }
 
-    // counter clcoksiwse = positive power
+    // clcoksiwse = positive power
     public void turnAlign (double power) {
 
         double leftYControl = 0 ;

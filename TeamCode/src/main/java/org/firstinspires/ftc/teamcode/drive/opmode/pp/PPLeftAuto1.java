@@ -121,14 +121,6 @@ public class PPLeftAuto1 extends LinearOpMode {
                 .back(48)
                 .resetConstraints()
                 .build();
-
-        telemetry.addData("Check to see if camera is aligned?", "Can it detect well?");
-        telemetry.addData(">", "Press Play to start");
-        telemetry.update();
-        waitForStart();
-
-        if(isStopRequested()) return;
-
         //Vufrofia
         targets1.activate();  // octopus
         targets2.activate(); // triangle
@@ -138,7 +130,7 @@ public class PPLeftAuto1 extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (runtime.time() < 1 && opModeIsActive()) {
+        while (!opModeIsActive()) {
             if (!targetVisible) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
@@ -163,6 +155,15 @@ public class PPLeftAuto1 extends LinearOpMode {
             telemetry.addData("Lable #", label);
             telemetry.update();
         }
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+        telemetry.addData("Check to see if camera is aligned?", "Can it detect well?");
+        telemetry.addData(">", "Press Play to start");
+        telemetry.update();
+        waitForStart();
+
+        if(isStopRequested()) return;
+
+
 
         drive.followTrajectorySequence(preloadDrop);
         // Put align code here? [import Cone.java and call a function to drop off cone]
@@ -206,7 +207,7 @@ public class PPLeftAuto1 extends LinearOpMode {
         drive.followTrajectorySequence(stackPickup);
         cone.pickUpCone(this);
         drive.followTrajectorySequence(stackDrop);
-        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
+        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(park);
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);

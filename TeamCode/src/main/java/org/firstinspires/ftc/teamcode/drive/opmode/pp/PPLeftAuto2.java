@@ -170,19 +170,18 @@ public class PPLeftAuto2 extends LinearOpMode {
                 .back(24)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(12)
-                .turn(Math.toRadians(120))
+                .forward(11)
+                .turn(Math.toRadians(135))
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .turn(Math.toRadians(-120))
-                .back(12)
+                .turn(Math.toRadians(-135))
+                .back(1)
                 .build();
 
         drive.followTrajectorySequence(trajSeq2);
         while (runtime.seconds() < 25 && opModeIsActive()) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
-            cone.turnAlign(0.2);
             cone.dropOffCone(this, 0, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             drive.followTrajectorySequence(rotateBack);
             coneThere = true;
