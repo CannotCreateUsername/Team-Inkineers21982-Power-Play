@@ -105,13 +105,11 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
      */
     private TFObjectDetector tfod;
 
-    private Servo intake = null;
 
     @Override
     public void runOpMode() {
 
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-        intake = hardwareMap.get(Servo.class, "intake");
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
@@ -132,8 +130,6 @@ public class ConceptTensorFlowObjectDetectionWebcam extends LinearOpMode {
             // (typically 16/9).
             tfod.setZoom(1.0, 16.0/9.0);
         }
-
-        intake.setPosition(1);
 
         /** Wait for the game to begin */
         telemetry.addData(">", "Go to the three dots on top right of screen and press Camera Stream");
