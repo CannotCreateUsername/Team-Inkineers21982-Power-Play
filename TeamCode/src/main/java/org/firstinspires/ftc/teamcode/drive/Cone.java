@@ -52,8 +52,8 @@ public class Cone {
 
     // Hardware
     private DistanceSensor sensorRange;
-//    private TouchSensor sensorTouch1;
-//    private TouchSensor sensorTouch2;
+    private TouchSensor sensorTouch1;
+    private TouchSensor sensorTouch2;
 
     PickupState pickupState;
     DropOffState dropOffState;
@@ -68,8 +68,8 @@ public class Cone {
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-//        sensorTouch1 = hardwareMap.get(TouchSensor.class, "touch1");
-//        sensorTouch2 = hardwareMap.get(TouchSensor.class, "touch2");
+        sensorTouch1 = hardwareMap.get(TouchSensor.class, "touch1");
+        sensorTouch2 = hardwareMap.get(TouchSensor.class, "touch2");
 
         pickupState = PickupState.ALIGNING;
         dropOffState = DropOffState.UNALIGNED;
@@ -93,7 +93,7 @@ public class Cone {
                 timer.reset();
                 //|| !againstWall()
                 //|| (sensorTouch1.isPressed() && sensorTouch2.isPressed())
-                while ((sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE) && timer.seconds() < 5 && op.opModeIsActive()) {
+                while ((sensorRange.getDistance(DistanceUnit.CM) > CONE_DISTANCE || (sensorTouch1.isPressed() && sensorTouch2.isPressed())) && timer.seconds() < 5 && op.opModeIsActive()) {
                     straight(0.3);
                     op.telemetry.addData("State", pickupState.name());
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
@@ -103,7 +103,7 @@ public class Cone {
                 stopMovement();
                 // vvv change condition to include touch sensor vvv
                 // touch sensor 1 || 2 is pressed
-                if (8 > sensorRange.getDistance(DistanceUnit.CM) || timer.seconds() < 6) {
+                if (8 > sensorRange.getDistance(DistanceUnit.CM) || sensorTouch1.isPressed() || sensorTouch2.isPressed() || timer.seconds() < 6) {
                     pickupState = PickupState.ALIGNED;
                 }
 
