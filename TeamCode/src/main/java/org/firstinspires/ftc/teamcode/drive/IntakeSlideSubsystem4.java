@@ -275,14 +275,14 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         switch (intakeState) {
             case IN:
                 intake.setPosition(-1);
-                if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
+                if (rtReader.isDown()) {
                     autoIn = false;
                     intakeState = IntakeState.OUT;
                 }
                 break;
             case OUT:
                 intake.setPosition(1);
-                if (autoIn || controller.getButton(GamepadKeys.Button.A)) {
+                if (autoIn) {
                     intakeState = IntakeState.IN;
                 }
                 break;
