@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
  * exercise is to ascertain whether the localizer has been configured properly (note: the pure
  * encoder localizer heading may be significantly off if the track width has not been tuned).
  */
-@TeleOp(name="Odyssea Deez Nuts", group = "Linear Opmode")
+@TeleOp(name="Odyssea Drive", group = "Linear Opmode")
 public class PowerPlayTeleOpServo extends LinearOpMode {
 
     private enum TurnState {

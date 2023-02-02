@@ -106,6 +106,7 @@ public class PPLeftAuto2 extends LinearOpMode {
                 .forward(1)
                 .strafeRight(24)
                 .forward(48)
+                .strafeLeft(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -161,7 +162,7 @@ public class PPLeftAuto2 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, -0.22, IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
@@ -170,20 +171,20 @@ public class PPLeftAuto2 extends LinearOpMode {
                 .back(24)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(11)
-                .turn(Math.toRadians(135))
+                .forward(25)
+                .strafeRight(8)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .turn(Math.toRadians(-135))
-                .back(1)
+                .strafeLeft(9.75)
+                .back(25)
                 .build();
 
         drive.followTrajectorySequence(trajSeq2);
-        while (runtime.seconds() < 25 && opModeIsActive()) {
+        for (int i = 0; i < 1; i++) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(this, 0, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
-            drive.followTrajectorySequence(rotateBack);
+            cone.dropOffCone(this, 0.25, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+            //drive.followTrajectorySequence(rotateBack);
             coneThere = true;
         }
         // the last thing auto should do is move slide back to rest

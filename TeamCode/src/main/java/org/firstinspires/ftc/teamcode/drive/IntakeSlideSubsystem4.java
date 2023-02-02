@@ -99,16 +99,18 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     rest = false;
                 }
                 if (rest) {
-                    slides.setPower(-0.5);
-                    intakeTimer.reset();
-                    while (intakeTimer.seconds() < 4) {
-                        if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                            break;
-                        }
+                    slides.setPower(-0.3);
+                    if (gamepad1.wasJustPressed(GamepadKeys.Button.B)) {
+                        slides.setPower(0);
+                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        rest = false;
+                    } else if (intakeTimer.seconds() > 3) {
+                        slides.setPower(0);
+                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                        rest = false;
                     }
-                    slides.setPower(0);
-                    slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                    slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 setSlidePower();
                 break;
@@ -137,6 +139,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
+                    intakeTimer.reset();
                 } else {
                     setSlidePower();
                 }

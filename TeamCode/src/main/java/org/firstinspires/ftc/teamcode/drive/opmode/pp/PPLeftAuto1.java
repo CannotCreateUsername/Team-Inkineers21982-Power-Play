@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="1(Auto LEFT Left [A5 or F2])", group="Linear Opmode")
+@Disabled
 public class PPLeftAuto1 extends LinearOpMode {
 
 

@@ -106,7 +106,7 @@ public class PPLeftAuto3 extends LinearOpMode {
                 .forward(2)
                 .turn(Math.toRadians(-90))
                 .strafeRight(2)
-                .forward(28)
+                .forward(24)
                 .strafeLeft(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
