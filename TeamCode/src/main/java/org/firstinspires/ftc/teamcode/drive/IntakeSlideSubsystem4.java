@@ -99,21 +99,16 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     rest = false;
                 }
                 if (rest) {
-                    if (gamepad1.isDown(GamepadKeys.Button.A)) {
-                        slides.setPower(-0.5);
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                        slides.setPower(0);
-                        intakeTimer.reset();
-                    } else {
-                        slides.setPower(0);
-                    }
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                        while(intakeTimer.seconds() < 1) {
-                            // wait to finish
+                    slides.setPower(-0.5);
+                    intakeTimer.reset();
+                    while (intakeTimer.seconds() < 4) {
+                        if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                            break;
                         }
-                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     }
+                    slides.setPower(0);
+                    slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 setSlidePower();
                 break;

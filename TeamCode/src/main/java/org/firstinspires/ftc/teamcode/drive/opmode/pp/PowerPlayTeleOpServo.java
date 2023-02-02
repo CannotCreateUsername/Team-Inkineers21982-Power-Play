@@ -83,10 +83,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_LEFT)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         drive.turn(Math.toRadians(90));
                         turnState = TurnState.LEFT;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         drive.turn(Math.toRadians(-90));
                         turnState = TurnState.RIGHT;
                     }
@@ -95,10 +95,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_LEFT)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         drive.turn(Math.toRadians(90));
                         turnState = TurnState.BACKWARDS;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         drive.turn(Math.toRadians(-90));
                         turnState = TurnState.STRAIGHT;
                     }
@@ -107,10 +107,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     LeftYInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_LEFT)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         drive.turn(Math.toRadians(90));
                         turnState = TurnState.STRAIGHT;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         drive.turn(Math.toRadians(-90));
                         turnState = TurnState.BACKWARDS;
                     }
@@ -119,10 +119,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     LeftYInput = -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_LEFT)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         drive.turn(Math.toRadians(90));
                         turnState = TurnState.RIGHT;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.DPAD_RIGHT)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         drive.turn(Math.toRadians(-90));
                         turnState = TurnState.LEFT;
                     }
@@ -150,11 +150,11 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
             drive.update();
 
             alignStick.run();
-            if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
-                alignStick.turnAlign(gamepadEx1,0.5);
-            } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.B)) {
-                alignStick.turnAlign(gamepadEx1,-0.5);
-            }
+//            if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
+//                alignStick.turnAlign(gamepadEx1,0.5);
+//            } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.B)) {
+//                alignStick.turnAlign(gamepadEx1,-0.5);
+//            }
 
 //            telemetry.addData("X", poseEstimate.getX());
 //            telemetry.addData("Y", poseEstimate.getY());
