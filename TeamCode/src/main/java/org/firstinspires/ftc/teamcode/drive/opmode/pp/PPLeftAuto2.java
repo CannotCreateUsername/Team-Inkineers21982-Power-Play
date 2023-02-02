@@ -168,7 +168,6 @@ public class PPLeftAuto2 extends LinearOpMode {
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeLeft(9.75)
                 .turn(Math.toRadians(-90))
-                .back(24)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(25)
@@ -187,6 +186,15 @@ public class PPLeftAuto2 extends LinearOpMode {
             //drive.followTrajectorySequence(rotateBack);
             coneThere = true;
         }
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
+                .strafeLeft(2)
+                .back(parkDistance)
+                .turn(Math.toRadians(90))
+                .back(5)
+                .build();
+
+        drive.followTrajectorySequence(park);
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();

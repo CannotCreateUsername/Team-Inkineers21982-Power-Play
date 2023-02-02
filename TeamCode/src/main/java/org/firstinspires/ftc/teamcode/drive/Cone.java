@@ -185,7 +185,7 @@ public class Cone {
 
                 // whether a cone has already been dropped
                 if (!cone && sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
-                    while ((sensorRange.getDistance(DistanceUnit.CM) < 100 && sensorRange.getDistance(DistanceUnit.CM) > JUNCTION_DISTANCE)&& timer.seconds() < 3 && op.opModeIsActive()) {
+                    while ((sensorRange.getDistance(DistanceUnit.CM) < 400 && sensorRange.getDistance(DistanceUnit.CM) > JUNCTION_DISTANCE) && timer.seconds() < 3 && op.opModeIsActive()) {
                         straight(0.1);
                         op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                         op.telemetry.addData("State:", dropOffState.name());
