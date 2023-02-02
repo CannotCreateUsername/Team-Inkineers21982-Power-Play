@@ -99,21 +99,16 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     rest = false;
                 }
                 if (rest) {
-                    if (gamepad1.isDown(GamepadKeys.Button.A)) {
-                        slides.setPower(-0.5);
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                        slides.setPower(0);
-                        intakeTimer.reset();
-                    } else {
-                        slides.setPower(0);
-                    }
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                        while(intakeTimer.seconds() < 1) {
-                            // wait to finish
+                    intakeTimer.reset();
+                    slides.setPower(-0.5);
+                    while (intakeTimer.seconds() < 4) {
+                        if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                            break;
                         }
-                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                     }
+                    slides.setPower(0);
+                    slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 }
                 setSlidePower();
                 break;
@@ -275,14 +270,14 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         switch (intakeState) {
             case IN:
                 intake.setPosition(-1);
-                if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
+                if (rtReader.isDown() || controller.wasJustReleased(GamepadKeys.Button.B)) {
                     autoIn = false;
                     intakeState = IntakeState.OUT;
                 }
                 break;
             case OUT:
                 intake.setPosition(1);
-                if (autoIn || controller.getButton(GamepadKeys.Button.A)) {
+                if (autoIn || controller.wasJustReleased(GamepadKeys.Button.A)) {
                     intakeState = IntakeState.IN;
                 }
                 break;
