@@ -23,7 +23,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="3(Auto LEFT Bottom/Left [A5 or F2])", group="Linear Opmode")
+@Autonomous(name="3_LEFT(Double HIGH)", group="Linear Opmode")
 //@Disabled
 public class PPLeftAuto3 extends LinearOpMode {
 

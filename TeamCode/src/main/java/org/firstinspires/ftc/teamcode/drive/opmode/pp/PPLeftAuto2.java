@@ -22,7 +22,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="2(Auto LEFT Bottom [A5 or F2])", group="Linear Opmode")
+@Autonomous(name="2_LEFT(Double MEDIUM)", group="Linear Opmode")
 public class PPLeftAuto2 extends LinearOpMode {
 
 
@@ -168,6 +168,7 @@ public class PPLeftAuto2 extends LinearOpMode {
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeLeft(9.75)
                 .turn(Math.toRadians(-90))
+                .strafeLeft(2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(25)

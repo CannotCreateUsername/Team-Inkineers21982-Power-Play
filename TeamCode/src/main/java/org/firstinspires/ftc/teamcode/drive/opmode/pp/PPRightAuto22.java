@@ -123,13 +123,13 @@ public class PPRightAuto22 extends LinearOpMode {
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 48;
+                            parkDistance = 1;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 1;
+                            parkDistance = 48;
                         }
                         break;
                     }
