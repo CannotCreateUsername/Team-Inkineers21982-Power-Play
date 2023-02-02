@@ -99,8 +99,8 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     rest = false;
                 }
                 if (rest) {
-                    intakeTimer.reset();
                     slides.setPower(-0.5);
+                    intakeTimer.reset();
                     while (intakeTimer.seconds() < 4) {
                         if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
                             break;
