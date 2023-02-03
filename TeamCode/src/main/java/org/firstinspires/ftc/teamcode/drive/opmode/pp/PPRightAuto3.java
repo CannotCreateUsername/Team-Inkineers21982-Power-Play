@@ -102,7 +102,7 @@ public class PPRightAuto3 extends LinearOpMode {
         // run to left high junction, REMEMBER TO CHANGE vvv TO FASTER (BECAUSE GITHUBU DIES NOT UPDSAT EIT P)
         TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
-                .turn(Math.toRadians(-90))
+                .turn(Math.toRadians(90))
                 .strafeLeft(2)
                 .forward(24)
                 .strafeRight(48)
@@ -174,11 +174,11 @@ public class PPRightAuto3 extends LinearOpMode {
                 .build();
 
         drive.followTrajectorySequence(preloadDrop);
-        cone.dropOffCone(this, -0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, 0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(stackPickup);
         cone.pickUpCone(this);
         drive.followTrajectorySequence(stackDrop);
-        cone.dropOffCone(this, -0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
+        cone.dropOffCone(this, 0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
         drive.followTrajectorySequence(park);
 
         // the last thing auto should do is move slide back to rest

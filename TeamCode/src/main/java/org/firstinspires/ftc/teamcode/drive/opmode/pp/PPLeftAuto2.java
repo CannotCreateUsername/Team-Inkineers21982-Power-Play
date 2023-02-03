@@ -192,7 +192,6 @@ public class PPLeftAuto2 extends LinearOpMode {
                 .strafeLeft(2)
                 .back(parkDistance)
                 .turn(Math.toRadians(90))
-                .back(5)
                 .build();
 
         drive.followTrajectorySequence(park);
