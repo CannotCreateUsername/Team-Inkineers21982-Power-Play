@@ -167,11 +167,10 @@ public class PPRightAuto2 extends LinearOpMode {
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeRight(9.75)
                 .turn(Math.toRadians(90))
-                .strafeRight(2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(25)
-                .strafeLeft(8)
+                .strafeLeft(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeRight(9.75)
@@ -190,7 +189,7 @@ public class PPRightAuto2 extends LinearOpMode {
         TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeRight(2)
                 .back(parkDistance)
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(-90))
                 .build();
 
         drive.followTrajectorySequence(park);

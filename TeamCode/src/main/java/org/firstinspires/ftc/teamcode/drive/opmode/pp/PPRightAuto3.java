@@ -114,7 +114,7 @@ public class PPRightAuto3 extends LinearOpMode {
                 .build();
         //pick up stack cone
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
-                //.strafeLeft(3) //to make sure is back at position
+                .strafeLeft(3) //to make sure is back at position
                 .back(24)
                 .build();
         //drop stack cone
@@ -124,7 +124,7 @@ public class PPRightAuto3 extends LinearOpMode {
 
 
         //Vufrofia
-        targets1.activate();  // octopus
+        targets1.activate(); // octopus
         targets2.activate(); // triangle
         targets3.activate(); // traffic
 

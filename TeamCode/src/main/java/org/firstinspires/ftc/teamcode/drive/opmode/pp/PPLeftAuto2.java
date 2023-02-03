@@ -168,11 +168,10 @@ public class PPLeftAuto2 extends LinearOpMode {
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeLeft(9.75)
                 .turn(Math.toRadians(-90))
-                .strafeLeft(0.2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(25)
-                .strafeRight(8)
+                .strafeRight(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeLeft(9.75)

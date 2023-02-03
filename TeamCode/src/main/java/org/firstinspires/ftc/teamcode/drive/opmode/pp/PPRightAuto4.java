@@ -184,7 +184,7 @@ public class PPRightAuto4 extends LinearOpMode {
         for (int i = 0; i < 1; i++) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(this, -0.25, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+            cone.dropOffCone(this, -0.23, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             //drive.followTrajectorySequence(rotateBack);
             coneThere = true;
         }
