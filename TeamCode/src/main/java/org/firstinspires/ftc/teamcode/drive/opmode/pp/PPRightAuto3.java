@@ -171,6 +171,7 @@ public class PPRightAuto3 extends LinearOpMode {
         TrajectorySequence park = drive.trajectorySequenceBuilder(stackDrop.end())
                 .strafeRight(1) //to make sure is back at position
                 .back(parkDistance)
+                .turn(Math.toRadians(-90))
                 .build();
 
         drive.followTrajectorySequence(preloadDrop);
