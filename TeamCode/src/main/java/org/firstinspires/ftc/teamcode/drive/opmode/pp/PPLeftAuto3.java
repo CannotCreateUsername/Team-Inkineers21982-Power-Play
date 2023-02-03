@@ -106,13 +106,13 @@ public class PPLeftAuto3 extends LinearOpMode {
                 .forward(2)
                 .turn(Math.toRadians(-90))
                 .strafeRight(2)
-                .forward(24)
+                .forward(26)
                 .strafeLeft(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .build();
         //pick up stack cone
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())

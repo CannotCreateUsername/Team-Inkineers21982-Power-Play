@@ -105,12 +105,12 @@ public class PPRightAuto4 extends LinearOpMode {
                 .forward(1)
                 .strafeLeft(24)
                 .forward(48)
-                .strafeRight(8)
+                .strafeLeft(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .resetConstraints()
                 .build();
 
@@ -168,7 +168,6 @@ public class PPRightAuto4 extends LinearOpMode {
                 .strafeRight(9.75)
                 .turn(Math.toRadians(90))
                 .back(24)
-                .strafeRight(1.2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(25)
@@ -193,7 +192,7 @@ public class PPRightAuto4 extends LinearOpMode {
         TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeRight(2)
                 .back(parkDistance)
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(-90))
                 .back(5)
                 .build();
         drive.followTrajectorySequence(park);

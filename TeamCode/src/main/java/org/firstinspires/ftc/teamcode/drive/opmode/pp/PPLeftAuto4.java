@@ -110,7 +110,7 @@ public class PPLeftAuto4 extends LinearOpMode {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .resetConstraints()
                 .build();
 

@@ -101,20 +101,20 @@ public class PPRightAuto3 extends LinearOpMode {
 
         // run to left high junction, REMEMBER TO CHANGE vvv TO FASTER (BECAUSE GITHUBU DIES NOT UPDSAT EIT P)
         TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
-                .forward(2)
+                .forward(3)
                 .turn(Math.toRadians(90))
                 .strafeLeft(2)
-                .forward(24)
+                .forward(26)
                 .strafeRight(48)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .build();
         //pick up stack cone
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
-                .strafeLeft(3) //to make sure is back at position
+                //.strafeLeft(3) //to make sure is back at position
                 .back(24)
                 .build();
         //drop stack cone

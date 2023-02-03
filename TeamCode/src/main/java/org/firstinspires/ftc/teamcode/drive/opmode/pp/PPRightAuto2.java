@@ -105,12 +105,12 @@ public class PPRightAuto2 extends LinearOpMode {
                 .forward(1)
                 .strafeLeft(24)
                 .forward(48)
-                .strafeLeft(8)
+                .strafeRight(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .resetConstraints()
                 .build();
 

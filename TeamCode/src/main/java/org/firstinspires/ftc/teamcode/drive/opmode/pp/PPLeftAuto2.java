@@ -111,7 +111,7 @@ public class PPLeftAuto2 extends LinearOpMode {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
-                .waitSeconds(1)
+                .waitSeconds(0.5)
                 .resetConstraints()
                 .build();
 
@@ -168,7 +168,7 @@ public class PPLeftAuto2 extends LinearOpMode {
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeLeft(9.75)
                 .turn(Math.toRadians(-90))
-                .strafeLeft(2)
+                .strafeLeft(0.2)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(25)
