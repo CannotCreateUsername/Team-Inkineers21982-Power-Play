@@ -55,8 +55,8 @@ public class SampleMecanumDrive extends MecanumDrive {
 
     // IY: tune the pid with BackAndForth
     // ref: https://learnroadrunner.com/follower-pid-tuning.html
-    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(12, 0, 0.05);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(7, 0, 0);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(8, 0, 0.05);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(8.9, 0, 0.05);
 
     // IY tune the lateral multipler with StrafTest:
     // https://learnroadrunner.com/trackwidth-tuning.html

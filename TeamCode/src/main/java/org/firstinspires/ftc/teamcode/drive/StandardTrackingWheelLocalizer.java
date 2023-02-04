@@ -44,13 +44,13 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
     // ref: https://learnroadrunner.com/dead-wheels.html#three-wheel-odometry
     // IY: later on, tune the LATERAL_DISTANCE using TrackingWheelLateralDistanceTuner
     // ref: https://learnroadrunner.com/dead-wheels.html#tuning-three-wheel
-    public static double LATERAL_DISTANCE = 11.06; // 13.25; // 15.9; // 16.34;  in; distance between the left and right wheels
-    public static double FORWARD_OFFSET =  -2.5; // -6.5; // in; offset of the lateral wheel
+    public static double LATERAL_DISTANCE = 11.208; // 13.25; // 15.9; // 16.34;  in; distance between the left and right wheels
+    public static double FORWARD_OFFSET =  2.5; // -6.5; // in; offset of the lateral wheel
 
     // IY , using localizationtest , the measured X distance is 87.66.
     // Measured Distance / Telemetry Distance Traveled
-    public static double X_MULTIPLIER = 1.01021438994;  //Nov-2022: X reading : 90.62;    //1.0266940;    // Aug-2022:  1.0266940 = 90/87.66 // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 1.01;  // Nov-2022: y reading: 90.82  ; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 1.0227;  //Nov-2022: X reading : 90.62;    //1.0266940;    // Aug-2022:  1.0266940 = 90/87.66 // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 1.0227;  // Nov-2022: y reading: 90.82  ; // Multiplier in the Y direction
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 

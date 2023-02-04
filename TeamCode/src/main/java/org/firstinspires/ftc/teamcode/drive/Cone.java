@@ -129,7 +129,7 @@ public class Cone {
                     // wait
                 }
                 // back out
-                while (sensorRange.getDistance(DistanceUnit.CM) < 15 && op.opModeIsActive()) {
+                while (sensorRange.getDistance(DistanceUnit.CM) < 18 && timer.seconds() < 3 && op.opModeIsActive()) {
                     straight(-0.3);
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State", pickupState.name());

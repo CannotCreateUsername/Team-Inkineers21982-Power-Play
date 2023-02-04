@@ -103,9 +103,8 @@ public class PPRightAuto3 extends LinearOpMode {
         TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .forward(3)
                 .turn(Math.toRadians(90))
-                .strafeLeft(2)
-                .forward(26)
-                .strafeRight(48)
+                .forward(24)
+                .strafeRight(56)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
