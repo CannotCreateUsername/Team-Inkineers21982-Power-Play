@@ -225,16 +225,18 @@ public class Cone {
                 intakeSlide.runIntake();
                 timer.reset();
 
-                if (sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
-                    while (sensorRange.getDistance(DistanceUnit.CM) < 15 && timer.seconds() < 2 && op.opModeIsActive()) {
-                        straight(-0.3);
-                        op.telemetry.addData("Time", timer.seconds());
-                        op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
-                        op.telemetry.update();
-                    }
-                } else {
-                    straightDistance(-5);
-                }
+//                if (sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
+//                    while (sensorRange.getDistance(DistanceUnit.CM) < 18 && timer.seconds() < 2 && op.opModeIsActive()) {
+//                        straight(-0.3);
+//                        op.telemetry.addData("Time", timer.seconds());
+//                        op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+//                        op.telemetry.update();
+//                    }
+//                } else {
+//                    straightDistance(-8);
+//                }
+
+                straightDistance(-8);
 
                 loaded = false;
 

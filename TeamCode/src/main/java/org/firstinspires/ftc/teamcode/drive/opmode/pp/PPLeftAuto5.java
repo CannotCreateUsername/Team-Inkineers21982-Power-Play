@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -15,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -23,9 +21,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="3_LEFT(Double HIGH)", group="Linear Opmode")
-//@Disabled
-public class PPLeftAuto3 extends LinearOpMode {
+@Autonomous(name="LEFTConePark", group="Linear Opmode")
+public class PPLeftAuto5 extends LinearOpMode {
 
 
 
@@ -66,6 +63,8 @@ public class PPLeftAuto3 extends LinearOpMode {
         // VuforiaTrackable relicTemplate = relicTrackables.get(0);
         // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
+        boolean coneThere = false;
+
         int label = 0;
         int parkDistance = 1;
 
@@ -101,26 +100,18 @@ public class PPLeftAuto3 extends LinearOpMode {
 
         drive.setPoseEstimate(startPose);
 
-        // run to left high junction, REMEMBER TO CHANGE vvv TO FASTER (BECAUSE GITHUBU DIES NOT UPDSAT EIT P)
-        TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
-                .forward(3)
-                .turn(Math.toRadians(-90))
-                .forward(22)
-                .strafeLeft(58)
+        // run to bottom high junction
+        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+                .forward(2)
+                .strafeRight(24)
+                .forward(48)
+                .strafeRight(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
                 })
                 .waitSeconds(0.5)
-                .build();
-        //pick up stack cone
-        TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
-                .strafeRight(9.75) //to make sure is back at position
-                .back(24)
-                .build();
-        //drop stack cone
-        TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
-                .forward(22)
+                .resetConstraints()
                 .build();
 
 
@@ -141,7 +132,7 @@ public class PPLeftAuto3 extends LinearOpMode {
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 42;
+                            parkDistance = 48;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
@@ -160,27 +151,47 @@ public class PPLeftAuto3 extends LinearOpMode {
         }
         intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
 
+        telemetry.addData("Check to see if camera is aligned?", "Can it detect well?");
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
         waitForStart();
 
         if(isStopRequested()) return;
+        runtime.reset();
 
-
-
-        //park
-        TrajectorySequence park = drive.trajectorySequenceBuilder(stackDrop.end())
-                .strafeRight(5) //to make sure is back at position
-                .back(parkDistance)
-                .turn(Math.toRadians(90))
+        drive.followTrajectorySequence(trajSeq);
+        // Put align code here? [import Cone.java and call a function to drop off cone]
+        cone.dropOffCone(this, 0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        Pose2d afterAdjPose = drive.getPoseEstimate();
+        // go to ready position
+        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
+                .strafeLeft(9.75)
+                .turn(Math.toRadians(-90))
+                .back(24)
+                .strafeLeft(4)
+                .build();
+        TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
+                .forward(20)
+                .strafeRight(10)
+                .build();
+        TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
+                .strafeLeft(9.75)
+                .back(25)
                 .build();
 
-        drive.followTrajectorySequence(preloadDrop);
-        cone.dropOffCone(this, -0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
-        drive.followTrajectorySequence(stackPickup);
-        cone.pickUpCone(this);
-        drive.followTrajectorySequence(stackDrop);
-        cone.dropOffCone(this, -0.25, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
+//        for (int i = 0; i < 1; i++) {
+//            cone.pickUpCone(this);
+//            drive.followTrajectorySequence(rotateTo);
+//            cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+//            //drive.followTrajectorySequence(rotateBack);
+//            coneThere = true;
+//        }
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
+                .strafeLeft(9.75)
+                .back(24)
+                .strafeLeft(parkDistance)
+                .build();
         drive.followTrajectorySequence(park);
 
         // the last thing auto should do is move slide back to rest

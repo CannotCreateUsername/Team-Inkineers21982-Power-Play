@@ -102,7 +102,7 @@ public class PPLeftAuto4 extends LinearOpMode {
 
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(1)
+                .forward(2)
                 .strafeRight(24)
                 .forward(48)
                 .strafeRight(8)
@@ -132,7 +132,7 @@ public class PPLeftAuto4 extends LinearOpMode {
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 48;
+                            parkDistance = 42;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
@@ -168,11 +168,11 @@ public class PPLeftAuto4 extends LinearOpMode {
                 .strafeLeft(9.75)
                 .turn(Math.toRadians(-90))
                 .back(24)
-                .strafeLeft(1.2)
+                .strafeLeft(4)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(25)
-                .strafeRight(8)
+                .forward(20)
+                .strafeRight(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeLeft(9.75)
@@ -185,13 +185,13 @@ public class PPLeftAuto4 extends LinearOpMode {
         for (int i = 0; i < 1; i++) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(this, 0.23, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+            cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             //drive.followTrajectorySequence(rotateBack);
             coneThere = true;
         }
 
         TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeLeft(2)
+                .strafeLeft(7.5)
                 .back(parkDistance)
                 .turn(Math.toRadians(90))
                 .back(5)

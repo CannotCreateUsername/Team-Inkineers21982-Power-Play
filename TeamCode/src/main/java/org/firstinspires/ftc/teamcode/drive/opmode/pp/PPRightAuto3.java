@@ -103,7 +103,7 @@ public class PPRightAuto3 extends LinearOpMode {
         TrajectorySequence preloadDrop = drive.trajectorySequenceBuilder(startPose)
                 .forward(3)
                 .turn(Math.toRadians(90))
-                .forward(24)
+                .forward(22)
                 .strafeRight(56)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
@@ -113,12 +113,12 @@ public class PPRightAuto3 extends LinearOpMode {
                 .build();
         //pick up stack cone
         TrajectorySequence stackPickup = drive.trajectorySequenceBuilder(preloadDrop.end())
-                .strafeLeft(3) //to make sure is back at position
+                .strafeLeft(9.75) //to make sure is back at position
                 .back(24)
                 .build();
         //drop stack cone
         TrajectorySequence stackDrop = drive.trajectorySequenceBuilder(stackPickup.end())
-                .forward(26)
+                .forward(22)
                 .build();
 
 
@@ -145,7 +145,7 @@ public class PPRightAuto3 extends LinearOpMode {
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 48;
+                            parkDistance = 42;
                         }
                         break;
                     }
@@ -168,17 +168,17 @@ public class PPRightAuto3 extends LinearOpMode {
 
         //park
         TrajectorySequence park = drive.trajectorySequenceBuilder(stackDrop.end())
-                .strafeRight(1) //to make sure is back at position
+                .strafeLeft(5) //to make sure is back at position
                 .back(parkDistance)
                 .turn(Math.toRadians(-90))
                 .build();
 
         drive.followTrajectorySequence(preloadDrop);
-        cone.dropOffCone(this, 0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(stackPickup);
         cone.pickUpCone(this);
         drive.followTrajectorySequence(stackDrop);
-        cone.dropOffCone(this, 0.3, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
+        cone.dropOffCone(this, 0.25, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
         drive.followTrajectorySequence(park);
 
         // the last thing auto should do is move slide back to rest

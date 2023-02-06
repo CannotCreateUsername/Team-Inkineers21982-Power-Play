@@ -102,7 +102,7 @@ public class PPRightAuto4 extends LinearOpMode {
 
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(1)
+                .forward(2)
                 .strafeLeft(24)
                 .forward(48)
                 .strafeLeft(8)
@@ -138,7 +138,7 @@ public class PPRightAuto4 extends LinearOpMode {
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 48;
+                            parkDistance = 42;
                         }
                         break;
                     }
@@ -161,22 +161,22 @@ public class PPRightAuto4 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, -0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, -0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeRight(9.75)
                 .turn(Math.toRadians(90))
-                .strafeRight(2)
                 .back(24)
+                .strafeRight(4)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(24)
-                .strafeLeft(8)
+                .forward(20)
+                .strafeLeft(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeRight(9.75)
-                .back(25)
+                .back(20)
                 .build();
 
 
@@ -185,13 +185,13 @@ public class PPRightAuto4 extends LinearOpMode {
         for (int i = 0; i < 1; i++) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(this, -0.23, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+            cone.dropOffCone(this, -0.2, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             //drive.followTrajectorySequence(rotateBack);
             coneThere = true;
         }
 
         TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeRight(2)
+                .strafeRight(7.5)
                 .back(parkDistance)
                 .turn(Math.toRadians(-90))
                 .back(5)

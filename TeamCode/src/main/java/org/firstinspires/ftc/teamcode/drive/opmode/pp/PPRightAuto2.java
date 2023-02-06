@@ -169,25 +169,25 @@ public class PPRightAuto2 extends LinearOpMode {
                 .turn(Math.toRadians(90))
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(25)
+                .forward(24)
                 .strafeLeft(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeRight(9.75)
-                .back(25)
+                .back(24)
                 .build();
 
         drive.followTrajectorySequence(trajSeq2);
+        coneThere = true;
         for (int i = 0; i < 1; i++) {
             cone.pickUpCone(this);
             drive.followTrajectorySequence(rotateTo);
             cone.dropOffCone(this, -0.25, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             //drive.followTrajectorySequence(rotateBack);
-            coneThere = true;
         }
 
         TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeRight(2)
+                .strafeRight(8)
                 .back(parkDistance)
                 .turn(Math.toRadians(-90))
                 .build();
