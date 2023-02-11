@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.drive.opmode.pp;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -43,8 +43,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
-import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
-import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,9 +57,9 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Red & Blue Left Vuforia", group = "Concept")
+@Autonomous(name = "Red & Blue Right Vuforia", group = "Concept")
 @Disabled
-public class AaLeftSideEV extends LinearOpMode {
+public class AaRightSideEV extends LinearOpMode {
     public static final String TAG = "Vuforia VuMark Sample";
 
     OpenGLMatrix lastLocation = null;
@@ -139,7 +137,7 @@ public class AaLeftSideEV extends LinearOpMode {
         if (opModeIsActive()) {
             int label = 0;
             runtime.reset();
-            while (runtime.time() < 8 && opModeIsActive()) {
+            while (runtime.time() < 2 && opModeIsActive()) {
                 if (!targetVisible) {
                     for (VuforiaTrackable trackable : allTrackables) {
                         if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
@@ -269,9 +267,9 @@ public class AaLeftSideEV extends LinearOpMode {
         slides.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
     private void dropCone() {
-        encoderStrafeRight(10);
+        encoderStrafeLeft(10);
         encoderForward(15);
-        encoderStrafeLeft(5);
+        encoderStrafeRight(5);
         //insert arm code here
     }
 

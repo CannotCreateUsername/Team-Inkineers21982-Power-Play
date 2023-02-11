@@ -6,12 +6,9 @@ import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.drive.AlignJunction;
+import org.firstinspires.ftc.teamcode.drive.TeleOpFunctions;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide2;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem4;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
@@ -59,7 +56,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
         GamepadHelper rightStickX = new GamepadHelper();
         rightStickX.init();
 
-        AlignJunction alignStick = new AlignJunction();
+        TeleOpFunctions alignStick = new TeleOpFunctions();
         alignStick.init(drive, hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -73,7 +70,6 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
             leftStickMultiplierX = leftStickX.getGamepadStickRampingMultiplier(gamepad1.left_stick_x);
             leftStickMultiplierY = leftStickY.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
             rightStickMultiplierX = rightStickX.getGamepadStickRampingMultiplier(gamepad1.right_stick_x);
-            // alignMultiplierY = alignStick.getGamepadStickRampingMultiplier(gamepad1.left_stick_y);
 
 
             // keeps controls the same if robot is rotated 90 degrees in any direction
@@ -83,10 +79,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
                     if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
-                        drive.turn(Math.toRadians(90));
+                        alignStick.runTurning(90);
                         turnState = TurnState.LEFT;
                     } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
-                        drive.turn(Math.toRadians(-90));
+                        alignStick.runTurning(-90);
                         turnState = TurnState.RIGHT;
                     }
                     break;
@@ -95,7 +91,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
                     if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
-                        drive.turn(Math.toRadians(-90));
+                        alignStick.runTurning(-90);
                         turnState = TurnState.STRAIGHT;
                     } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         drive.turn(Math.toRadians(-180));
@@ -110,7 +106,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                         drive.turn(Math.toRadians(-180));
                         turnState = TurnState.LEFT;
                     } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
-                        drive.turn(Math.toRadians(90));
+                        alignStick.runTurning(90);
                         turnState = TurnState.STRAIGHT;
                     }
                     break;
@@ -133,6 +129,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                             -RightXInput
                     )
             );
+
 
             drive.update();
 

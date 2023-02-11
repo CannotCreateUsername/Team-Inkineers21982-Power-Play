@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode.pp;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="4_LEFT(HIGH, MEDIUM)", group="Linear Opmode")
-public class PPLeftAuto4 extends LinearOpMode {
+@Autonomous(name="RIGHTConePark", group="Linear Opmode")
+public class PPRightAuto5 extends LinearOpMode {
 
 
 
@@ -103,9 +103,9 @@ public class PPLeftAuto4 extends LinearOpMode {
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
-                .strafeRight(24)
+                .strafeLeft(24)
                 .forward(48)
-                .strafeRight(8)
+                .strafeLeft(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -132,13 +132,13 @@ public class PPLeftAuto4 extends LinearOpMode {
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 42;
+                            parkDistance = 1;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 1;
+                            parkDistance = 48;
                         }
                         break;
                     }
@@ -161,40 +161,36 @@ public class PPLeftAuto4 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, 0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(this, -0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
-                .strafeLeft(9.75)
-                .turn(Math.toRadians(-90))
+                .strafeRight(9.75)
+                .turn(Math.toRadians(90))
                 .back(24)
-                .strafeLeft(4)
+                .strafeRight(4)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(20)
-                .strafeRight(10)
+                .strafeLeft(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeLeft(9.75)
-                .back(25)
+                .strafeRight(9.75)
+                .back(20)
                 .build();
 
+//        for (int i = 0; i < 1; i++) {
+//            cone.pickUpCone(this);
+//            drive.followTrajectorySequence(rotateTo);
+//            cone.dropOffCone(this, -0.2, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+//            //drive.followTrajectorySequence(rotateBack);
+//            coneThere = true;
+//        }
 
-        drive.followTrajectorySequence(trajSeq2);
-
-        for (int i = 0; i < 1; i++) {
-            cone.pickUpCone(this);
-            drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
-            //drive.followTrajectorySequence(rotateBack);
-            coneThere = true;
-        }
-
-        TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeLeft(7.5)
-                .back(parkDistance)
-                .turn(Math.toRadians(90))
-                .back(5)
+        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
+                .strafeRight(9.75)
+                .back(24)
+                .strafeRight(parkDistance)
                 .build();
         drive.followTrajectorySequence(park);
 

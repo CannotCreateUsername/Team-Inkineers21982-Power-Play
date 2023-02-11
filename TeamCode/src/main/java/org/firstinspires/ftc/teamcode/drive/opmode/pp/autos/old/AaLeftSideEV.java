@@ -27,7 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.drive.opmode.pp;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -37,10 +37,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,29 +59,25 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@Autonomous(name = "Red & Blue Left Encoder", group = "Concept")
+@Autonomous(name = "Red & Blue Left Vuforia", group = "Concept")
 @Disabled
-public class AaLeftSideE extends LinearOpMode {
-    /*
-     * Specify the source for the Tensor Flow Model.
-     * If the TensorFlowLite object model is included in the Robot Controller App as an "asset",
-     * the OpMode must to load it using loadModelFromAsset().  However, if a team generated model
-     * has been downloaded to the Robot Controller's SD FLASH memory, it must to be loaded using loadModelFromFile()
-     * Here we assume it's an Asset.    Also see method initTfod() below .
+public class AaLeftSideEV extends LinearOpMode {
+    public static final String TAG = "Vuforia VuMark Sample";
+
+    OpenGLMatrix lastLocation = null;
+
+    /**
+     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * localization engine.
      */
+    VuforiaLocalizer vuforia;
+
     private DcMotor front_left = null;
     private DcMotor front_right = null;
     private DcMotor back_left = null;
     private DcMotor back_right = null;
     private DcMotor slides = null;
-    private static final String TFOD_MODEL_ASSET = "PowerPlay.tflite";
-    // private static final String TFOD_MODEL_FILE  = "/sdcard/FIRST/tflitemodels/CustomTeamModel.tflite";
 
-    private static final String[] LABELS = {
-            "1 Bolt",
-            "2 Bulb",
-            "3 Panel"
-    };
 
     //Encoder Stuff
     static final double COUNTS_PER_MOTOR_REV = 312;
@@ -86,55 +88,31 @@ public class AaLeftSideE extends LinearOpMode {
     static final double TURN_SPEED = 0.5;
 
     private ElapsedTime runtime = new ElapsedTime();
-    /*
-     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
-     * 'parameters.vuforiaLicenseKey' is initialized is for illustration only, and will not function.
-     * A Vuforia 'Development' license key, can be obtained free of charge from the Vuforia developer
-     * web site at https://developer.vuforia.com/license-manager.
-     *
-     * Vuforia license keys are always 380 characters long, and look as if they contain mostly
-     * random data. As an example, here is a example of a fragment of a valid key:
-     *      ... yIgIzTqZ4mWjk9wd3cZO9T1axEqzuhxoGlfOOI2dRzKS4T0hQ8kT ...
-     * Once you've obtained a license key, copy the string from the Vuforia web site
-     * and paste it in to your code on the next line, between the double quotes.
-     */
     private static final String VUFORIA_KEY =
             "AYP9k3r/////AAABmbsKp4S4+0RSpbJyMlJGbNQJWbthdpl1gIp8CO+DnDwIDkzifNXPuUMawrPbYmKwDfWtSi+PAKLOcvbHmHZxsTM24Sd32QsBy/RarvDqfIJgEIVDiUXpTlOvKCqFNCS5FGivU6Tz3C5FIhf5N/KapHhETsd2ExGtCtsZSE7QQw5SCjynKE+JvP/DnjZ8eBk6PYlS/TUdvQmonUSTkPwPCEXcL3HVO9Mw+QjvYT0eA93l7yn2NssK+37MjpJBn7kzME8FUmurwynqPJA5Ido5l/iafDl53Hndd+vl0H5ooXY0qVE1mc8HUK5lYoVXMygBDqa9Grkghg8bD791U09C20SnuKdwFCWH0Ic6zZUkeH9o";
 
-    /**
-     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
-     * localization engine.
-     */
-    private VuforiaLocalizer vuforia;
-
-    /**
-     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
-     * Detection engine.
-     */
-    private TFObjectDetector tfod;
-
     @Override
     public void runOpMode() {
-        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
-        // first.
         initVuforia();
-        initTfod();
-
         /**
-         * Activate TensorFlow Object Detection before we wait for the start command.
-         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
-         **/
-        if (tfod != null) {
-            tfod.activate();
+         * Load the data set containing the VuMarks for Relic Recovery. There's only one trackable
+         * in this data set: all three of the VuMarks in the game were created from this one template,
+         * but differ in their instance id information.
+         * @see VuMarkInstanceId
+         */
+        VuforiaTrackables targets1 = this.vuforia.loadTrackablesFromAsset("PowerPlay1");
+        VuforiaTrackables targets2 = this.vuforia.loadTrackablesFromAsset("PowerPlay2");
+        VuforiaTrackables targets3 = this.vuforia.loadTrackablesFromAsset("PowerPlay3");
 
-            // The TensorFlow software will scale the input images from the camera to a lower resolution.
-            // This can result in lower detection accuracy at longer distances (> 55cm or 22").
-            // If your target is at distance greater than 50 cm (20") you can increase the magnification value
-            // to artificially zoom in to the center of image.  For best results, the "aspectRatio" argument
-            // should be set to the value of the images used to create the TensorFlow Object Detection model
-            // (typically 16/9).
-            tfod.setZoom(1.0, 16.0/9.0);
-        }
+        // For convenience, gather together all the trackable objects in one easily-iterable collection */
+        List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
+        allTrackables.addAll(targets1);
+        allTrackables.addAll(targets2);
+        allTrackables.addAll(targets3);
+
+        // VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
         front_left = hardwareMap.get(DcMotor.class, "left_front_drive");
         back_left = hardwareMap.get(DcMotor.class, "left_back_drive");
         front_right = hardwareMap.get(DcMotor.class, "right_front_drive");
@@ -150,42 +128,37 @@ public class AaLeftSideE extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
+        //Vufrofia
+        targets1.activate();  // octopus
+        targets2.activate(); // triangle
+        targets3.activate(); // traffic
+
+        boolean targetVisible = false;
+        String targetName = "NOT FOUND";
+
         if (opModeIsActive()) {
             int label = 0;
-            slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             runtime.reset();
             while (runtime.time() < 8 && opModeIsActive()) {
-                if (tfod != null) {
-                    // getUpdatedRecognitions() will return null if no new information is available since
-                    // the last time that call was made.
-                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
-                    if (updatedRecognitions != null) {
-                        telemetry.addData("# Objects Detected", updatedRecognitions.size());
-
-                        // step through the list of recognitions and display image position/size information for each one
-                        // Note: "Image number" refers to the randomized image orientation/number
-                        for (Recognition recognition : updatedRecognitions) {
-                            double col = (recognition.getLeft() + recognition.getRight()) / 2 ;
-                            double row = (recognition.getTop()  + recognition.getBottom()) / 2 ;
-                            double width  = Math.abs(recognition.getRight() - recognition.getLeft()) ;
-                            double height = Math.abs(recognition.getTop()  - recognition.getBottom()) ;
-
-                            if (recognition.getLabel() == "1 Bolt") {
+                if (!targetVisible) {
+                    for (VuforiaTrackable trackable : allTrackables) {
+                        if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
+                            targetVisible = true;
+                            targetName = trackable.getName();
+                            if (targetName == "octopus") {
                                 label = 1;
-                            } else if (recognition.getLabel() == "2 Bulb") {
+                            } else if (targetName == "triangle") {
                                 label = 2;
-                            } else if (recognition.getLabel() == "3 Panel") {
+                            } else if (targetName == "traffic") {
                                 label = 3;
                             }
-
-                            telemetry.addData(""," ");
-                            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100 );
-                            telemetry.addData("- Position (Row/Col)","%.0f / %.0f", row, col);
-                            telemetry.addData("- Size (Width/Height)","%.0f / %.0f", width, height);
+                            break;
                         }
-                        telemetry.update();
                     }
                 }
+                telemetry.addData("Visible Target",targetName );
+                telemetry.addData("Lable #", label);
+                telemetry.update();
             }
             if (label == 1) {
                 dropCone();
@@ -199,6 +172,7 @@ public class AaLeftSideE extends LinearOpMode {
                 goForward(1000);
                 telemetry.addData("Haha","No image detected");
             }
+            telemetry.update();
         }
     }
 
@@ -267,26 +241,9 @@ public class AaLeftSideE extends LinearOpMode {
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
     }
 
-    /**
-     * Initialize the TensorFlow Object Detection engine.
-     */
-    private void initTfod() {
-        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-            "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minResultConfidence = 0.75f;
-        tfodParameters.isModelTensorFlow2 = true;
-        tfodParameters.inputSize = 300;
-        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
-
-        // Use loadModelFromAsset() if the TF Model is built in as an asset by Android Studio
-        // Use loadModelFromFile() if you have downloaded a custom team model to the Robot Controller's FLASH.
-        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABELS);
-        // tfod.loadModelFromFile(TFOD_MODEL_FILE, LABELS);
-    }
-
     private void highJunction() {
         slides.setTargetPosition(2000);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slides.setPower(0.5);
         while (opModeIsActive() && slides.isBusy()) {
             telemetry.addData("Dispenser", "Going up!");
@@ -295,6 +252,7 @@ public class AaLeftSideE extends LinearOpMode {
     }
     private void mediumJunction () {
         slides.setTargetPosition(1200);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slides.setPower(0.5);
         while (opModeIsActive() && slides.isBusy()) {
             telemetry.addData("Dispenser", "Going up!");
@@ -303,6 +261,7 @@ public class AaLeftSideE extends LinearOpMode {
     }
     private void lowJunction() {
         slides.setTargetPosition(500);
+        slides.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         slides.setPower(0.5);
         while (opModeIsActive() && slides.isBusy()) {
             telemetry.addData("Dispenser", "Going up!");

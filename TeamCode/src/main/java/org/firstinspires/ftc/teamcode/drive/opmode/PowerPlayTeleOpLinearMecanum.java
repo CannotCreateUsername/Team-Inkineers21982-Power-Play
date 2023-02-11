@@ -1,18 +1,13 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
-import android.graphics.Paint;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
-import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.drive.AlignJunction;
+import org.firstinspires.ftc.teamcode.drive.TeleOpFunctions;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
@@ -69,7 +64,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         GamepadHelper rightStickX = new GamepadHelper();
         rightStickX.init();
 
-        AlignJunction alignStick = new AlignJunction();
+        TeleOpFunctions alignStick = new TeleOpFunctions();
         alignStick.init(drive, hardwareMap);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

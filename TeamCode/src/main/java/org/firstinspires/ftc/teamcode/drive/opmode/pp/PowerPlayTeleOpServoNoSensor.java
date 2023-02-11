@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.drive.AlignJunction;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem4;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;

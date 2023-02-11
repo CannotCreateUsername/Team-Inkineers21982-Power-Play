@@ -3,16 +3,21 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.hardware.bosch.BHI260IMU;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 
-public class AlignJunction {
+public class TeleOpFunctions {
 
     public enum GamePadState {
         POSITIVE,
@@ -34,11 +39,8 @@ public class AlignJunction {
 
     private double gameStickMultiplier;
 
-    /*
-    Time Base Ramping
-    If the driver keep on pressing the gamepad, the sensitivity of the gamepad input will increase over time
-    */
-    ElapsedTime xGamePadTimer;
+    public final double Kp = .05;
+
     boolean isStopped;
     GamePadState previousGameStickState;
     GamePadState currentGameStickState;
@@ -49,6 +51,10 @@ public class AlignJunction {
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
 
+    private BHI260IMU imu;
+    IMU.Parameters myIMUparameters;
+
+
     SampleMecanumDrive drive;
 
     public void init(SampleMecanumDrive d, HardwareMap hardwareMap) {
@@ -57,6 +63,18 @@ public class AlignJunction {
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         redLED = hardwareMap.get(DigitalChannel.class, "red");
         greenLED = hardwareMap.get(DigitalChannel.class, "green");
+        imu = hardwareMap.get(BHI260IMU.class, "imu");
+
+        myIMUparameters = new IMU.Parameters(
+                new RevHubOrientationOnRobot(
+                        RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
+                        RevHubOrientationOnRobot.UsbFacingDirection.LEFT
+                )
+        );
+
+        imu.initialize(myIMUparameters);
+
+
 
         redLED.setMode(DigitalChannel.Mode.OUTPUT);
         greenLED.setMode(DigitalChannel.Mode.OUTPUT);
@@ -65,75 +83,7 @@ public class AlignJunction {
         currentGameStickState = GamePadState.NETURAL;
         alignState = AlignState.UNALIGNED;
         lightState = LightState.OFF;
-        xGamePadTimer = new ElapsedTime();
         isStopped = false;
-    }
-
-    public double  getGamepadStickRampingMultiplier(float gameStick) {
-
-        previousGameStickState = currentGameStickState;
-        if (gameStick < 0){
-            currentGameStickState = GamePadState.NETURAL;
-        } else  if (gameStick > 0){
-            currentGameStickState = GamePadState.POSITIVE;
-        } else {
-            currentGameStickState = GamePadState.NETURAL;
-        }
-
-        switch (alignState) {
-            case UNALIGNED:
-                if (sensorRange.getDistance(DistanceUnit.CM) < 40) {
-                    alignState = AlignState.ALIGNING;
-                    lightState = LightState.ALIGNING;
-                }
-                isStopped = false;
-                gameStickMultiplier = 1;
-                break;
-            case ALIGNING:
-                if (sensorRange.getDistance(DistanceUnit.CM) < 8) {
-                    alignState = AlignState.ALIGNED;
-                    lightState = LightState.ALIGNED;
-                } else if (sensorRange.getDistance(DistanceUnit.CM) > 40) {
-                    alignState = AlignState.UNALIGNED;
-                    lightState = LightState.OFF;
-                }
-                gameStickMultiplier = 0.8;
-                break;
-            case ALIGNED:
-                if (sensorRange.getDistance(DistanceUnit.CM) > 8 && sensorRange.getDistance(DistanceUnit.CM) < 40) {
-                    alignState = AlignState.ALIGNING;
-                    lightState = LightState.ALIGNING;
-                } else if (sensorRange.getDistance(DistanceUnit.CM) > 40) {
-                    alignState = AlignState.UNALIGNED;
-                    lightState = LightState.OFF;
-                }
-//                isStopped = false;
-//                if (currentGameStickState == previousGameStickState && !isStopped) {
-//                    gameStickMultiplier = 0;
-//                } else if (currentGameStickState != previousGameStickState) {
-//                    isStopped = true;
-//                    gameStickMultiplier = 1;
-//                }
-                break;
-        }
-
-        switch (lightState) {
-            case OFF:
-                greenLED.setState(false);
-                redLED.setState(false);
-                break;
-            case ALIGNING:
-                greenLED.setState(false);
-                redLED.setState(true);
-                break;
-            case ALIGNED:
-                greenLED.setState(true);
-                redLED.setState(false);
-                break;
-        }
-
-        return gameStickMultiplier;
-
     }
 
     public void run() {
@@ -205,6 +155,38 @@ public class AlignJunction {
             );
             drive.update();
 
+        }
+
+    }
+
+    // Positive degrees is Counter Clockwise
+    public void runTurning(double degrees) {
+        double power;
+        double error;
+        // Create an object to receive the IMU angles
+        YawPitchRollAngles robotOrientation;
+        robotOrientation = imu.getRobotYawPitchRollAngles();
+
+        // Now use these simple methods to extract each angle
+        double Yaw   = robotOrientation.getYaw(AngleUnit.DEGREES);
+//        double Pitch = robotOrientation.getPitch(AngleUnit.DEGREES);
+//        double Roll  = robotOrientation.getRoll(AngleUnit.DEGREES);
+        error = degrees - Yaw;
+        power = error * Kp;
+
+        if (Math.abs(error) > degrees) {
+            drive.setWeightedDrivePower(
+                    new Pose2d(
+                            -0,
+                            -0,
+                            -power
+                    )
+            );
+        }
+        drive.update();
+
+        if (Yaw == degrees) {
+            imu.resetYaw();
         }
 
     }
