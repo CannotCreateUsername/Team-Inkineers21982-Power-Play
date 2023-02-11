@@ -52,7 +52,7 @@ public class TeleOpFunctions {
     private DigitalChannel greenLED;
 
     private BHI260IMU imu;
-    IMU.Parameters myIMUparameters;
+
 
 
     SampleMecanumDrive drive;
@@ -65,7 +65,9 @@ public class TeleOpFunctions {
         greenLED = hardwareMap.get(DigitalChannel.class, "green");
         imu = hardwareMap.get(BHI260IMU.class, "imu");
 
-        myIMUparameters = new IMU.Parameters(
+        BHI260IMU.Parameters myIMUparameters;
+
+        myIMUparameters = new BHI260IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
                         RevHubOrientationOnRobot.UsbFacingDirection.LEFT
@@ -73,7 +75,6 @@ public class TeleOpFunctions {
         );
 
         imu.initialize(myIMUparameters);
-
 
 
         redLED.setMode(DigitalChannel.Mode.OUTPUT);
@@ -169,12 +170,12 @@ public class TeleOpFunctions {
 
         // Now use these simple methods to extract each angle
         double Yaw   = robotOrientation.getYaw(AngleUnit.DEGREES);
-//        double Pitch = robotOrientation.getPitch(AngleUnit.DEGREES);
-//        double Roll  = robotOrientation.getRoll(AngleUnit.DEGREES);
+        double Pitch = robotOrientation.getPitch(AngleUnit.DEGREES);
+        double Roll  = robotOrientation.getRoll(AngleUnit.DEGREES);
         error = degrees - Yaw;
         power = error * Kp;
 
-        if (Math.abs(error) > degrees) {
+        while (Yaw < Math.abs(degrees)) {
             drive.setWeightedDrivePower(
                     new Pose2d(
                             -0,
@@ -190,6 +191,8 @@ public class TeleOpFunctions {
         }
 
     }
+
+    public double getYawReading() { return imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES); }
 
     public String getAlignState() { return alignState.name(); }
     public String getLightState() { return lightState.name(); }

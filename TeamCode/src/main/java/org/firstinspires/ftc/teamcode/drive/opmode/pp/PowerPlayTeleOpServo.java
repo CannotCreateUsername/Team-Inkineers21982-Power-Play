@@ -167,6 +167,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
 
             telemetry.addData("Servo Position", intakeSlide.getServoPosition());
             telemetry.addData("Intake State", intakeSlide.getIntakeState());
+            telemetry.addData("Yaw Angle:", alignStick.getYawReading());
             // publish all the telemetry at once
             telemetry.update();
         }

@@ -124,7 +124,7 @@ public class PPRightAuto4 extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (!opModeIsActive()) {
+        while (!isStopRequested() && !opModeIsActive()) {
             if (!targetVisible) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
