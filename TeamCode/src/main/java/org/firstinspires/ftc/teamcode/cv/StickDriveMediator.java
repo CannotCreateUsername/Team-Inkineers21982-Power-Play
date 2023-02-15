@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -29,14 +30,15 @@ public class StickDriveMediator {
     private StickObserverPipeline opencv = null;
     private LinearOpMode op;
     private SampleMecanumDrive drive;
+    private IntakeSlideSubsystemAuto intakeSlide;
     private DistanceSensor sensorRange;
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
 
     private double LATERAL_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
-    private double DISTANCE_JUNCTION = 13; // cm
-    private double DISTANCE_JUNCTION_MAX = 20; // cm
+    private double DISTANCE_JUNCTION = 8; // cm
+    private double DISTANCE_JUNCTION_MAX = 36; // cm
 
 
 
@@ -44,6 +46,7 @@ public class StickDriveMediator {
     public void setDrive(SampleMecanumDrive drive) {
         this.drive = drive;
     }
+    public void setSlide(IntakeSlideSubsystemAuto intakeSlide) { this.intakeSlide = intakeSlide; }
 
     public StickDriveMediator(LinearOpMode p_op){
         //you can input  a hardwareMap instead of linearOpMode if you want
@@ -84,11 +87,16 @@ public class StickDriveMediator {
          while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
              LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
          }
-
+         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+         intakeSlide.run();
          timer.reset();
-        while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
+         while (timer.seconds() < 1.5) {
+             // wait for slides to raise
+         }
+         timer.reset();
+         while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
             distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
-        }
+         }
 
 
     }

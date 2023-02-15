@@ -63,7 +63,7 @@ public class TeleOpFunctions {
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         redLED = hardwareMap.get(DigitalChannel.class, "red");
         greenLED = hardwareMap.get(DigitalChannel.class, "green");
-        imu = hardwareMap.get(BHI260IMU.class, "imu");
+        imu = hardwareMap.get(BHI260IMU.class, "IMU");
 
         BHI260IMU.Parameters myIMUparameters;
 
@@ -178,8 +178,8 @@ public class TeleOpFunctions {
         while (Yaw < Math.abs(degrees)) {
             drive.setWeightedDrivePower(
                     new Pose2d(
-                            -0,
-                            -0,
+                            0,
+                            0,
                             -power
                     )
             );

@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Light;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.cv.StickDriveMediator;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -48,8 +49,6 @@ public class Cone {
     private final double CONE_DISTANCE = 6;
     private final double LATERAL_DISTANCE = 40;
 
-    private LinearOpMode op;
-
     // Hardware
     private DistanceSensor sensorRange;
     private TouchSensor sensorTouch1;
@@ -60,10 +59,17 @@ public class Cone {
 
     IntakeSlideSubsystemAuto intakeSlide;
     SampleMecanumDrive drive;
+    LinearOpMode op;
+    StickDriveMediator stickDrive;
 
-    public void init (SampleMecanumDrive d, IntakeSlideSubsystemAuto i, HardwareMap hardwareMap) {
+    public void init (SampleMecanumDrive d, IntakeSlideSubsystemAuto i, HardwareMap hardwareMap, LinearOpMode o) {
         drive = d;
         intakeSlide = i;
+        op = o;
+        stickDrive = new StickDriveMediator(op);
+        stickDrive.setDrive(drive);
+        stickDrive.setSlide(intakeSlide);
+        stickDrive.observeStick();
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -84,8 +90,7 @@ public class Cone {
 //        }
 //    }
     // PROBLEM: YOU HAVE TO CALL RUN FOR INTAKE SLIDES AND INIT GAMEPADS!! HOW TO SOLVE!?
-    public void pickCone(LinearOpMode p_op) {
-        op = p_op;
+    public void pickCone() {
         switch (pickupState) {
             case ALIGNING:
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
@@ -141,18 +146,16 @@ public class Cone {
         }
     }
 
-    public void pickUpCone(LinearOpMode p_op) {
+    public void pickUpCone() {
         loaded = false;
-        op = p_op;
         while (!loaded && op.opModeIsActive()) {
             intakeSlide.stack = true;
-            pickCone(op);
+            pickCone();
         }
     }
 
     // change speed (direction) for strafe right/left for different starting positions
-    public void dropOffCone(LinearOpMode p_op, double speed, IntakeSlideSubsystemAuto.LiftState height, boolean cone) {
-        op = p_op;
+    public void dropOffCone(double speed, IntakeSlideSubsystemAuto.LiftState height, boolean cone) {
         if (op.opModeIsActive()) {
             timer.reset();
             while ((sensorRange.getDistance(DistanceUnit.CM) > LATERAL_DISTANCE && timer.seconds() < 5) && op.opModeIsActive() ) {
@@ -249,46 +252,50 @@ public class Cone {
         }
     }
 
-    public boolean checkForAlign() {
-        while (checks<=10) {
-            if (sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
-                positives++;
-            }
-            checks++;
-        }
-        // if positives is greater than the minimum positives needed to be aligned
-        if (positives > MINIMUM_POSITIVES) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    public void align() {
-        while (!checkForAlign()) {
-            strafeDistance(-1);
-        }
-        pIterations++;
-        while (checkForAlign()) {
-            strafeDistance(-1);
-            pIterations++;
-        }
-        for (s = 0; s < pIterations/2; s++) {
-            strafeDistance(1);
-        }
-    }
+//    public boolean checkForAlign() {
+//        while (checks<=10) {
+//            if (sensorRange.getDistance(DistanceUnit.CM) < LATERAL_DISTANCE) {
+//                positives++;
+//            }
+//            checks++;
+//        }
+//        // if positives is greater than the minimum positives needed to be aligned
+//        if (positives > MINIMUM_POSITIVES) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
+//    public void align() {
+//        while (!checkForAlign()) {
+//            strafeDistance(-1);
+//        }
+//        pIterations++;
+//        while (checkForAlign()) {
+//            strafeDistance(-1);
+//            pIterations++;
+//        }
+//        for (s = 0; s < pIterations/2; s++) {
+//            strafeDistance(1);
+//        }
+//    }
+//
+//    public void smallAlignL() {
+//        strafeDistance2(20);
+//    }
+//
+//    // only stops overshoot
+//    public void smallAlignV(boolean cone) {
+//        straightDistance(8);
+//        if (!cone && sensorRange.getDistance(DistanceUnit.CM) < JUNCTION_DISTANCE) {
+//            stopMovement();
+//        } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < CONE_DISTANCE) {
+//            stopMovement();
+//        }
+//    }
 
-    public void smallAlignL() {
-        strafeDistance2(20);
-    }
-
-    // only stops overshoot
-    public void smallAlignV(boolean cone) {
-        straightDistance(8);
-        if (!cone && sensorRange.getDistance(DistanceUnit.CM) < JUNCTION_DISTANCE) {
-            stopMovement();
-        } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < CONE_DISTANCE) {
-            stopMovement();
-        }
+    public void align(IntakeSlideSubsystemAuto.LiftState height) {
+        stickDrive.alignStick(3,1);
     }
 
     // Negative speed for forwards

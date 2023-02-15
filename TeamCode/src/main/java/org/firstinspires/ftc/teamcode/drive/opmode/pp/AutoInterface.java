@@ -16,6 +16,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto2;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto3;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto4;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto5;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto2;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto3;
@@ -26,7 +29,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="RIGHTConePark", group="Linear Opmode")
+@Autonomous(name="AllAutos", group="Linear Opmode")
 public class AutoInterface extends LinearOpMode {
 
     private enum Side {
@@ -82,6 +85,9 @@ public class AutoInterface extends LinearOpMode {
         PPRightAuto3 rightAuto3 = null;
         PPRightAuto2 rightAuto2 = null;
         PPLeftAuto5 leftAuto5 = null;
+        PPLeftAuto4 leftAuto4 = null;
+        PPLeftAuto3 leftAuto3 = null;
+        PPLeftAuto2 leftAuto2 = null;
 
 
         // Vuforia
@@ -113,12 +119,12 @@ public class AutoInterface extends LinearOpMode {
         IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
         intakeSlide.init(hardwareMap);
         Cone cone = new Cone();
-        cone.init(drive, intakeSlide, hardwareMap);
+        cone.init(drive, intakeSlide, hardwareMap, this);
 
-        while (!isStopRequested() && !sideSelected) {
+        while (!isStopRequested() && !sideSelected && !junctionsSelected) {
             switch (side) {
                 case SELECTING:
-                    if (gamepad1.x) {
+                    if (gamepad1.left_bumper) {
                         side = Side.LEFT;
                         sideSelected = true;
                         while (!junctionsSelected) {
@@ -138,14 +144,15 @@ public class AutoInterface extends LinearOpMode {
                                         junctionsSelected = true;
                                     }
                             }
+                            telemetry.addData("Selected Side:", side.name());
                             telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
                             telemetry.addData("To select DOUBLE MEDIUM:", "Gamepad X");
                             telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
-                            telemetry.addData("Selected Side:", side.name());
+                            telemetry.addData("To select HIGH:", "Gamepad B");
                             telemetry.update();
                         }
 
-                    } else if (gamepad1.b) {
+                    } else if (gamepad1.right_bumper) {
                         side = Side.RIGHT;
                         sideSelected = true;
                         while (!junctionsSelected) {
@@ -165,16 +172,17 @@ public class AutoInterface extends LinearOpMode {
                                         junctionsSelected = true;
                                     }
                             }
+                            telemetry.addData("Selected Side:", side.name());
                             telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
                             telemetry.addData("To select DOUBLE MEDIUM:", "Gamepad X");
                             telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
-                            telemetry.addData("Selected Side:", side.name());
+                            telemetry.addData("To select HIGH:", "Gamepad B");
                             telemetry.update();
                         }
                     }
             }
-            telemetry.addData("To select LEFT:", "Gamepad X");
-            telemetry.addData("To select RIGHT:", "Gamepad B");
+            telemetry.addData("To select LEFT:", "Gamepad Left Bumper");
+            telemetry.addData("To select RIGHT:", "Gamepad Right Bumper");
             if (junctionsSelected) {
                 telemetry.addData("Selected Auto:", junctions.name());
             } else {
@@ -238,6 +246,7 @@ public class AutoInterface extends LinearOpMode {
                 telemetry.addData("Visible Target", targetName);
                 telemetry.addData("Lable #", label);
                 telemetry.addData("Parking:", parkDistance);
+                telemetry.addData("Selected Auto:", junctions.name());
                 telemetry.update();
             }
         } else {
@@ -265,6 +274,7 @@ public class AutoInterface extends LinearOpMode {
                 telemetry.addData("Visible Target", targetName);
                 telemetry.addData("Lable #", label);
                 telemetry.addData("Parking:", parkDistance);
+                telemetry.addData("Selected Auto:", junctions.name());
                 telemetry.update();
             }
         }
@@ -281,23 +291,24 @@ public class AutoInterface extends LinearOpMode {
         runtime.reset();
         switch (junctions) {
             case LEFT_MM:
-
+                telemetry.addData("Auto:", "Left Medium Medium");
             case LEFT_HH:
-
+                telemetry.addData("Auto:", "Left High High");
             case LEFT_HM:
-
+                telemetry.addData("Auto:", "Left High Medium");
             case LEFT_H:
-                leftAuto5.followPath(drive, intakeSlide, cone, parkDistance);
+                telemetry.addData("Auto:", "Left High Park");
+                //leftAuto5.followPath(drive, intakeSlide, cone, parkDistance);
             case RIGHT_MM:
-
+                telemetry.addData("Auto:", "Left Medium Medium");
             case RIGHT_HH:
-
+                telemetry.addData("Auto:", "Left High High");
             case RIGHT_HM:
-
+                telemetry.addData("Auto:", "Left High Medium");
             case RIGHT_H:
-                rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
+                //rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
         }
-
+        telemetry.update();
     }
 
     /**

@@ -74,7 +74,7 @@ public class PPRightAuto5 extends LinearOpMode {
         IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
         intakeSlide.init(hardwareMap);
         Cone cone = new Cone();
-        cone.init(drive, intakeSlide, hardwareMap);
+        cone.init(drive, intakeSlide, hardwareMap, this);
 
 //        // intake
 //        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
@@ -161,7 +161,7 @@ public class PPRightAuto5 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, -0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
@@ -238,7 +238,7 @@ public class PPRightAuto5 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(this, -0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)

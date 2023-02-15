@@ -73,7 +73,7 @@ public class PPRightAuto3 extends LinearOpMode {
         IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
         intakeSlide.init(hardwareMap);
         Cone cone = new Cone();
-        cone.init(drive, intakeSlide, hardwareMap);
+        cone.init(drive, intakeSlide, hardwareMap, this);
 
 //        // intake
 //        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();
@@ -174,11 +174,11 @@ public class PPRightAuto3 extends LinearOpMode {
                 .build();
 
         drive.followTrajectorySequence(preloadDrop);
-        cone.dropOffCone(this, 0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(0.2, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(stackPickup);
-        cone.pickUpCone(this);
+        cone.pickUpCone();
         drive.followTrajectorySequence(stackDrop);
-        cone.dropOffCone(this, 0.25, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
+        cone.dropOffCone(0.25, IntakeSlideSubsystemAuto.LiftState.HIGH, true);
         drive.followTrajectorySequence(park);
 
         // the last thing auto should do is move slide back to rest

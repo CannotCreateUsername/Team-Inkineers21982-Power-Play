@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 
+import org.apache.commons.math3.analysis.function.Max;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem4;
@@ -151,6 +152,10 @@ public class SpeedTesting extends LinearOpMode {
                 MaxSpeedMultiplier += 0.05;
             } else if (gamepadEx1.wasJustPressed(GamepadKeys.Button.B)) {
                 MaxSpeedMultiplier -= 0.05;
+            } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
+                MaxSpeedMultiplier += 0.1;
+            } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
+                MaxSpeedMultiplier -= 0.1;
             }
             if (MaxSpeedMultiplier > 1) {
                 MaxSpeedMultiplier = 1;
