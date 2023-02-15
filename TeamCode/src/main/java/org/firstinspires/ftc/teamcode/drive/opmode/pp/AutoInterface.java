@@ -16,6 +16,11 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto5;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto2;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto3;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto4;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto5;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 import java.util.ArrayList;
@@ -34,9 +39,11 @@ public class AutoInterface extends LinearOpMode {
         LEFT_MM,
         LEFT_HH,
         LEFT_HM,
+        LEFT_H,
         RIGHT_MM,
         RIGHT_HH,
-        RIGHT_HM
+        RIGHT_HM,
+        RIGHT_H
     }
 
     // Selection variables
@@ -68,6 +75,14 @@ public class AutoInterface extends LinearOpMode {
 
         side = Side.SELECTING;
         junctions = Junctions.SELECTING;
+        
+        //initialize autos
+        PPRightAuto5 rightAuto5 = null;
+        PPRightAuto4 rightAuto4 = null;
+        PPRightAuto3 rightAuto3 = null;
+        PPRightAuto2 rightAuto2 = null;
+        PPLeftAuto5 leftAuto5 = null;
+
 
         // Vuforia
         initVuforia();
@@ -118,6 +133,9 @@ public class AutoInterface extends LinearOpMode {
                                     } else if (gamepad1.y) {
                                         junctions = Junctions.LEFT_HH;
                                         junctionsSelected = true;
+                                    } else if (gamepad1.b) {
+                                        junctions = Junctions.LEFT_H;
+                                        junctionsSelected = true;
                                     }
                             }
                             telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
@@ -141,6 +159,9 @@ public class AutoInterface extends LinearOpMode {
                                         junctionsSelected = true;
                                     } else if (gamepad1.y) {
                                         junctions = Junctions.RIGHT_HH;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.b) {
+                                        junctions = Junctions.RIGHT_H;
                                         junctionsSelected = true;
                                     }
                             }
@@ -192,33 +213,65 @@ public class AutoInterface extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (!isStopRequested() && !opModeIsActive()) {
-            if (!targetVisible) {
-                for (VuforiaTrackable trackable : allTrackables) {
-                    if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
-                        targetVisible = true;
-                        targetName = trackable.getName();
-                        if (targetName == "PowerPlay2") {
-                            label = 1;
-                            parkDistance = 1;
-                        } else if (targetName == "PowerPlay1") {
-                            label = 2;
-                            parkDistance = 24;
-                        } else if (targetName == "PowerPlay3") {
-                            label = 3;
-                            parkDistance = 48;
+        if (side == Side.RIGHT) {
+            while (!isStopRequested() && !opModeIsActive()) {
+                if (!targetVisible) {
+                    for (VuforiaTrackable trackable : allTrackables) {
+                        if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
+                            targetVisible = true;
+                            targetName = trackable.getName();
+                            if (targetName == "PowerPlay2") {
+                                label = 1;
+                                parkDistance = 1;
+                            } else if (targetName == "PowerPlay1") {
+                                label = 2;
+                                parkDistance = 24;
+                            } else if (targetName == "PowerPlay3") {
+                                label = 3;
+                                parkDistance = 48;
+                            }
+                            break;
                         }
-                        break;
                     }
                 }
+                intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+                telemetry.addData("Visible Target", targetName);
+                telemetry.addData("Lable #", label);
+                telemetry.addData("Parking:", parkDistance);
+                telemetry.update();
             }
-            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
-            telemetry.addData("Visible Target", targetName);
-            telemetry.addData("Lable #", label);
-            telemetry.update();
+        } else {
+            while (!isStopRequested() && !opModeIsActive()) {
+                if (!targetVisible) {
+                    for (VuforiaTrackable trackable : allTrackables) {
+                        if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
+                            targetVisible = true;
+                            targetName = trackable.getName();
+                            if (targetName == "PowerPlay2") {
+                                label = 1;
+                                parkDistance = 48;
+                            } else if (targetName == "PowerPlay1") {
+                                label = 2;
+                                parkDistance = 24;
+                            } else if (targetName == "PowerPlay3") {
+                                label = 3;
+                                parkDistance = 1;
+                            }
+                            break;
+                        }
+                    }
+                }
+                intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+                telemetry.addData("Visible Target", targetName);
+                telemetry.addData("Lable #", label);
+                telemetry.addData("Parking:", parkDistance);
+                telemetry.update();
+            }
         }
+
         intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
 
+        // this telemetry will not be seen because of the loop above
         telemetry.addData("Auto selected:", junctions.name());
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
@@ -233,11 +286,16 @@ public class AutoInterface extends LinearOpMode {
 
             case LEFT_HM:
 
+            case LEFT_H:
+                leftAuto5.followPath(drive, intakeSlide, cone, parkDistance);
             case RIGHT_MM:
 
             case RIGHT_HH:
 
             case RIGHT_HM:
+
+            case RIGHT_H:
+                rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
         }
 
     }
