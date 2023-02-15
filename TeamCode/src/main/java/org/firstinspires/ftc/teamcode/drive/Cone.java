@@ -295,7 +295,7 @@ public class Cone {
 //    }
 
     public void align(IntakeSlideSubsystemAuto.LiftState height) {
-        stickDrive.alignStick(3,1);
+        stickDrive.alignStick(3,1, height);
     }
 
     // Negative speed for forwards

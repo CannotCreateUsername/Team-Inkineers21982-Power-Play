@@ -20,6 +20,7 @@ import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto2;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto3;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto4;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto5;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftTEST;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto2;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto3;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto4;
@@ -29,7 +30,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="AllAutos", group="Linear Opmode")
+@Autonomous(name="0-All Autos", group="Linear Opmode")
 public class AutoInterface extends LinearOpMode {
 
     private enum Side {
@@ -43,6 +44,7 @@ public class AutoInterface extends LinearOpMode {
         LEFT_HH,
         LEFT_HM,
         LEFT_H,
+        LEFT_TEST,
         RIGHT_MM,
         RIGHT_HH,
         RIGHT_HM,
@@ -89,6 +91,7 @@ public class AutoInterface extends LinearOpMode {
         PPLeftAuto3 leftAuto3 = null;
         PPLeftAuto2 leftAuto2 = null;
 
+        PPLeftTEST leftTest = null;
 
         // Vuforia
         initVuforia();
@@ -141,6 +144,9 @@ public class AutoInterface extends LinearOpMode {
                                         junctionsSelected = true;
                                     } else if (gamepad1.b) {
                                         junctions = Junctions.LEFT_H;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.dpad_up) {
+                                        junctions = Junctions.LEFT_TEST;
                                         junctionsSelected = true;
                                     }
                             }
@@ -306,7 +312,11 @@ public class AutoInterface extends LinearOpMode {
             case RIGHT_HM:
                 telemetry.addData("Auto:", "Left High Medium");
             case RIGHT_H:
+                telemetry.addData("Auto:", "Left High Park");
                 //rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
+            case LEFT_TEST:
+                leftTest.followPath(drive, intakeSlide, cone, parkDistance);
+
         }
         telemetry.update();
     }

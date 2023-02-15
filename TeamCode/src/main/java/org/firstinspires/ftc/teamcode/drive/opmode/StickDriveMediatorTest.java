@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.cv.CVMaster;
 import org.firstinspires.ftc.teamcode.cv.StickDriveMediator;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @Autonomous(name = "StickDriveMediatorTest")
@@ -25,7 +26,7 @@ public class StickDriveMediatorTest extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
 
-            stickDrive.alignStick(6, 1);
+            stickDrive.alignStick(6, 1, IntakeSlideSubsystemAuto.LiftState.LOW);
 
 //            while (opModeIsActive()) {
 //

@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.opencv.core.Mat;
@@ -79,7 +80,7 @@ public class StickDriveMediator {
 
     }
 
-    public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime){
+    public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime, IntakeSlideSubsystemAuto.LiftState HEIGHT){
          ElapsedTime timer = new ElapsedTime();
          double LateralError = 1;
          double distanceError = 1;
@@ -87,7 +88,7 @@ public class StickDriveMediator {
          while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
              LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
          }
-         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+         intakeSlide.liftState = HEIGHT;
          intakeSlide.run();
          timer.reset();
          while (timer.seconds() < 1.5) {

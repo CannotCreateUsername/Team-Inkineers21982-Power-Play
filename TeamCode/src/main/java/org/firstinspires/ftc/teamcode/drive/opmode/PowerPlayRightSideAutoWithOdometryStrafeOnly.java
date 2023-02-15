@@ -19,6 +19,7 @@ import org.firstinspires.ftc.teamcode.cv.StickDriveMediator;
 import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
+import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -173,7 +174,7 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                 .strafeLeft(11) //distance to be adjusted since most errors
                 .addTemporalMarker(() -> {
                     //2023-01-11 this is where we do the final adjustmnet using distance sensor and vision
-                    stickDrive.alignStick(2, 2);
+                    stickDrive.alignStick(2, 2, IntakeSlideSubsystemAuto.LiftState.LOW);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
