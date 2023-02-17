@@ -65,7 +65,7 @@ public class PowerPlayTeleOpLinearMecanum extends LinearOpMode {
         rightStickX.init();
 
         TeleOpFunctions alignStick = new TeleOpFunctions();
-        alignStick.init(drive, hardwareMap);
+        alignStick.init(drive, hardwareMap, gamepadEx1, this);
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 

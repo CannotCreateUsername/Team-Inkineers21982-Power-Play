@@ -1,14 +1,19 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import android.sax.StartElementListener;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import static org.firstinspires.ftc.teamcode.drive.IMUConstants.Kp;
+import static org.firstinspires.ftc.teamcode.drive.IMUConstants.Kd;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -37,11 +42,15 @@ public class TeleOpFunctions {
 
     private double gameStickMultiplier;
 
-    public final double Kp = .05;
+    private double YAW_ERROR_THRESHOLD = 0.5;
 
     boolean isStopped;
+
+    LinearOpMode op;
+
     GamePadState previousGameStickState;
     GamePadState currentGameStickState;
+    GamepadEx gamepad1;
 
     AlignState alignState;
     LightState lightState;
@@ -52,11 +61,12 @@ public class TeleOpFunctions {
     private IMU imu;
 
 
-
     SampleMecanumDrive drive;
 
-    public void init(SampleMecanumDrive d, HardwareMap hardwareMap) {
+    public void init(SampleMecanumDrive d, HardwareMap hardwareMap, GamepadEx gamepad, LinearOpMode o) {
         drive = d;
+        gamepad1 = gamepad;
+        op = o;
 
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         redLED = hardwareMap.get(DigitalChannel.class, "red");
@@ -135,10 +145,13 @@ public class TeleOpFunctions {
                 redLED.setState(false);
                 break;
         }
+        if (gamepad1.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
+            imu.resetYaw();
+        }
     }
 
     // positive counter clockwise
-    public void turnAlign (GamepadEx gamepad1, double power) {
+    public void turnAlign (double power) {
 
         double leftYControl = 0 ;
         double leftXControl = 0 ;
@@ -161,19 +174,12 @@ public class TeleOpFunctions {
     // Positive degrees is Counter Clockwise
     public void runTurning(double degrees) {
         double power;
-        double error;
+        double error = 1;
         // Create an object to receive the IMU angles
-        YawPitchRollAngles robotOrientation;
-        robotOrientation = imu.getRobotYawPitchRollAngles();
 
-        // Now use these simple methods to extract each angle
-        double Yaw   = robotOrientation.getYaw(AngleUnit.DEGREES);
-        double Pitch = robotOrientation.getPitch(AngleUnit.DEGREES);
-        double Roll  = robotOrientation.getRoll(AngleUnit.DEGREES);
-        error = degrees - Yaw;
-        power = error * Kp;
-
-        while (Yaw < Math.abs(degrees)) {
+        while (Math.abs(error) > YAW_ERROR_THRESHOLD && op.opModeIsActive()) {
+            error = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.abs(degrees);
+            power = (error * Kp) + Kd;
             drive.setWeightedDrivePower(
                     new Pose2d(
                             0,
@@ -181,10 +187,16 @@ public class TeleOpFunctions {
                             -power
                     )
             );
+            drive.update();
+            if (gamepad1.wasJustReleased(GamepadKeys.Button.DPAD_DOWN)) {
+                imu.resetYaw();
+                break;
+            }
+            op.telemetry.addData("Yaw:", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
+            op.telemetry.update();
         }
-        drive.update();
 
-        if (Yaw == degrees) {
+        if (Math.abs(error) < 1) {
             imu.resetYaw();
         }
 
