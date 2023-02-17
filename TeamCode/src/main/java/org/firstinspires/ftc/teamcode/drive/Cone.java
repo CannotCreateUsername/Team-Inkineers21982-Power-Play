@@ -284,15 +284,15 @@ public class Cone {
 //        strafeDistance2(20);
 //    }
 //
-//    // only stops overshoot
-//    public void smallAlignV(boolean cone) {
-//        straightDistance(8);
-//        if (!cone && sensorRange.getDistance(DistanceUnit.CM) < JUNCTION_DISTANCE) {
-//            stopMovement();
-//        } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < CONE_DISTANCE) {
-//            stopMovement();
-//        }
-//    }
+    // only stops overshoot
+    public void smallAlignV(boolean cone) {
+        straightDistance(8);
+        if (!cone && sensorRange.getDistance(DistanceUnit.CM) < JUNCTION_DISTANCE) {
+            stopMovement();
+        } else if (cone && sensorRange.getDistance(DistanceUnit.CM) < CONE_DISTANCE) {
+            stopMovement();
+        }
+    }
 
     public void align(IntakeSlideSubsystemAuto.LiftState height) {
         stickDrive.alignStick(3,1, height);

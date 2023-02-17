@@ -73,7 +73,7 @@ public class PPLeftAuto22 extends LinearOpMode {
         IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
         intakeSlide.init(hardwareMap);
         Cone cone = new Cone();
-        cone.init(drive, intakeSlide, hardwareMap);
+        cone.init(drive, intakeSlide, hardwareMap, this);
 
 //        // intake
 //        IntakeSlideSubsystem2 intakeSlide2 = new IntakeSlideSubsystem2();

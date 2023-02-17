@@ -3,14 +3,12 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
-import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.hardware.bosch.BHI260IMU;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -51,7 +49,7 @@ public class TeleOpFunctions {
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
 
-    private BHI260IMU imu;
+    private IMU imu;
 
 
 
@@ -63,11 +61,11 @@ public class TeleOpFunctions {
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
         redLED = hardwareMap.get(DigitalChannel.class, "red");
         greenLED = hardwareMap.get(DigitalChannel.class, "green");
-        imu = hardwareMap.get(BHI260IMU.class, "IMU");
+        imu = hardwareMap.get(IMU.class, "IMU");
 
-        BHI260IMU.Parameters myIMUparameters;
+        IMU.Parameters myIMUparameters;
 
-        myIMUparameters = new BHI260IMU.Parameters(
+        myIMUparameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
                         RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD,
                         RevHubOrientationOnRobot.UsbFacingDirection.LEFT
