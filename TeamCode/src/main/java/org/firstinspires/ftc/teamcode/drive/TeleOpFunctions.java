@@ -171,20 +171,30 @@ public class TeleOpFunctions {
 
     }
 
-    // Positive degrees is Counter Clockwise
+
+    /**
+     *
+     * @param degrees  Positive degrees is Counter Clockwise; degree should be between 0 to 180
+     */
     public void runTurning(double degrees) {
         double power;
         double error = 1;
         // Create an object to receive the IMU angles
 
+        // the turn direction should always be consistent with the input parameter.
+        double turnDirection = degrees > 0 ? -1:1;
+
         while (Math.abs(error) > YAW_ERROR_THRESHOLD && op.opModeIsActive()) {
-            error = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.abs(degrees);
+            // calculate the error , regardless of the target or current turn angle
+            error = Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)) - Math.abs(degrees);
             power = (error * Kp) + Kd;
+
+            // note: power postive means turn right,
             drive.setWeightedDrivePower(
                     new Pose2d(
                             0,
                             0,
-                            -power
+                            power * turnDirection
                     )
             );
             drive.update();
