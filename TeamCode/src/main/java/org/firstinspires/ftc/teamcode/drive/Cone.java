@@ -74,8 +74,8 @@ public class Cone {
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-        sensorTouch1 = hardwareMap.get(TouchSensor.class, "touch1");
-        sensorTouch2 = hardwareMap.get(TouchSensor.class, "touch2");
+        sensorTouch1 = hardwareMap.get(TouchSensor.class, "leftTouch");
+        sensorTouch2 = hardwareMap.get(TouchSensor.class, "rightTouch");
 
         pickupState = PickupState.ALIGNING;
         dropOffState = DropOffState.UNALIGNED;

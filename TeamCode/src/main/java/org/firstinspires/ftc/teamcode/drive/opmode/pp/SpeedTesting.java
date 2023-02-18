@@ -45,8 +45,8 @@ public class SpeedTesting extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         turnState = TurnState.STRAIGHT;
-        sensorTouch1 = hardwareMap.get(TouchSensor.class, "touch1");
-        sensorTouch2 = hardwareMap.get(TouchSensor.class, "touch2");
+        sensorTouch1 = hardwareMap.get(TouchSensor.class, "leftTouch");
+        sensorTouch2 = hardwareMap.get(TouchSensor.class, "rightTouch");
 
         GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
         GamepadEx gamepadEx2 = new GamepadEx(gamepad2);
@@ -134,18 +134,16 @@ public class SpeedTesting extends LinearOpMode {
                                 -RightXInput
                         )
                 );
-                drive.update();
             } else if (sensorTouch1.isPressed() && sensorTouch1.isPressed()) {
                 drive.setWeightedDrivePower(
                         new Pose2d(
-                                -0,
+                                0,
                                 -0.1,
-                                -0
+                                0
                         )
                 );
-                drive.update();
             }
-
+            drive.update();
 
 
             if (gamepadEx1.wasJustPressed(GamepadKeys.Button.A)) {
@@ -178,9 +176,7 @@ public class SpeedTesting extends LinearOpMode {
 //            telemetry.addData("Current Slide Position 1", intakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", intakeSlide.getCurrentState());
 //            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());
-            telemetry.addData("Current Control", intakeSlide);
 //            telemetry.addData("Is intake pressed", intakeSlide3.getIntakePressed());
-            telemetry.addData("Rotation", turnState.name());
 
             // Distance
 //            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
@@ -192,6 +188,8 @@ public class SpeedTesting extends LinearOpMode {
             telemetry.addData("Servo Position", intakeSlide.getServoPosition());
             telemetry.addData("Intake State", intakeSlide.getIntakeState());
             telemetry.addData("Current Max Speed", MaxSpeedMultiplier);
+            telemetry.addData("Left Touch", sensorTouch1.isPressed());
+            telemetry.addData("Right Touch", sensorTouch2.isPressed());
 
             // publish all the telemetry at once
             telemetry.update();

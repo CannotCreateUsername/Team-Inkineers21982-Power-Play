@@ -177,14 +177,15 @@ public class TeleOpFunctions {
      * @param degrees  Positive degrees is Counter Clockwise; degree should be between 0 to 180
      */
     public void runTurning(double degrees) {
+        ElapsedTime timer = new ElapsedTime();
         double power;
         double error = 1;
-        // Create an object to receive the IMU angles
 
         // the turn direction should always be consistent with the input parameter.
         double turnDirection = degrees > 0 ? -1:1;
-
-        while (Math.abs(error) > YAW_ERROR_THRESHOLD && op.opModeIsActive()) {
+        imu.resetYaw();
+        timer.reset();
+        while (Math.abs(error) > YAW_ERROR_THRESHOLD && timer.seconds() < 1. && op.opModeIsActive()) {
             // calculate the error , regardless of the target or current turn angle
             error = Math.abs(imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES)) - Math.abs(degrees);
             power = (error * Kp) + Kd;
@@ -204,10 +205,6 @@ public class TeleOpFunctions {
             }
             op.telemetry.addData("Yaw:", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));
             op.telemetry.update();
-        }
-
-        if (Math.abs(error) < 1) {
-            imu.resetYaw();
         }
 
     }
