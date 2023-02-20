@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="2_RIGHT(Double MEDIUM)", group="Linear Opmode")
-public class PPRightAuto2 extends LinearOpMode {
+public class RightDoubleMedium extends LinearOpMode {
 
 
 

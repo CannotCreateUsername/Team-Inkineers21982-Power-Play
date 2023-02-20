@@ -294,8 +294,17 @@ public class Cone {
         }
     }
 
-    public void align(IntakeSlideSubsystemAuto.LiftState height) {
-        stickDrive.alignStick(3,1, height);
+    public void align(IntakeSlideSubsystemAuto.LiftState height, boolean coneThere) {
+        stickDrive.alignStick(3,1, height, coneThere);
+        timer.reset();
+        while (timer.seconds() < 1.5 && op.opModeIsActive()) {
+            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
+        }
+        straightDistance(-8);
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+        intakeSlide.run();
+        op.telemetry.addData("Drop Off:", "Completed");
+        op.telemetry.update();
     }
 
     // Negative speed for forwards

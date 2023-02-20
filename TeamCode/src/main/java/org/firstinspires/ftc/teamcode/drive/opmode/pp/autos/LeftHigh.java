@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="LEFTConePark", group="Linear Opmode")
-public class PPLeftAuto5 extends LinearOpMode {
+public class LeftHigh extends LinearOpMode {
 
 
 

@@ -14,7 +14,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
@@ -22,8 +21,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="2_LEFT(Double MEDIUM)", group="Linear Opmode")
-public class PPLeftAuto2 extends LinearOpMode {
+@Autonomous(name="4_RIGHT(HIGH, MEDIUM)", group="Linear Opmode")
+public class RightHighMedium extends LinearOpMode {
 
 
 
@@ -103,8 +102,8 @@ public class PPLeftAuto2 extends LinearOpMode {
 
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(1)
-                .strafeRight(24)
+                .forward(2)
+                .strafeLeft(24)
                 .forward(48)
                 .strafeLeft(8)
                 .addTemporalMarker(() -> {
@@ -125,7 +124,7 @@ public class PPLeftAuto2 extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (!opModeIsActive()) {
+        while (!isStopRequested() && !opModeIsActive()) {
             if (!targetVisible) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
@@ -133,13 +132,13 @@ public class PPLeftAuto2 extends LinearOpMode {
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 48;
+                            parkDistance = 1;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 1;
+                            parkDistance = 42;
                         }
                         break;
                     }
@@ -162,36 +161,43 @@ public class PPLeftAuto2 extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
+        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
-                .strafeLeft(9.75)
-                .turn(Math.toRadians(-90))
+                .strafeRight(9.75)
+                .turn(Math.toRadians(90))
+                .back(24)
+                .strafeRight(4)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(24)
-                .strafeRight(10)
+                .forward(20)
+                .strafeLeft(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeLeft(9.75)
-                .back(24)
+                .strafeRight(9.75)
+                .back(20)
                 .build();
 
-//        for (int i = 0; i < 1; i++) {
-//            cone.pickUpCone(this);
-//            drive.followTrajectorySequence(rotateTo);
-//            cone.dropOffCone(this, 0.25, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
-//            //drive.followTrajectorySequence(rotateBack);
-//            coneThere = true;
-//        }
 
-        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
-                .strafeRight(8)
-                .strafeLeft(parkDistance)
+        drive.followTrajectorySequence(trajSeq2);
+
+        for (int i = 0; i < 1; i++) {
+            cone.pickUpCone();
+            drive.followTrajectorySequence(rotateTo);
+            cone.dropOffCone(-0.2, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
+            //drive.followTrajectorySequence(rotateBack);
+            coneThere = true;
+        }
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
+                .strafeRight(7.5)
+                .back(parkDistance)
+                .turn(Math.toRadians(-90))
+                .back(5)
                 .build();
-
         drive.followTrajectorySequence(park);
+
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();

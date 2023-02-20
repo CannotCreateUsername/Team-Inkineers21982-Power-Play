@@ -26,7 +26,7 @@ public class StickDriveMediatorTest extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
 
-            stickDrive.alignStick(6, 1, IntakeSlideSubsystemAuto.LiftState.LOW);
+            stickDrive.alignStick(6, 1, IntakeSlideSubsystemAuto.LiftState.LOW, false);
 
 //            while (opModeIsActive()) {
 //

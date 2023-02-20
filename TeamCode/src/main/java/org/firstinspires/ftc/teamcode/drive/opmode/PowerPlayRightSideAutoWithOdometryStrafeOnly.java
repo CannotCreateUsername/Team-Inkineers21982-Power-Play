@@ -174,7 +174,7 @@ public class  PowerPlayRightSideAutoWithOdometryStrafeOnly extends LinearOpMode 
                 .strafeLeft(11) //distance to be adjusted since most errors
                 .addTemporalMarker(() -> {
                     //2023-01-11 this is where we do the final adjustmnet using distance sensor and vision
-                    stickDrive.alignStick(2, 2, IntakeSlideSubsystemAuto.LiftState.LOW);
+                    stickDrive.alignStick(2, 2, IntakeSlideSubsystemAuto.LiftState.LOW, false);
                     intakeSlide2.runToPosition(intakeSlide2.targetPositionHigh);
                 })
                 .waitSeconds(3)
