@@ -150,6 +150,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
 
             intakeSlide.run(gamepadEx1, gamepadEx2);
             intakeSlide.runIntake(gamepadEx1);
+
 //            telemetry.addData("Current Slide Position 1", intakeSlide.getCurrentSlidePosition());
             telemetry.addData("Current State 1", intakeSlide.getCurrentState());
 //            telemetry.addData("How many DpadUp?", intakeSlide.getDpadPressed());

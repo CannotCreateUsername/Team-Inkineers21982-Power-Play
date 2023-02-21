@@ -169,6 +169,13 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     setSlidePower();
                 }
 
+                // to manually raise/lower
+                if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                    targetPositionLow += 10;
+                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
+                    targetPositionLow -= 10;
+                }
+
                 break;
             case MEDIUM:
                 if (rtReader1.isDown()) {
@@ -194,6 +201,13 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     setSlidePower();
                 }
 
+                // to manually raise/lower
+                if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                    targetPositionMedium += 10;
+                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
+                    targetPositionMedium -= 10;
+                }
+
                 break;
             case HIGH:
                 if (rtReader1.isDown()) {
@@ -215,6 +229,13 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     rest = true;
                 } else {
                     setSlidePower();
+                }
+
+                // to manually raise/lower
+                if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                    targetPositionHigh += 10;
+                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
+                    targetPositionHigh -= 10;
                 }
 
                 break;
@@ -257,6 +278,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         if (!rest) {
             runToPosition(currentTarget, currentPower);
         }
+
         //runIntake();
     }
 
@@ -273,14 +295,14 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         switch (intakeState) {
             case IN:
                 intake.setPosition(-1);
-                if (rtReader.isDown() || controller.wasJustReleased(GamepadKeys.Button.B)) {
+                if (rtReader.isDown()) {
                     autoIn = false;
                     intakeState = IntakeState.OUT;
                 }
                 break;
             case OUT:
                 intake.setPosition(1);
-                if (autoIn || controller.wasJustReleased(GamepadKeys.Button.A)) {
+                if (autoIn) {
                     intakeState = IntakeState.IN;
                 }
                 break;

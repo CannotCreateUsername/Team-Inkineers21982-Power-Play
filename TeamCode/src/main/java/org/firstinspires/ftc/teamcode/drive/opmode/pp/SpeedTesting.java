@@ -134,11 +134,11 @@ public class SpeedTesting extends LinearOpMode {
                                 -RightXInput
                         )
                 );
-            } else if (sensorTouch1.isPressed() && sensorTouch1.isPressed()) {
+            } else if (sensorTouch1.isPressed() && sensorTouch1.isPressed() && LeftYInput < 0) {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 0,
-                                -0.1,
+                                0,
                                 0
                         )
                 );
