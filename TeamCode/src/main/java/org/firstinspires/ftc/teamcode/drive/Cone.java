@@ -31,7 +31,7 @@ public class Cone {
     }
 
     ElapsedTime timer = new ElapsedTime();
-    private boolean loaded = true;
+    public boolean loaded = true;
     
     // Alignment
     private int s = 0;
@@ -295,6 +295,7 @@ public class Cone {
     }
 
     public void align(IntakeSlideSubsystemAuto.LiftState height, boolean coneThere) {
+        loaded = true;
         stickDrive.alignStick(3,1, height, coneThere);
         timer.reset();
         while (timer.seconds() < 1.5 && op.opModeIsActive()) {
@@ -305,6 +306,7 @@ public class Cone {
         intakeSlide.run();
         op.telemetry.addData("Drop Off:", "Completed");
         op.telemetry.update();
+        loaded = false;
     }
 
     // Negative speed for forwards

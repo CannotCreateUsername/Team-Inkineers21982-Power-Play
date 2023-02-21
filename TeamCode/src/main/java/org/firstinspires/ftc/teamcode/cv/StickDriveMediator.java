@@ -88,6 +88,8 @@ public class StickDriveMediator {
 
          while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
              LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
+             op.telemetry.addData("Aligning:", "Horizontally");
+             op.telemetry.update();
          }
          intakeSlide.liftState = HEIGHT;
          intakeSlide.run();
@@ -99,10 +101,14 @@ public class StickDriveMediator {
          if (coneThere) {
              while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
                  distanceError = alignStickDistance(DISTANCE_CONE, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+                 op.telemetry.addData("Aligning:", "Vertically");
+                 op.telemetry.update();
              }
          } else {
              while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
                  distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+                 op.telemetry.addData("Aligning:", "Vertically");
+                 op.telemetry.update();
              }
          }
     }

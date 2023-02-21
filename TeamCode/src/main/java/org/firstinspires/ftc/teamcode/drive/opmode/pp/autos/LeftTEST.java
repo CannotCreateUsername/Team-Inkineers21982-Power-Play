@@ -48,6 +48,11 @@ public class LeftTEST {
                         driveState = DriveState.DROP_OFF;
                     }
                 case DROP_OFF:
+                    if (runtime.seconds() > 2) {
+                        while (cone.loaded && op.opModeIsActive()) {
+                            // wait for cone alignment process to be done
+                        }
+                    }
                     if (!drive.isBusy()) {
                         drive.followTrajectorySequenceAsync(park);
                         driveState = DriveState.PARK;
