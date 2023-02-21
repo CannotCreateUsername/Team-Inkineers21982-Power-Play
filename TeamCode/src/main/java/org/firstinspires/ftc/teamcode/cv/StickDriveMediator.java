@@ -39,6 +39,7 @@ public class StickDriveMediator {
     private double LATERAL_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_JUNCTION = 8; // cm
+    private double DISTANCE_CONE = 6; // cm
     private double DISTANCE_JUNCTION_MAX = 36; // cm
 
 
@@ -80,7 +81,7 @@ public class StickDriveMediator {
 
     }
 
-    public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime, IntakeSlideSubsystemAuto.LiftState HEIGHT){
+    public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime, IntakeSlideSubsystemAuto.LiftState HEIGHT, boolean coneThere){
          ElapsedTime timer = new ElapsedTime();
          double LateralError = 1;
          double distanceError = 1;
@@ -95,11 +96,15 @@ public class StickDriveMediator {
              // wait for slides to raise
          }
          timer.reset();
-         while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
-            distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+         if (coneThere) {
+             while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
+                 distanceError = alignStickDistance(DISTANCE_CONE, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+             }
+         } else {
+             while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
+                 distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+             }
          }
-
-
     }
 
     /**

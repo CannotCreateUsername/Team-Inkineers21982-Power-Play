@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -16,16 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto2;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto3;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto4;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftAuto5;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPLeftTEST;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto2;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto3;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto4;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.PPRightAuto5;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftDoubleHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftDoubleMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftHighMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftTEST;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightDoubleMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightDoubleHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHighMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHigh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +42,11 @@ public class AutoInterface extends LinearOpMode {
         LEFT_HH,
         LEFT_HM,
         LEFT_H,
-        LEFT_TEST,
         RIGHT_MM,
         RIGHT_HH,
         RIGHT_HM,
-        RIGHT_H
+        RIGHT_H,
+        LEFT_TEST
     }
 
     // Selection variables
@@ -81,17 +79,20 @@ public class AutoInterface extends LinearOpMode {
         side = Side.SELECTING;
         junctions = Junctions.SELECTING;
         
-        //initialize autos
-        PPRightAuto5 rightAuto5 = null;
-        PPRightAuto4 rightAuto4 = null;
-        PPRightAuto3 rightAuto3 = null;
-        PPRightAuto2 rightAuto2 = null;
-        PPLeftAuto5 leftAuto5 = null;
-        PPLeftAuto4 leftAuto4 = null;
-        PPLeftAuto3 leftAuto3 = null;
-        PPLeftAuto2 leftAuto2 = null;
+        // initialize autos
+        // Right Side
+        RightHigh rightAuto5 = null;
+        RightHighMedium rightAuto4 = null;
+        RightDoubleHigh rightAuto3 = null;
+        RightDoubleMedium rightAuto2 = null;
 
-        PPLeftTEST leftTest = null;
+        // Left Side
+        LeftHigh leftAuto5 = null;
+        LeftHighMedium leftAuto4 = null;
+        LeftDoubleHigh leftAuto3 = null;
+        LeftDoubleMedium leftAuto2 = null;
+
+        LeftTEST leftTest = null;
 
         // Vuforia
         initVuforia();
@@ -279,7 +280,7 @@ public class AutoInterface extends LinearOpMode {
                 }
                 intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
                 telemetry.addData("Visible Target", targetName);
-                telemetry.addData("Lable #", label);
+                telemetry.addData("Zone #", label);
                 telemetry.addData("Parking:", parkDistance);
                 telemetry.addData("Selected Auto:", junctions.name());
                 telemetry.update();

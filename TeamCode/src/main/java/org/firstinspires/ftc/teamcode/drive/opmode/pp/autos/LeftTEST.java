@@ -1,31 +1,27 @@
 package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
 
+import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Autonomous(name="Left Test", group="Linear Opmode")
-public class PPLeftTEST extends LinearOpMode {
-
+public class LeftTEST extends LinearOpMode {
+    enum DriveState {
+        TRAJECTORY1,
+        DROP_OFF,
+        PARK,
+        IDLE,
+    }
+    DriveState driveState = DriveState.IDLE;
     private ElapsedTime runtime = new ElapsedTime();
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -102,19 +98,36 @@ public class PPLeftTEST extends LinearOpMode {
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
 
-        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(50)
                 .strafeRight(8)
                 .resetConstraints()
                 .build();
 
+        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq1.end())
+                .strafeRight(16)
+                .strafeLeft(parkDistance)
+                .build();
+
         if (isStopRequested()) return;
+        driveState = DriveState.TRAJECTORY1;
+        drive.followTrajectorySequenceAsync(trajSeq1);
+
         runtime.reset();
-
-        drive.followTrajectorySequence(trajSeq);
-        cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM);
-
-        // the last thing auto should do is move slide back to rest
-        telemetry.update();
+        while (opModeIsActive() && !isStopRequested()) {
+            switch (driveState) {
+                case TRAJECTORY1:
+                    if (!drive.isBusy()) {
+                        cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
+                        driveState = DriveState.DROP_OFF;
+                    }
+                case DROP_OFF:
+                    if (!drive.isBusy()) {
+                        drive.followTrajectorySequenceAsync(park);
+                        driveState = DriveState.PARK;
+                    }
+            }
+            telemetry.update();
+        }
     }
 }
