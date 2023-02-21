@@ -171,9 +171,9 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
 
                 // to manually raise/lower
                 if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                    targetPositionLow += 10;
+                    currentTarget += 100;
                 } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
-                    targetPositionLow -= 10;
+                    currentTarget -= 100;
                 }
 
                 break;
@@ -203,9 +203,9 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
 
                 // to manually raise/lower
                 if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                    targetPositionMedium += 10;
+                    currentTarget += 100;
                 } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
-                    targetPositionMedium -= 10;
+                    currentTarget -= 100;
                 }
 
                 break;
@@ -233,9 +233,9 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
 
                 // to manually raise/lower
                 if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                    targetPositionHigh += 10;
+                    currentTarget += 100;
                 } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
-                    targetPositionHigh -= 10;
+                    currentTarget -= 100;
                 }
 
                 break;

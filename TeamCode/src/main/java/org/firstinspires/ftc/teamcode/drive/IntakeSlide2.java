@@ -11,8 +11,8 @@ public abstract class IntakeSlide2 {
     public int targetPositionHigh = 2842;
     public int targetPositionMedium = 2025;
     public int targetPositionLow = 1175;
-    public final int targetPositionPickup = 130;
     public int targetPositionPickup2 = 300;
+    public final int targetPositionPickup = 130;
     public final int targetPositionRest = 0;  // ideally it should be zero !!!
 
     // distance error factor

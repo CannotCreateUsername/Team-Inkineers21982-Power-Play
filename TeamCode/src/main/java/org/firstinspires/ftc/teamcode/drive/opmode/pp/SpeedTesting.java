@@ -134,7 +134,8 @@ public class SpeedTesting extends LinearOpMode {
                                 -RightXInput
                         )
                 );
-            } else if (sensorTouch1.isPressed() && sensorTouch1.isPressed() && LeftYInput < 0) {
+                drive.update();
+            } else if (sensorTouch1.isPressed() && sensorTouch1.isPressed() && gamepad1.left_stick_y < 0) {
                 drive.setWeightedDrivePower(
                         new Pose2d(
                                 0,
@@ -142,9 +143,8 @@ public class SpeedTesting extends LinearOpMode {
                                 0
                         )
                 );
+                drive.update();
             }
-            drive.update();
-
 
             if (gamepadEx1.wasJustPressed(GamepadKeys.Button.A)) {
                 MaxSpeedMultiplier += 0.05;

@@ -92,7 +92,7 @@ public class AutoInterface extends LinearOpMode {
         LeftDoubleHigh leftAuto3 = null;
         LeftDoubleMedium leftAuto2 = null;
 
-        LeftTEST leftTest = null;
+        LeftTEST leftTest = new LeftTEST();
 
         // Vuforia
         initVuforia();
@@ -300,24 +300,34 @@ public class AutoInterface extends LinearOpMode {
         switch (junctions) {
             case LEFT_MM:
                 telemetry.addData("Auto:", "Left Medium Medium");
+                telemetry.update();
             case LEFT_HH:
                 telemetry.addData("Auto:", "Left High High");
+                telemetry.update();
             case LEFT_HM:
                 telemetry.addData("Auto:", "Left High Medium");
+                telemetry.update();
             case LEFT_H:
                 telemetry.addData("Auto:", "Left High Park");
+                telemetry.update();
                 //leftAuto5.followPath(drive, intakeSlide, cone, parkDistance);
             case RIGHT_MM:
                 telemetry.addData("Auto:", "Left Medium Medium");
+                telemetry.update();
             case RIGHT_HH:
                 telemetry.addData("Auto:", "Left High High");
+                telemetry.update();
             case RIGHT_HM:
                 telemetry.addData("Auto:", "Left High Medium");
+                telemetry.update();
             case RIGHT_H:
                 telemetry.addData("Auto:", "Left High Park");
+                telemetry.update();
                 //rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
             case LEFT_TEST:
-                leftTest.followPath(drive, intakeSlide, cone, parkDistance);
+                telemetry.addData("Auto:", "Left Test");
+                telemetry.update();
+                leftTest.followPath(drive, intakeSlide, cone, parkDistance, this);
 
         }
         telemetry.update();
