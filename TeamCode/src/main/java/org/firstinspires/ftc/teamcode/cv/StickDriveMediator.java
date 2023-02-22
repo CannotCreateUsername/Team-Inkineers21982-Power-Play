@@ -26,6 +26,7 @@ public class StickDriveMediator {
 
     public final int WIDTH = 640;
     public final int HEIGHT = 480;
+    public final int SCREEN_MIDPOINT = WIDTH/2;
     // private OpenCvWebcam webcamFront;
     private OpenCvWebcam webcamBack;
     private StickObserverPipeline opencv = null;
@@ -40,7 +41,7 @@ public class StickDriveMediator {
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_JUNCTION = 8; // cm
     private double DISTANCE_CONE = 6; // cm
-    private double DISTANCE_JUNCTION_MAX = 36; // cm
+    private double DISTANCE_JUNCTION_MAX = 50; // cm
 
 
 
@@ -102,15 +103,48 @@ public class StickDriveMediator {
              while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
                  distanceError = alignStickDistance(DISTANCE_CONE, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
                  op.telemetry.addData("Aligning:", "Vertically");
+                 op.telemetry.addData("Distance:", sensorRange.getDistance(DistanceUnit.CM));
                  op.telemetry.update();
              }
          } else {
              while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
                  distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
                  op.telemetry.addData("Aligning:", "Vertically");
+                 op.telemetry.addData("Distance:", sensorRange.getDistance(DistanceUnit.CM));
                  op.telemetry.update();
              }
          }
+    }
+    public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime, boolean coneThere){
+        ElapsedTime timer = new ElapsedTime();
+        double LateralError = 1;
+        double distanceError = 1;
+
+        while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
+            LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
+            op.telemetry.addData("Aligning:", "Horizontally");
+            op.telemetry.update();
+        }
+        timer.reset();
+        while (timer.seconds() < 1.5) {
+            // wait for slides to raise
+        }
+        timer.reset();
+        if (coneThere) {
+            while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
+                distanceError = alignStickDistance(DISTANCE_CONE, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+                op.telemetry.addData("Aligning:", "Vertically");
+                op.telemetry.addData("Distance:", sensorRange.getDistance(DistanceUnit.CM));
+                op.telemetry.update();
+            }
+        } else {
+            while (op.opModeIsActive() && timer.seconds() <= distanceAlignmentTime && Math.abs(distanceError) > DISTANCE_ERROR_THRESHOLD ){
+                distanceError = alignStickDistance(DISTANCE_JUNCTION, DISTANCE_JUNCTION_MAX, DISTANCE_ERROR_THRESHOLD);
+                op.telemetry.addData("Aligning:", "Vertically");
+                op.telemetry.addData("Distance:", sensorRange.getDistance(DistanceUnit.CM));
+                op.telemetry.update();
+            }
+        }
     }
 
     /**
@@ -120,12 +154,12 @@ public class StickDriveMediator {
      * @return
      */
     public double alignStickDistance(double targetDistance, double maxRange, double thresHold){
-        double error = 0;
+        double error;
 
         // assume the robot is close to the junction/stack but not crazy far
         // if the robot distance is really far, i.e. exceed max Range, don't do anything
-        error = (sensorRange.getDistance(DistanceUnit.CM) - targetDistance) / targetDistance ;
-        error = error > 1 ? 1: error; // cap as 1
+        error = (sensorRange.getDistance(DistanceUnit.CM) - targetDistance) / targetDistance;
+        error = error > 1 ? 0.5 : error; // cap as 0.5
         if (error > thresHold &&  sensorRange.getDistance(DistanceUnit.CM) < maxRange ) {
 
             double leftXControl = 0;
@@ -168,18 +202,18 @@ public class StickDriveMediator {
      *  https://www.youtube.com/watch?v=_Hxn4fzfN7k
      * @return error from the observation
      */
-    public double  alignStickLateral(double thresHold){
+    public double alignStickLateral(double thresHold){
 
-        double error = 0;
+        double error = 1;
 
         // first observe stick location
         if (opencv != null ) {
             Rect stick = opencv.getStickRect();
             if (stick != null && stick.width > 0) {
                 // stick midpoint - screen midpoint
-                double stickMidpoint = stick.x + stick.width / 2;
-                error = stickMidpoint - WIDTH / 2;
-                error = (error / (WIDTH / 2));
+                double stickMidpoint = stick.x + stick.width/2;
+                error = stickMidpoint - SCREEN_MIDPOINT;
+                error = (error / SCREEN_MIDPOINT);
 
                 // using the principle of PID
                 if (Math.abs(error) > thresHold) {

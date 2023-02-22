@@ -27,7 +27,6 @@ public class LeftTEST {
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(50)
                 .strafeRight(8)
-                .resetConstraints()
                 .build();
 
         TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq1.end())
@@ -36,41 +35,26 @@ public class LeftTEST {
                 .build();
 
         if (op.isStopRequested()) return;
-        driveState = DriveState.TRAJECTORY1;
-        drive.followTrajectorySequenceAsync(trajSeq1);
-
         runtime.reset();
-        while (op.opModeIsActive() && !op.isStopRequested()) {
-            switch (driveState) {
-                case TRAJECTORY1:
-                    if (!drive.isBusy()) {
-                        cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
-                        driveState = DriveState.DROP_OFF;
-                    }
-                case DROP_OFF:
-                    if (runtime.seconds() > 2) {
-                        while (cone.loaded && op.opModeIsActive()) {
-                            // wait for cone alignment process to be done
-                        }
-                    }
-                    if (!drive.isBusy()) {
-                        drive.followTrajectorySequenceAsync(park);
-                        driveState = DriveState.PARK;
-                    }
-                case PARK:
-                    if (!drive.isBusy()) {
-                        driveState = DriveState.IDLE;
-                    }
-            }
+        drive.followTrajectorySequence(trajSeq1);
+        cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
+        drive.followTrajectorySequence(park);
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+    }
 
-            // We update drive continuously in the background, regardless of state
-            drive.update();
+    public void followPath2(SampleMecanumDrive drive, IntakeSlideSubsystemAuto intakeSlide, Cone cone, int parkDistance, LinearOpMode op) {
+        Pose2d startPose = new Pose2d(-62,-10,Math.toRadians(0));
+        Pose2d dropOff = new Pose2d(-25, -10, Math.toRadians(90));
 
-            // Read pose
-            Pose2d poseEstimate = drive.getPoseEstimate();
+        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(dropOff)
+                .build();
 
-            op.telemetry.addData("Status:", "Running");
-            op.telemetry.update();
-        }
+        if (op.isStopRequested()) return;
+        runtime.reset();
+        drive.followTrajectorySequence(trajSeq1);
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
     }
 }

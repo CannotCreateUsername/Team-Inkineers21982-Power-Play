@@ -16,9 +16,13 @@ public class StickDriveMediatorTest extends LinearOpMode {
     public void runOpMode() {
 
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+
+        IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
+        intakeSlide.init(hardwareMap);
         // initialize camera,  pipeline and distance sensor
         StickDriveMediator stickDrive = new StickDriveMediator(this);
         stickDrive.setDrive(drive);
+        stickDrive.setSlide(intakeSlide);
         stickDrive.observeStick(); // call the function to startStreaming
 
 
@@ -26,7 +30,7 @@ public class StickDriveMediatorTest extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
 
-            stickDrive.alignStick(6, 1, IntakeSlideSubsystemAuto.LiftState.LOW, false);
+            stickDrive.alignStick(6, 3, IntakeSlideSubsystemAuto.LiftState.LOW, false);
 
 //            while (opModeIsActive()) {
 //

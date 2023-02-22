@@ -296,7 +296,7 @@ public class Cone {
 
     public void align(IntakeSlideSubsystemAuto.LiftState height, boolean coneThere) {
         loaded = true;
-        stickDrive.alignStick(3,1, height, coneThere);
+        stickDrive.alignStick(6,3, height, coneThere);
         timer.reset();
         while (timer.seconds() < 1.5 && op.opModeIsActive()) {
             intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
