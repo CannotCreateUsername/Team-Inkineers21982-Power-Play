@@ -25,7 +25,8 @@ public class StickDriveMediatorTest extends LinearOpMode {
         stickDrive.observeStick(); // call the function to startStreaming
 
 
-
+        telemetry.addData("Ready:", "press play to start >");
+        telemetry.update();
         waitForStart();
         if (opModeIsActive()) {
 

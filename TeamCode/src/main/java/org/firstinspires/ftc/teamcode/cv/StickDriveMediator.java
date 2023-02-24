@@ -19,8 +19,11 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
 
-import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.Kp;
-import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.Kd;
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.LATERAL_Kp;
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.LATERAL_Kd;
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.LATERAL_ERROR_THRESHOLD;
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.VERTICAL_Kp;
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.VERTICAL_Kd;
 
 public class StickDriveMediator {
 
@@ -37,7 +40,7 @@ public class StickDriveMediator {
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
 
-    private double LATERAL_ERROR_THRESHOLD = 0.05;
+//    private double LATERAL_ERROR_THRESHOLD = 0.05;
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_JUNCTION = 8; // cm
     private double DISTANCE_CONE = 6; // cm
@@ -120,7 +123,7 @@ public class StickDriveMediator {
         double LateralError = 1;
         double distanceError = 1;
 
-        while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
+        while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD){
             LateralError = alignStickLateral(LATERAL_ERROR_THRESHOLD);
             op.telemetry.addData("Aligning:", "Horizontally");
             op.telemetry.update();
@@ -159,11 +162,11 @@ public class StickDriveMediator {
         // assume the robot is close to the junction/stack but not crazy far
         // if the robot distance is really far, i.e. exceed max Range, don't do anything
         error = (sensorRange.getDistance(DistanceUnit.CM) - targetDistance) / targetDistance;
-        error = error > 1 ? 0.5 : error; // cap as 0.5
+        error = error > 1 ? 1 : error; // cap as 1
         if (error > thresHold &&  sensorRange.getDistance(DistanceUnit.CM) < maxRange ) {
 
             double leftXControl = 0;
-            double leftYControl = 1 * error; // test and see if it needs to reduce the speed or not
+            double leftYControl = error * VERTICAL_Kp + VERTICAL_Kd; // test and see if it needs to reduce the speed or not
             double rightXControl = 0;
 
             drive.setWeightedDrivePower(
@@ -217,7 +220,7 @@ public class StickDriveMediator {
 
                 // using the principle of PID
                 if (Math.abs(error) > thresHold) {
-                    double leftXControl = -error * Kp + Kd; // assume camera is mount at the back of robot
+                    double leftXControl = -error * LATERAL_Kp + LATERAL_Kd; // assume camera is mount at the back of robot
                     double leftYControl = 0;
                     double rightXControl = 0;
 
@@ -230,6 +233,7 @@ public class StickDriveMediator {
                     );
                     drive.update();
 
+                    op.telemetry.addData("Power:", leftXControl);
                     greenLED.setState(false);
                     redLED.setState(true);
                 } else {
@@ -247,8 +251,9 @@ public class StickDriveMediator {
                     redLED.setState(false);
                 }
             }
+            op.telemetry.addData("Stick midpoint:", stick.x);
+            op.telemetry.addData("Error:", error);
         }
-
 
         return error;
 
