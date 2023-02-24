@@ -3,15 +3,13 @@ package org.firstinspires.ftc.teamcode.drive;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Light;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.cv.StickDriveMediator;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -41,6 +39,7 @@ public class Cone {
     private boolean alignedL = false;
     private double lastDistance;
 
+    public boolean drop = false;
     
     // Constants
     private final int MINIMUM_POSITIVES = 8;
@@ -295,18 +294,20 @@ public class Cone {
     }
 
     public void align(IntakeSlideSubsystemAuto.LiftState height, boolean coneThere) {
-        loaded = true;
-        stickDrive.alignStick(6,3, height, coneThere);
-        timer.reset();
-        while (timer.seconds() < 1.5 && op.opModeIsActive()) {
-            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
+        if (drop) {
+            stickDrive.alignStick(6,3, height, coneThere);
+            timer.reset();
+            while (timer.seconds() < 1.5 && op.opModeIsActive()) {
+                intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
+            }
+            straightDistance(-8);
+            intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+            intakeSlide.run();
+            op.telemetry.addData("Drop Off:", "Completed");
+            op.telemetry.update();
+            loaded = false;
+            drop = false;
         }
-        straightDistance(-8);
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
-        intakeSlide.run();
-        op.telemetry.addData("Drop Off:", "Completed");
-        op.telemetry.update();
-        loaded = false;
     }
 
     // Negative speed for forwards

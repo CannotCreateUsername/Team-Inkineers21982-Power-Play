@@ -1,18 +1,15 @@
 package org.firstinspires.ftc.teamcode.drive.opmode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlide;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystem2;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 @Autonomous(name="Auto Right Simple", group="Linear Opmode")
 @Disabled

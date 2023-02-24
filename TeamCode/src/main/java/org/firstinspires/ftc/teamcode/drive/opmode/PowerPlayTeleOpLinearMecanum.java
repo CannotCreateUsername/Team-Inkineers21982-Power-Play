@@ -9,10 +9,10 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.TeleOpFunctions;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem3;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystem;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystem2;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystem3;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlide;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 /**

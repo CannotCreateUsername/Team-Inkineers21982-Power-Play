@@ -1,15 +1,17 @@
-package org.firstinspires.ftc.teamcode.drive;
+package org.firstinspires.ftc.teamcode.drive.intakeslide;
 
 import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.arcrobotics.ftclib.gamepad.TriggerReader;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlide;
+
 /**
  * The IntakeSlideSubsystem class is a subsystem module that control
  * the elevator and roller intake used in PowerPlay
@@ -18,25 +20,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * @version 1.0
  * @since   2022-10-20
  */
-public class IntakeSlideSubsystem4 extends IntakeSlide2 {
+public class IntakeSlideSubsystem extends IntakeSlide {
 
     // THESE VARIABLES ARE USED BY THIS IMPLEMENTATION OF DRIVE CONTROL
     // Declare OpMode members.
 
-    // To slow down robot if at drop off state
-    public double dropOffMultiplier = 1;
-    // Pickup state switch
-    private boolean pickupStack = false;
     // Variable to detect on press and on release
     private int i = 0;
 
     // Variable to auto spin in intake
     private boolean autoIn = false;
-    private boolean rest = false;
-    private boolean reset = true;
-
-    // New Variables
-    private ElapsedTime intakeTimer = new ElapsedTime();
 
     /**
      *
@@ -55,103 +48,68 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
-        intake = hardwareMap.get(Servo.class, "intake");
+        intake = hardwareMap.get(CRServo.class, "intake");
 
         currentCaption = "Lift Status";
         currentStatus = "Initialized";
         currentTarget = 0;
         currentPower = 0;
 
-        intakeState = IntakeState.OUT;
+        intakeState = IntakeState.STOP;
         liftState = LiftState.REST;
 
 
     }
 
-//    public int getDpadPressed() { return i; }
-//    public boolean getIntakePressed() { return autoIn; }
-
-    public double getServoPosition() { return intake.getPosition(); }
-    public String getIntakeState() { return intakeState.name(); }
+    public int getDpadPressed() { return i; }
     @Override
     public void run(GamepadEx gamepad1, GamepadEx gamepad2) {
         TriggerReader rtReader1 = new TriggerReader(gamepad1, GamepadKeys.Trigger.RIGHT_TRIGGER);
         switch (liftState) {
             case REST:
-                dropOffMultiplier = 1;
+                // stops intake when slides hit rest
+                if (slides.getCurrentPosition() == currentTarget) {
+                    autoIn = false;
+                }
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                }
-                if (!rtReader1.isDown() && !rest) {
-                    if (pickupStack) {
-                        currentTarget = targetPositionPickup2 + 400;
-                    } else {
-                        currentTarget = targetPositionPickup2;
-                    }
-                    liftState = LiftState.PICKUP2;
-                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
-                    currentTarget = targetPositionPickup2;
-                    liftState = LiftState.PICKUP2;
-                    slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                } else if (rtReader1.isDown()) {
+                    // code here
                     autoIn = false;
-                    rest = false;
-                }
-                if (rest) {
-                    slides.setPower(-0.3);
-                    if (gamepad1.wasJustPressed(GamepadKeys.Button.B)) {
-                        slides.setPower(0);
-                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                        rest = false;
-                    } else if (intakeTimer.seconds() > 3) {
-                        slides.setPower(0);
-                        slides.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                        slides.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                        rest = false;
-                    }
+                    currentTarget = targetPositionPickup;
+                    liftState = LiftState.PICKUP;
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
+                    autoIn = false;
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
+                    i++;
                 }
                 setSlidePower();
+                //if (gamepad1.x || gamepad1.y) {
+                //   liftState = LiftState.MANUAL;
+                //}
                 break;
-            case PICKUP2:
-                dropOffMultiplier = 1;
-                if (slides.getCurrentPosition() > currentTarget - 5) {
-                    autoIn = false;
-                }
-                if (gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_DOWN)) {
-                    pickupStack = false;
-                    currentTarget = targetPositionPickup2;
-                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.DPAD_UP)) {
-                    pickupStack = true;
-                    currentTarget = targetPositionPickup2 + 400;
-                }
-                if (rtReader1.isDown()) {
+            case PICKUP:
+                if (!rtReader1.isDown()) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
                     autoIn = true;
                 } else if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     currentTarget = targetPositionLow;
                     liftState = LiftState.LOW;
-                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                    // to rest
-                    rest = true;
-                    slides.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
-                    intakeTimer.reset();
+                    autoIn = false;
+                } else if (slides.getCurrentPosition() < targetPositionMedium) {
+                    // add position to pick up from stack all the way to LOW
+                    currentTarget += 2;
                 } else {
                     setSlidePower();
                 }
-
                 break;
             case LOW:
-                if (rtReader1.isDown()) {
-                    autoIn = true;
-                } else {
-                    autoIn = false;
-                }
-                dropOffMultiplier = 1;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionMedium;
@@ -160,30 +118,14 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
-                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                    // to rest
-                    rest = true;
-                    currentTarget = targetPositionRest;
-                    liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
-
-                // to manually raise/lower
-                if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                    currentTarget += 100;
-                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
-                    currentTarget -= 100;
-                }
-
+                //if (gamepad1.x || gamepad1.y) {
+                //  liftState = LiftState.MANUAL;
+                //}
                 break;
             case MEDIUM:
-                if (rtReader1.isDown()) {
-                    autoIn = true;
-                } else {
-                    autoIn = false;
-                }
-                dropOffMultiplier = 0.5;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionHigh;
@@ -192,52 +134,28 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
-                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                    // to rest
-                    rest = true;
-                    currentTarget = targetPositionRest;
-                    liftState = LiftState.REST;
                 } else {
                     setSlidePower();
                 }
-
-                // to manually raise/lower
-                if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                    currentTarget += 100;
-                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
-                    currentTarget -= 100;
-                }
-
+                //if (gamepad1.x || gamepad1.y) {
+                //   liftState = LiftState.MANUAL;
+                //}
                 break;
             case HIGH:
-                if (rtReader1.isDown()) {
-                    autoIn = true;
-                } else {
-                    autoIn = false;
-                }
-                dropOffMultiplier = 0.5;
                 // DO SOMETHING TO MAKE DRIVING SLOWER WHILE THE CASE IS HIGH FOR BETTER CONTROL
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionRest;
                     liftState = LiftState.REST;
-                } else if (gamepad1.wasJustPressed(GamepadKeys.Button.BACK)) {
-                    // to rest
-                    currentTarget = targetPositionRest;
-                    liftState = LiftState.REST;
-                    runToPosition(currentTarget);
-                    rest = true;
                 } else {
                     setSlidePower();
                 }
-
-                // to manually raise/lower
-                if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
-                    currentTarget += 100;
-                } else if (gamepad1.wasJustReleased(GamepadKeys.Button.B)) {
-                    currentTarget -= 100;
+                if (rtReader1.isDown()) {
+                    autoIn = true;
                 }
-
+                //if (gamepad1.x || gamepad1.y) {
+                //   liftState = LiftState.MANUAL;
+                //}
                 break;
 
                 /*
@@ -275,10 +193,8 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
         }
         // update gamepad state
         gamepad1.readButtons();
-        if (!rest) {
-            runToPosition(currentTarget, currentPower);
-        }
-
+        runToPosition(currentTarget, currentPower);
+        runIntake(gamepad1);
         //runIntake();
     }
 
@@ -293,22 +209,32 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
     public void runIntake(GamepadEx controller){
         TriggerReader rtReader = new TriggerReader(controller, GamepadKeys.Trigger.LEFT_TRIGGER);
         switch (intakeState) {
-            case IN:
-                intake.setPosition(-1);
-                if (rtReader.isDown()) {
-                    autoIn = false;
+            case STOP:
+                setIntakePower(IntakeState.STOP);   // intake.setPower(0);
+                if (rtReader.isDown() || controller.isDown(GamepadKeys.Button.B)) {
                     intakeState = IntakeState.OUT;
                 }
-                break;
-            case OUT:
-                intake.setPosition(1);
-                if (autoIn) {
+                if (controller.isDown(GamepadKeys.Button.A) || autoIn) {
                     intakeState = IntakeState.IN;
                 }
                 break;
+            case IN:
+                if (!controller.getButton(GamepadKeys.Button.A) && !autoIn) {
+                    intakeState = IntakeState.STOP;
+                } else if (rtReader.isDown() || controller.getButton(GamepadKeys.Button.B)) {
+                    autoIn = false;
+                    intakeState = IntakeState.STOP;
+                }
+                setIntakePower(IntakeState.IN);   // intake.setPower(-1);
+                break;
+            case OUT:
+                if (!rtReader.isDown() || !controller.getButton(GamepadKeys.Button.B)) {
+                    intakeState = IntakeState.STOP;
+                }
+                setIntakePower(IntakeState.OUT);   //  intake.setPower(1);
+                break;
         }
     }
-
 //    private boolean onPress(boolean ButtonState, String ButtonName) {
 //        switch (ButtonName) {
 //            case "RT":

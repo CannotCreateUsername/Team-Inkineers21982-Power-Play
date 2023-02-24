@@ -9,18 +9,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
-import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvPipeline;
 import org.openftc.easyopencv.OpenCvWebcam;
+
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.Kp;
+import static org.firstinspires.ftc.teamcode.drive.constants.AlignerConstants.Kd;
 
 public class StickDriveMediator {
 
@@ -37,7 +37,7 @@ public class StickDriveMediator {
     private DigitalChannel redLED;
     private DigitalChannel greenLED;
 
-    private double LATERAL_ERROR_THRESHOLD = 0.1;
+    private double LATERAL_ERROR_THRESHOLD = 0.05;
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_JUNCTION = 8; // cm
     private double DISTANCE_CONE = 6; // cm
@@ -217,7 +217,7 @@ public class StickDriveMediator {
 
                 // using the principle of PID
                 if (Math.abs(error) > thresHold) {
-                    double leftXControl = -error / 2; // assume camera is mount at the back of robot
+                    double leftXControl = -error * Kp + Kd; // assume camera is mount at the back of robot
                     double leftYControl = 0;
                     double rightXControl = 0;
 

@@ -3,9 +3,8 @@ package org.firstinspires.ftc.teamcode.drive.opmode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.teamcode.cv.CVMaster;
 import org.firstinspires.ftc.teamcode.cv.StickDriveMediator;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 @Autonomous(name = "StickDriveMediatorTest")

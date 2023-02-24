@@ -15,13 +15,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.DriveConstants;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlide;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem2;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
+import org.firstinspires.ftc.teamcode.drive.constants.DriveConstants;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.drive.Cone;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -20,7 +20,19 @@ public class LeftTEST {
     DriveState driveState = DriveState.IDLE;
     private ElapsedTime runtime = new ElapsedTime();
 
-    public void followPath(SampleMecanumDrive drive, IntakeSlideSubsystemAuto intakeSlide, Cone cone, int parkDistance, LinearOpMode op) {
+    LinearOpMode op;
+    SampleMecanumDrive drive;
+    IntakeSlideSubsystemAuto intakeSlide;
+    Cone cone;
+
+    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
+        drive = d;
+        intakeSlide = i;
+        cone = c;
+        op = o;
+    }
+
+    public void followPath(int parkDistance) {
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
 
@@ -37,17 +49,18 @@ public class LeftTEST {
         if (op.isStopRequested()) return;
         runtime.reset();
         drive.followTrajectorySequence(trajSeq1);
+        cone.drop = true;
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
         drive.followTrajectorySequence(park);
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
         intakeSlide.run();
     }
 
-    public void followPath2(SampleMecanumDrive drive, IntakeSlideSubsystemAuto intakeSlide, Cone cone, int parkDistance, LinearOpMode op) {
-        Pose2d startPose = new Pose2d(-62,-10,Math.toRadians(0));
-        Pose2d dropOff = new Pose2d(-25, -10, Math.toRadians(90));
+    public void followPath2() {
+        Pose2d pickUp = new Pose2d(-62,-12,Math.toRadians(0));
+        Pose2d dropOff = new Pose2d(-25, -12, Math.toRadians(-90));
 
-        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
+        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)
                 .build();
 

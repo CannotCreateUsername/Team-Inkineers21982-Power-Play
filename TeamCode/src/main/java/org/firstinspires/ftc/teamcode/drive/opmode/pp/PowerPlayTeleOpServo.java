@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.drive.TeleOpFunctions;
 import org.firstinspires.ftc.teamcode.drive.GamepadHelper;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystem4;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystem4;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 
 /**

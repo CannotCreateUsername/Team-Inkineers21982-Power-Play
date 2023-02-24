@@ -13,7 +13,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.IntakeSlideSubsystemAuto;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftDoubleHigh;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftDoubleMedium;
@@ -52,6 +52,7 @@ public class AutoInterface extends LinearOpMode {
     // Selection variables
     private boolean sideSelected = false;
     private boolean junctionsSelected = false;
+    private boolean testSelected = false;
 
 
     // Vuforia Variables
@@ -78,21 +79,29 @@ public class AutoInterface extends LinearOpMode {
 
         side = Side.SELECTING;
         junctions = Junctions.SELECTING;
+
+        // initialize stuffs
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
+        IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
+        intakeSlide.init(hardwareMap);
+        Cone cone = new Cone();
+        cone.init(drive, intakeSlide, hardwareMap, this);
         
         // initialize autos
         // Right Side
-        RightHigh rightAuto5 = null;
-        RightHighMedium rightAuto4 = null;
-        RightDoubleHigh rightAuto3 = null;
-        RightDoubleMedium rightAuto2 = null;
+        RightHigh rightAuto5 = new RightHigh();
+        RightHighMedium rightAuto4 = new RightHighMedium();
+        RightDoubleHigh rightAuto3 = new RightDoubleHigh();
+        RightDoubleMedium rightAuto2 = new RightDoubleMedium();
 
         // Left Side
-        LeftHigh leftAuto5 = null;
-        LeftHighMedium leftAuto4 = null;
-        LeftDoubleHigh leftAuto3 = null;
-        LeftDoubleMedium leftAuto2 = null;
+        LeftHigh leftAuto5 = new LeftHigh();
+        LeftHighMedium leftAuto4 = new LeftHighMedium();
+        LeftDoubleHigh leftAuto3 = new LeftDoubleHigh();
+        LeftDoubleMedium leftAuto2 = new LeftDoubleMedium();
 
         LeftTEST leftTest = new LeftTEST();
+
 
         // Vuforia
         initVuforia();
@@ -116,15 +125,6 @@ public class AutoInterface extends LinearOpMode {
         // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
 
-
-        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
-
-        // cone
-        IntakeSlideSubsystemAuto intakeSlide = new IntakeSlideSubsystemAuto();
-        intakeSlide.init(hardwareMap);
-        Cone cone = new Cone();
-        cone.init(drive, intakeSlide, hardwareMap, this);
-
         while (!isStopRequested() && !sideSelected && !junctionsSelected) {
             switch (side) {
                 case SELECTING:
@@ -147,6 +147,7 @@ public class AutoInterface extends LinearOpMode {
                                         junctions = Junctions.LEFT_H;
                                         junctionsSelected = true;
                                     } else if (gamepad1.dpad_up) {
+                                        leftTest.init(drive, intakeSlide, cone, this);
                                         junctions = Junctions.LEFT_TEST;
                                         junctionsSelected = true;
                                     }
@@ -325,9 +326,20 @@ public class AutoInterface extends LinearOpMode {
                 telemetry.update();
                 //rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
             case LEFT_TEST:
-                telemetry.addData("Auto:", "Left Test");
-                telemetry.update();
-                leftTest.followPath(drive, intakeSlide, cone, parkDistance, this);
+                while (!testSelected) {
+                    if (gamepad1.a) {
+                        leftTest.followPath(parkDistance);
+                        testSelected = true;
+                    }
+                    else if (gamepad1.b) {
+                        leftTest.followPath2();
+                        testSelected = true;
+                    }
+                    telemetry.addData("Auto:", "Left Test");
+                    telemetry.update();
+                }
+
+
 
         }
         telemetry.update();
