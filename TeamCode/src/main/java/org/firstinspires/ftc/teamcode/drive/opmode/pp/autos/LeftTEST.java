@@ -8,6 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.AutoInterface;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.JunctionPoses;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 public class LeftTEST {
@@ -24,6 +26,7 @@ public class LeftTEST {
     SampleMecanumDrive drive;
     IntakeSlideSubsystemAuto intakeSlide;
     Cone cone;
+    JunctionPoses positions = new JunctionPoses();
 
     public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
         drive = d;
@@ -62,8 +65,8 @@ public class LeftTEST {
     }
 
     public void followPath2() {
-        Pose2d pickUp = new Pose2d(-54,-12,Math.toRadians(0));
-        Pose2d dropOff = new Pose2d(-24, -12, Math.toRadians(90));
+        Pose2d pickUp = positions.LeftConeStack;
+        Pose2d dropOff = positions.LeftMedium;
 
         drive.setPoseEstimate(pickUp);
 
