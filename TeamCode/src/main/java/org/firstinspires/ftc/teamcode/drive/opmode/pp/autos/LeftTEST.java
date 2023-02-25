@@ -26,7 +26,7 @@ public class LeftTEST {
     SampleMecanumDrive drive;
     IntakeSlideSubsystemAuto intakeSlide;
     Cone cone;
-    JunctionPoses positions = new JunctionPoses();
+    AutoInterface positions = new AutoInterface();
 
     public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
         drive = d;
@@ -66,7 +66,7 @@ public class LeftTEST {
 
     public void followPath2() {
         Pose2d pickUp = positions.LeftConeStack;
-        Pose2d dropOff = positions.LeftMedium;
+        Pose2d dropOff = positions.Medium;
 
         drive.setPoseEstimate(pickUp);
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="2_RIGHT(Double MEDIUM)", group="Linear Opmode")
-public class RightDoubleMedium extends LinearOpMode {
+@Autonomous(name="RIGHTConePark", group="Linear Opmode")
+public class RightHigh extends LinearOpMode {
 
 
 
@@ -102,10 +102,10 @@ public class RightDoubleMedium extends LinearOpMode {
 
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
-                .forward(1)
+                .forward(2)
                 .strafeLeft(24)
                 .forward(48)
-                .strafeRight(8)
+                .strafeLeft(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -124,7 +124,7 @@ public class RightDoubleMedium extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
-        while (!opModeIsActive()) {
+        while (!isStopRequested() && !opModeIsActive()) {
             if (!targetVisible) {
                 for (VuforiaTrackable trackable : allTrackables) {
                     if ( ((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()){
@@ -161,38 +161,31 @@ public class RightDoubleMedium extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(0.22, IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
+        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
                 .strafeRight(9.75)
                 .turn(Math.toRadians(90))
+                .back(24)
+                .strafeRight(4)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(24)
+                .forward(20)
                 .strafeLeft(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
                 .strafeRight(9.75)
+                .back(20)
+                .build();
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
+                .strafeRight(9.75)
                 .back(24)
+                .strafeRight(parkDistance)
                 .build();
-
-        drive.followTrajectorySequence(trajSeq2);
-        coneThere = true;
-        for (int i = 0; i < 1; i++) {
-            cone.pickUpCone();
-            drive.followTrajectorySequence(rotateTo);
-            cone.dropOffCone(-0.25, IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
-            //drive.followTrajectorySequence(rotateBack);
-        }
-
-        TrajectorySequence park = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeRight(8)
-                .back(parkDistance)
-                .turn(Math.toRadians(-90))
-                .build();
-
         drive.followTrajectorySequence(park);
+
         // the last thing auto should do is move slide back to rest
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();
@@ -221,6 +214,58 @@ public class RightDoubleMedium extends LinearOpMode {
             telemetry.addData("Slide to",  " %7d", position);
             telemetry.update();
         }
+    }
+
+    public void followPath(SampleMecanumDrive drive, IntakeSlideSubsystemAuto intakeSlide, Cone cone, int parkDistance) {
+        Pose2d startPose = new Pose2d(0, 0, 0);
+        drive.setPoseEstimate(startPose);
+
+        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+                .forward(2)
+                .strafeLeft(24)
+                .forward(48)
+                .strafeLeft(8)
+                .addTemporalMarker(() -> {
+                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+                    intakeSlide.run();
+                })
+                .waitSeconds(0.5)
+                .resetConstraints()
+                .build();
+
+        if(isStopRequested()) return;
+        runtime.reset();
+
+        drive.followTrajectorySequence(trajSeq);
+        // Put align code here? [import Cone.java and call a function to drop off cone]
+        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        Pose2d afterAdjPose = drive.getPoseEstimate();
+        // go to ready position
+        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
+                .strafeRight(9.75)
+                .turn(Math.toRadians(90))
+                .back(24)
+                .strafeRight(4)
+                .build();
+        TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
+                .forward(20)
+                .strafeLeft(10)
+                .build();
+        TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
+                .strafeRight(9.75)
+                .back(20)
+                .build();
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
+                .strafeRight(9.75)
+                .back(24)
+                .strafeRight(parkDistance)
+                .build();
+        drive.followTrajectorySequence(park);
+
+        // the last thing auto should do is move slide back to rest
+        moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
+        telemetry.update();
     }
     /**
      * Initialize the Vuforia localization engine.

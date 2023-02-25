@@ -15,15 +15,15 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
 import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftDoubleHigh;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftDoubleMedium;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftHigh;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftHighMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.LeftDoubleHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.LeftDoubleMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.LeftHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.LeftHighMedium;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftTEST;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightDoubleMedium;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightDoubleHigh;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHighMedium;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.RightDoubleMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.RightDoubleHigh;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.RightHighMedium;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old.RightHigh;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,16 @@ public class AutoInterface extends LinearOpMode {
     private boolean sideSelected = false;
     private boolean junctionsSelected = false;
     private boolean testSelected = false;
+    public int startSide = 1;
 
+    // Positions
+    public Pose2d LeftConeStack = new Pose2d(-54,-12, Math.toRadians(0));
+    public Pose2d RightConeStack = new Pose2d(54,-12, Math.toRadians(180));
+
+    public Pose2d Start = new Pose2d(34, -62, Math.toRadians(90));
+    public Pose2d Medium = new Pose2d(24, -12, Math.toRadians(90));
+    public Pose2d High = new Pose2d(24, -12, Math.toRadians(-90));
+    public Pose2d BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
     // Vuforia Variables
     int label = 0;
@@ -89,16 +98,16 @@ public class AutoInterface extends LinearOpMode {
         
         // initialize autos
         // Right Side
-        RightHigh rightAuto5 = new RightHigh();
-        RightHighMedium rightAuto4 = new RightHighMedium();
+        RightHigh rightAuto1 = new RightHigh();
+        RightHighMedium rightAuto2 = new RightHighMedium();
         RightDoubleHigh rightAuto3 = new RightDoubleHigh();
-        RightDoubleMedium rightAuto2 = new RightDoubleMedium();
+        RightDoubleMedium rightAuto4 = new RightDoubleMedium();
 
         // Left Side
-        LeftHigh leftAuto5 = new LeftHigh();
-        LeftHighMedium leftAuto4 = new LeftHighMedium();
+        LeftHigh leftAuto1 = new LeftHigh();
+        LeftHighMedium leftAuto2 = new LeftHighMedium();
         LeftDoubleHigh leftAuto3 = new LeftDoubleHigh();
-        LeftDoubleMedium leftAuto2 = new LeftDoubleMedium();
+        LeftDoubleMedium leftAuto4 = new LeftDoubleMedium();
 
         LeftTEST leftTest = new LeftTEST();
 
@@ -130,6 +139,8 @@ public class AutoInterface extends LinearOpMode {
                 case SELECTING:
                     if (gamepad1.left_bumper) {
                         side = Side.LEFT;
+                        // reverse X coordinate of Pose2Ds
+                        startSide = -1;
                         sideSelected = true;
                         while (!junctionsSelected) {
                             switch (junctions) {
@@ -163,6 +174,8 @@ public class AutoInterface extends LinearOpMode {
 
                     } else if (gamepad1.right_bumper) {
                         side = Side.RIGHT;
+                        // keep X coordinate of Pose2Ds the same
+                        startSide = 1;
                         sideSelected = true;
                         while (!junctionsSelected) {
                             switch (junctions) {
@@ -200,6 +213,8 @@ public class AutoInterface extends LinearOpMode {
             telemetry.update();
         }
 
+        // flip or keep x coordinates
+        initSide();
          /*
             read: Trajectories Overview
             https://learnroadrunner.com/trajectories.html#trajectories-vs-paths
@@ -214,12 +229,6 @@ public class AutoInterface extends LinearOpMode {
             always call drive.setPoseEstimate(startPose) to orient the drive ;
 
          */
-
-        // we assume A2/F5 is starting point, the robot back is facing the wall
-        Pose2d startPose = new Pose2d(0, 0, 0);
-
-        drive.setPoseEstimate(startPose);
-
 
         //Vufrofia
         targets1.activate();  // octopus
@@ -298,6 +307,7 @@ public class AutoInterface extends LinearOpMode {
 
         if(isStopRequested()) return;
         runtime.reset();
+        // remember to set poseEstimate in each class
         switch (junctions) {
             case LEFT_MM:
                 telemetry.addData("Auto:", "Left Medium Medium");
@@ -359,5 +369,12 @@ public class AutoInterface extends LinearOpMode {
 
         //  Instantiate the Vuforia engine
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
+    }
+
+    private void initSide() {
+        Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
+        Medium = new Pose2d(24*startSide, -12, Math.toRadians(90));
+        High = new Pose2d(24*startSide, -12, Math.toRadians(-90));
+        BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
     }
 }
