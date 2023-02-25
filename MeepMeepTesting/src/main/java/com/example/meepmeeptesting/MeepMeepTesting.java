@@ -21,7 +21,7 @@ public class MeepMeepTesting {
         RoadRunnerBotEntity myBot = (new DefaultBotBuilder(meepMeep)).setConstraints(60.0D, 60.0D, Math.toRadians(180.0D), Math.toRadians(180.0D), 15.0D).followTrajectorySequence((drive) -> {
             // return drive.trajectorySequenceBuilder(new Pose2d(-60.0D, -34.0D, 0.0D)).lineTo(new Vector2d(-60.0D, -15.0D)).splineTo(new Vector2d(-9.0D, -9.0D), Math.toRadians(45.0D)).splineToConstantHeading(new Vector2d(-30.0D, -60.0D), Math.toRadians(45.0D)).build();
             return drive.trajectorySequenceBuilder(new Pose2d(-60,-12,Math.toRadians(0)))
-                    .lineToLinearHeading(new Pose2d(-25, -12, Math.toRadians(-90)))
+                    .lineToLinearHeading(new Pose2d(-24, -12, Math.toRadians(90)))
                     .build();
         });
         meepMeep.setBackground(Background.FIELD_POWERPLAY_OFFICIAL).setDarkMode(true).setBackgroundAlpha(0.95F).addEntity(myBot).start();

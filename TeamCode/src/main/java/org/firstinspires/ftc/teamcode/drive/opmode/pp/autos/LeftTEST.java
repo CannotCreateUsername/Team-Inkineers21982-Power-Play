@@ -58,7 +58,7 @@ public class LeftTEST {
 
     public void followPath2() {
         Pose2d pickUp = new Pose2d(-62,-12,Math.toRadians(0));
-        Pose2d dropOff = new Pose2d(-25, -12, Math.toRadians(-90));
+        Pose2d dropOff = new Pose2d(-24, -12, Math.toRadians(90));
 
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)
