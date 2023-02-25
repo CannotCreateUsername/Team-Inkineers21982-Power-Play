@@ -88,7 +88,6 @@ public class Cone {
 //            return false;
 //        }
 //    }
-    // PROBLEM: YOU HAVE TO CALL RUN FOR INTAKE SLIDES AND INIT GAMEPADS!! HOW TO SOLVE!?
     public void pickCone() {
         switch (pickupState) {
             case ALIGNING:

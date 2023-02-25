@@ -47,9 +47,14 @@ public class LeftTEST {
                 .build();
 
         if (op.isStopRequested()) return;
-        runtime.reset();
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
+        runtime.reset();
+        while (runtime.seconds() < 2) {
+            // wait.. add telemetry here
+            op.telemetry.addData("Waiting", "to align");
+            op.telemetry.update();
+        }
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
         drive.followTrajectorySequence(park);
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
@@ -57,8 +62,10 @@ public class LeftTEST {
     }
 
     public void followPath2() {
-        Pose2d pickUp = new Pose2d(-62,-12,Math.toRadians(0));
+        Pose2d pickUp = new Pose2d(-54,-12,Math.toRadians(0));
         Pose2d dropOff = new Pose2d(-24, -12, Math.toRadians(90));
+
+        drive.setPoseEstimate(pickUp);
 
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)

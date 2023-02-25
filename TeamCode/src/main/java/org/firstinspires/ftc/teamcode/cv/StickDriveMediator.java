@@ -44,7 +44,7 @@ public class StickDriveMediator {
     private double DISTANCE_ERROR_THRESHOLD = 0.1;
     private double DISTANCE_JUNCTION = 8; // cm
     private double DISTANCE_CONE = 6; // cm
-    private double DISTANCE_JUNCTION_MAX = 50; // cm
+    private double DISTANCE_JUNCTION_MAX = 52; // cm
 
 
 
@@ -87,7 +87,7 @@ public class StickDriveMediator {
 
     public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime, IntakeSlideSubsystemAuto.LiftState HEIGHT, boolean coneThere){
          ElapsedTime timer = new ElapsedTime();
-         double LateralError = 1;
+         double LateralError = 1000;
          double distanceError = 1;
 
          while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD ){
@@ -98,7 +98,7 @@ public class StickDriveMediator {
          intakeSlide.liftState = HEIGHT;
          intakeSlide.run();
          timer.reset();
-         while (timer.seconds() < 1.5) {
+         while (timer.seconds() < 1.5 && op.opModeIsActive()) {
              // wait for slides to raise
          }
          timer.reset();
@@ -120,7 +120,7 @@ public class StickDriveMediator {
     }
     public void alignStick(double lateralAlignmentTime, double distanceAlignmentTime, boolean coneThere){
         ElapsedTime timer = new ElapsedTime();
-        double LateralError = 1;
+        double LateralError = 1000;
         double distanceError = 1;
 
         while (op.opModeIsActive() && timer.seconds() <= lateralAlignmentTime && Math.abs(LateralError) > LATERAL_ERROR_THRESHOLD){
@@ -129,7 +129,7 @@ public class StickDriveMediator {
             op.telemetry.update();
         }
         timer.reset();
-        while (timer.seconds() < 1.5) {
+        while (timer.seconds() < 1.5 && op.opModeIsActive()) {
             // wait for slides to raise
         }
         timer.reset();
@@ -207,7 +207,7 @@ public class StickDriveMediator {
      */
     public double alignStickLateral(double thresHold){
 
-        double error = 1;
+        double error = 1000;
 
         // first observe stick location
         if (opencv != null ) {
@@ -215,24 +215,38 @@ public class StickDriveMediator {
             if (stick != null && stick.width > 0) {
                 // stick midpoint - screen midpoint
                 double stickMidpoint = stick.x + stick.width/2;
-                error = stickMidpoint - SCREEN_MIDPOINT;
-                error = (error / SCREEN_MIDPOINT);
+                error = Math.abs(stickMidpoint - SCREEN_MIDPOINT);
+                // error = (error / SCREEN_MIDPOINT);
 
                 // using the principle of PID
                 if (Math.abs(error) > thresHold) {
-                    double leftXControl = -error * LATERAL_Kp + LATERAL_Kd; // assume camera is mount at the back of robot
+                    // to adjust to the change in digits of error
+//                    if (error < 100) {
+//                        LATERAL_Kp = 0.005;
+//                    } else {
+//                        LATERAL_Kp = 0.0005;
+//                    }
+
+                    // if leftXControl is negative, the robot strafes left
+                    // if it is positive, it strafes right
+                    double leftXControl = -(error * LATERAL_Kp + LATERAL_Kd); // assume camera is mount at the back of robot
                     double leftYControl = 0;
                     double rightXControl = 0;
+
+                    // if the stickMidpoint is to the right of the screen midpoint, strafe left. (-leftXControl * 1 = negative number)
+                    // else, strafe right (-leftXControl * -1 = positive number)
+                    double strafeDirection = stickMidpoint > 320 ? 1:-1;
 
                     drive.setWeightedDrivePower(
                             new Pose2d(
                                     -leftYControl,
-                                    -leftXControl,
+                                    -leftXControl * strafeDirection,
                                     -rightXControl
                             )
                     );
                     drive.update();
 
+                    op.telemetry.addData("Kp", LATERAL_Kp);
                     op.telemetry.addData("Power:", leftXControl);
                     greenLED.setState(false);
                     redLED.setState(true);
