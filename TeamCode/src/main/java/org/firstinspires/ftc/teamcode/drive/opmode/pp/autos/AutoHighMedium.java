@@ -86,7 +86,6 @@ public class AutoHighMedium {
             cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, coneThere);
             coneThere = true;
         }
-        cone.pickCone();
         drive.followTrajectorySequence(park);
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
         intakeSlide.run();
