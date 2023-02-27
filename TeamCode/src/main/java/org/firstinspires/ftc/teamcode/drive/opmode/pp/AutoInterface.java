@@ -213,13 +213,16 @@ public class AutoInterface extends LinearOpMode {
                             targetName = trackable.getName();
                             if (targetName == "PowerPlay2") {
                                 label = 1;
-                                parkDistance = 1;
+//                                parkDistance = 1;
+                                parkDistance = 12;
                             } else if (targetName == "PowerPlay1") {
                                 label = 2;
-                                parkDistance = 24;
+//                                parkDistance = 24;
+                                parkDistance = 36;
                             } else if (targetName == "PowerPlay3") {
                                 label = 3;
-                                parkDistance = 48;
+//                                parkDistance = 48;
+                                parkDistance = 60;
                             }
                             break;
                         }
@@ -242,13 +245,16 @@ public class AutoInterface extends LinearOpMode {
                             targetName = trackable.getName();
                             if (targetName == "PowerPlay2") {
                                 label = 1;
-                                parkDistance = 48;
+//                                parkDistance = 48;
+                                parkDistance = 60;
                             } else if (targetName == "PowerPlay1") {
                                 label = 2;
-                                parkDistance = 24;
+//                                parkDistance = 24;
+                                parkDistance = 36;
                             } else if (targetName == "PowerPlay3") {
                                 label = 3;
-                                parkDistance = 1;
+//                                parkDistance = 1;
+                                parkDistance = 12;
                             }
                             break;
                         }
@@ -276,16 +282,17 @@ public class AutoInterface extends LinearOpMode {
 
         if(isStopRequested()) return;
         runtime.reset();
+        // all paths are on the right side by default
         // remember to set poseEstimate in each class
         switch (junctions) {
             case HIGH_MEDIUM:
-                auto1.followPath(parkDistance);
+                auto1.followPath(parkDistance, startSide);
                 break;
             case DOUBLE_HIGH:
-                auto2.followPath(parkDistance);
+                auto2.followPath(parkDistance, startSide);
                 break;
             case DOUBLE_MEDIUM:
-                auto3.followPath(parkDistance);
+                auto3.followPath(parkDistance, startSide);
                 break;
             case HIGH:
                 // follow the old high junction and park autos

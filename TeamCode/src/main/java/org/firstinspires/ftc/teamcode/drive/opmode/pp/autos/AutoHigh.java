@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
 
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -34,13 +35,19 @@ public class AutoHigh {
         op = o;
     }
 
-    public void followPath(int parkDistance) {
+    public void followPath(int parkDistance, int side) {
+        // locations
+        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        Pose2d dropOff = positions.Medium;
+
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
 
+        // forward/backwards does not need to be reversed
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(50)
-                .strafeRight(8)
+                .forward(2)
+                .strafeLeft(24*side)
+                .forward(48)
                 .build();
 
         TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq1.end())
@@ -63,20 +70,20 @@ public class AutoHigh {
         intakeSlide.run();
     }
 
-    public void followPath2() {
-        Pose2d pickUp = positions.LeftConeStack;
-        Pose2d dropOff = positions.Medium;
-
-        drive.setPoseEstimate(pickUp);
-
-        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
-                .lineToLinearHeading(dropOff)
-                .build();
-
-        if (op.isStopRequested()) return;
-        runtime.reset();
-        drive.followTrajectorySequence(trajSeq1);
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
-    }
+//    public void followPath2() {
+//        Pose2d pickUp = positions.LeftConeStack;
+//        Pose2d dropOff = positions.Medium;
+//
+//        drive.setPoseEstimate(pickUp);
+//
+//        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
+//                .lineToLinearHeading(dropOff)
+//                .build();
+//
+//        if (op.isStopRequested()) return;
+//        runtime.reset();
+//        drive.followTrajectorySequence(trajSeq1);
+//        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+//        intakeSlide.run();
+//    }
 }
