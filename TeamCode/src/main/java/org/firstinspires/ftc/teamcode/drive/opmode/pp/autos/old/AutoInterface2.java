@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode.pp;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -13,20 +13,17 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.AutoHigh;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.AutoHighMedium;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.AutoMedium;
-import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftHigh;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftTEST;
+import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.LeftHigh;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHigh;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="0-All Autos", group="Linear Opmode")
-public class AutoInterface extends LinearOpMode {
+public class AutoInterface2 extends LinearOpMode {
 
     private enum Side {
         SELECTING,
@@ -35,10 +32,14 @@ public class AutoInterface extends LinearOpMode {
     }
     private enum Junctions {
         SELECTING,
-        DOUBLE_HIGH,
-        DOUBLE_MEDIUM,
-        HIGH_MEDIUM,
-        HIGH,
+        LEFT_MM,
+        LEFT_HH,
+        LEFT_HM,
+        LEFT_H,
+        RIGHT_MM,
+        RIGHT_HH,
+        RIGHT_HM,
+        RIGHT_H,
         LEFT_TEST
     }
 
@@ -90,15 +91,18 @@ public class AutoInterface extends LinearOpMode {
         cone.init(drive, intakeSlide, hardwareMap, this);
         
         // initialize autos
-        AutoHighMedium auto1 = new AutoHighMedium();
-        AutoHigh auto2 = new AutoHigh();
-        AutoMedium auto3 = new AutoMedium();
+        // Right Side
+        RightHigh rightAuto1 = new RightHigh();
+        RightHighMedium rightAuto2 = new RightHighMedium();
+        RightDoubleHigh rightAuto3 = new RightDoubleHigh();
+        RightDoubleMedium rightAuto4 = new RightDoubleMedium();
 
-        // older autos (for backup)
-        RightHigh rightHigh = new RightHigh();
-        LeftHigh leftHigh = new LeftHigh();
+        // Left Side
+        LeftHigh leftAuto1 = new LeftHigh();
+        LeftHighMedium leftAuto2 = new LeftHighMedium();
+        LeftDoubleHigh leftAuto3 = new LeftDoubleHigh();
+        LeftDoubleMedium leftAuto4 = new LeftDoubleMedium();
 
-        // testing programs
         LeftTEST leftTest = new LeftTEST();
 
 
@@ -124,7 +128,7 @@ public class AutoInterface extends LinearOpMode {
         // relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
 
 
-        while (!isStopRequested() && !sideSelected) {
+        while (!isStopRequested() && !sideSelected && !junctionsSelected) {
             switch (side) {
                 case SELECTING:
                     if (gamepad1.left_bumper) {
@@ -132,52 +136,77 @@ public class AutoInterface extends LinearOpMode {
                         // reverse X coordinate of Pose2Ds
                         startSide = -1;
                         sideSelected = true;
+                        while (!junctionsSelected) {
+                            switch (junctions) {
+                                case SELECTING:
+                                    if (gamepad1.a) {
+                                       junctions = Junctions.LEFT_HM;
+                                       junctionsSelected = true;
+                                    } else if (gamepad1.x) {
+                                        junctions = Junctions.LEFT_MM;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.y) {
+                                        junctions = Junctions.LEFT_HH;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.b) {
+                                        junctions = Junctions.LEFT_H;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.dpad_up) {
+                                        leftTest.init(drive, intakeSlide, cone, this);
+                                        junctions = Junctions.LEFT_TEST;
+                                        junctionsSelected = true;
+                                    }
+                            }
+                            telemetry.addData("Selected Side:", side.name());
+                            telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
+                            telemetry.addData("To select DOUBLE MEDIUM:", "Gamepad X");
+                            telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
+                            telemetry.addData("To select HIGH:", "Gamepad B");
+                            telemetry.addData("Run Test:", "DPAD UP");
+                            telemetry.update();
+                        }
+
                     } else if (gamepad1.right_bumper) {
                         side = Side.RIGHT;
                         // keep X coordinate of Pose2Ds the same
                         startSide = 1;
                         sideSelected = true;
+                        while (!junctionsSelected) {
+                            switch (junctions) {
+                                case SELECTING:
+                                    if (gamepad1.a) {
+                                        junctions = Junctions.RIGHT_HM;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.x) {
+                                        junctions = Junctions.RIGHT_MM;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.y) {
+                                        junctions = Junctions.RIGHT_HH;
+                                        junctionsSelected = true;
+                                    } else if (gamepad1.b) {
+                                        junctions = Junctions.RIGHT_H;
+                                        junctionsSelected = true;
+                                    }
+                            }
+                            telemetry.addData("Selected Side:", side.name());
+                            telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
+                            telemetry.addData("To select DOUBLE MEDIUM:", "Gamepad X");
+                            telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
+                            telemetry.addData("To select HIGH:", "Gamepad B");
+                            telemetry.update();
+                        }
                     }
             }
             telemetry.addData("To select LEFT:", "Gamepad Left Bumper");
             telemetry.addData("To select RIGHT:", "Gamepad Right Bumper");
-            telemetry.addData("Selected Side:", side.name());
-            telemetry.update();
-        }
-        while (!isStopRequested() && !junctionsSelected) {
-            switch (junctions) {
-                case SELECTING:
-                    if (gamepad1.a) {
-                        junctions = Junctions.HIGH_MEDIUM;
-                        auto1.init(drive, intakeSlide, cone, this);
-                        junctionsSelected = true;
-                    } else if (gamepad1.x) {
-                        junctions = Junctions.DOUBLE_MEDIUM;
-                        auto3.init(drive, intakeSlide, cone, this);
-                        junctionsSelected = true;
-                    } else if (gamepad1.y) {
-                        junctions = Junctions.DOUBLE_HIGH;
-                        auto2.init(drive, intakeSlide, cone, this);
-                        junctionsSelected = true;
-                    } else if (gamepad1.b) {
-                        junctions = Junctions.HIGH;
-                        leftHigh.init(drive, intakeSlide, cone, this);
-                        rightHigh.init(drive, intakeSlide, cone, this);
-                        junctionsSelected = true;
-                    } else if (gamepad1.dpad_up) {
-                        junctions = Junctions.LEFT_TEST;
-                        leftTest.init(drive, intakeSlide, cone, this);
-                        junctionsSelected = true;
-                    }
+            if (junctionsSelected) {
+                telemetry.addData("Selected Auto:", junctions.name());
+            } else {
+                telemetry.addData("Selected Side:", side.name());
             }
-            telemetry.addData("Selected Side:", side.name());
-            telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
-            telemetry.addData("To select DOUBLE MEDIUM:", "Gamepad X");
-            telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
-            telemetry.addData("To select HIGH:", "Gamepad B");
-            telemetry.addData("Run Test:", "DPAD UP");
             telemetry.update();
         }
+
         // flip or keep x coordinates
         initSide();
          /*
@@ -229,7 +258,6 @@ public class AutoInterface extends LinearOpMode {
                 telemetry.addData("Visible Target", targetName);
                 telemetry.addData("Lable #", label);
                 telemetry.addData("Parking:", parkDistance);
-                telemetry.addData("Selected Side:", side.name());
                 telemetry.addData("Selected Auto:", junctions.name());
                 telemetry.update();
             }
@@ -258,7 +286,6 @@ public class AutoInterface extends LinearOpMode {
                 telemetry.addData("Visible Target", targetName);
                 telemetry.addData("Zone #", label);
                 telemetry.addData("Parking:", parkDistance);
-                telemetry.addData("Selected Side:", side.name());
                 telemetry.addData("Selected Auto:", junctions.name());
                 telemetry.update();
             }
@@ -267,9 +294,7 @@ public class AutoInterface extends LinearOpMode {
         intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
 
         // this telemetry will not be seen because of the loop above
-        telemetry.addData("Selected Side:", side.name());
         telemetry.addData("Auto selected:", junctions.name());
-        telemetry.addData("Zone #", label);
         telemetry.addData(">", "Press Play to start");
         telemetry.update();
         waitForStart();
@@ -278,28 +303,33 @@ public class AutoInterface extends LinearOpMode {
         runtime.reset();
         // remember to set poseEstimate in each class
         switch (junctions) {
-            case HIGH_MEDIUM:
-                auto1.followPath(parkDistance);
-                break;
-            case DOUBLE_HIGH:
-                auto2.followPath(parkDistance);
-                break;
-            case DOUBLE_MEDIUM:
-                auto3.followPath(parkDistance);
-                break;
-            case HIGH:
-                // follow the old high junction and park autos
-                switch (side) {
-                    case LEFT:
-                        leftHigh.followPath(parkDistance);
-                        break;
-                    case RIGHT:
-                        rightHigh.followPath(parkDistance);
-                        break;
-                }
-                break;
+            case LEFT_MM:
+                telemetry.addData("Auto:", "Left Medium Medium");
+                telemetry.update();
+            case LEFT_HH:
+                telemetry.addData("Auto:", "Left High High");
+                telemetry.update();
+            case LEFT_HM:
+                telemetry.addData("Auto:", "Left High Medium");
+                telemetry.update();
+            case LEFT_H:
+                telemetry.addData("Auto:", "Left High Park");
+                telemetry.update();
+                //leftAuto5.followPath(drive, intakeSlide, cone, parkDistance);
+            case RIGHT_MM:
+                telemetry.addData("Auto:", "Left Medium Medium");
+                telemetry.update();
+            case RIGHT_HH:
+                telemetry.addData("Auto:", "Left High High");
+                telemetry.update();
+            case RIGHT_HM:
+                telemetry.addData("Auto:", "Left High Medium");
+                telemetry.update();
+            case RIGHT_H:
+                telemetry.addData("Auto:", "Left High Park");
+                telemetry.update();
+                //rightAuto5.followPath(drive, intakeSlide, cone, parkDistance);
             case LEFT_TEST:
-                // runs test programs
                 while (!testSelected) {
                     if (gamepad1.a) {
                         leftTest.followPath(parkDistance);
@@ -312,7 +342,9 @@ public class AutoInterface extends LinearOpMode {
                     telemetry.addData("Auto:", "Left Test");
                     telemetry.update();
                 }
-                break;
+
+
+
         }
         telemetry.update();
     }

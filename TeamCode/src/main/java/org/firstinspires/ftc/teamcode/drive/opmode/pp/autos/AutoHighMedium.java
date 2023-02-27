@@ -6,12 +6,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.Cone;
-import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.AutoInterface;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-public class LeftTEST {
+public class AutoHighMedium {
     enum DriveState {
         TRAJECTORY1,
         DROP_OFF,

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old;
+package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -21,8 +21,8 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="RIGHTConePark", group="Linear Opmode")
-public class RightHigh extends LinearOpMode {
+@Autonomous(name="LEFTConePark", group="Linear Opmode")
+public class LeftHigh extends LinearOpMode {
 
 
 
@@ -103,9 +103,9 @@ public class RightHigh extends LinearOpMode {
         // run to bottom high junction
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
-                .strafeLeft(24)
+                .strafeRight(24)
                 .forward(48)
-                .strafeLeft(8)
+                .strafeRight(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -132,13 +132,13 @@ public class RightHigh extends LinearOpMode {
                         targetName = trackable.getName();
                         if (targetName == "PowerPlay2") {
                             label = 1;
-                            parkDistance = 1;
+                            parkDistance = 48;
                         } else if (targetName == "PowerPlay1") {
                             label = 2;
                             parkDistance = 24;
                         } else if (targetName == "PowerPlay3") {
                             label = 3;
-                            parkDistance = 48;
+                            parkDistance = 1;
                         }
                         break;
                     }
@@ -161,28 +161,64 @@ public class RightHigh extends LinearOpMode {
 
         drive.followTrajectorySequence(trajSeq);
         // Put align code here? [import Cone.java and call a function to drop off cone]
-        cone.dropOffCone(-0.20, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        cone.dropOffCone(0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         Pose2d afterAdjPose = drive.getPoseEstimate();
-        // go to ready position
-        TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
-                .strafeRight(9.75)
-                .turn(Math.toRadians(90))
-                .back(24)
-                .strafeRight(4)
-                .build();
-        TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
-                .forward(20)
-                .strafeLeft(10)
-                .build();
-        TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeRight(9.75)
-                .back(20)
-                .build();
 
         TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
-                .strafeRight(9.75)
+                .strafeLeft(9.75)
                 .back(24)
-                .strafeRight(parkDistance)
+                .strafeLeft(parkDistance)
+                .build();
+        drive.followTrajectorySequence(park);
+
+        // the last thing auto should do is move slide back to rest
+        moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
+        telemetry.update();
+    }
+
+    LinearOpMode op;
+    SampleMecanumDrive drive;
+    IntakeSlideSubsystemAuto intakeSlide;
+    Cone cone;
+
+    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
+        drive = d;
+        intakeSlide = i;
+        cone = c;
+        op = o;
+    }
+
+    public void followPath(int parkDistance) {
+        Pose2d startPose = new Pose2d(0, 0, 0);
+
+        drive.setPoseEstimate(startPose);
+
+        // run to bottom high junction
+        TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
+                .forward(2)
+                .strafeRight(24)
+                .forward(48)
+                .strafeRight(8)
+                .addTemporalMarker(() -> {
+                    intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
+                    intakeSlide.run();
+                })
+                .waitSeconds(0.5)
+                .resetConstraints()
+                .build();
+
+        if(isStopRequested()) return;
+        runtime.reset();
+
+        drive.followTrajectorySequence(trajSeq);
+        // Put align code here? [import Cone.java and call a function to drop off cone]
+        cone.dropOffCone(0.22, IntakeSlideSubsystemAuto.LiftState.HIGH, false);
+        Pose2d afterAdjPose = drive.getPoseEstimate();
+
+        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
+                .strafeLeft(9.75)
+                .back(24)
+                .strafeLeft(parkDistance)
                 .build();
         drive.followTrajectorySequence(park);
 
@@ -222,9 +258,9 @@ public class RightHigh extends LinearOpMode {
 
         TrajectorySequence trajSeq = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
-                .strafeLeft(24)
+                .strafeRight(24)
                 .forward(48)
-                .strafeLeft(8)
+                .strafeRight(8)
                 .addTemporalMarker(() -> {
                     intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
                     intakeSlide.run();
@@ -242,24 +278,23 @@ public class RightHigh extends LinearOpMode {
         Pose2d afterAdjPose = drive.getPoseEstimate();
         // go to ready position
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(afterAdjPose)
-                .strafeRight(9.75)
-                .turn(Math.toRadians(90))
+                .strafeLeft(9.75)
+                .turn(Math.toRadians(-90))
                 .back(24)
-                .strafeRight(4)
+                .strafeLeft(4)
                 .build();
         TrajectorySequence rotateTo = drive.trajectorySequenceBuilder(trajSeq2.end())
                 .forward(20)
-                .strafeLeft(10)
+                .strafeRight(10)
                 .build();
         TrajectorySequence rotateBack = drive.trajectorySequenceBuilder(rotateTo.end())
-                .strafeRight(9.75)
-                .back(20)
+                .strafeLeft(9.75)
+                .back(25)
                 .build();
-
         TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq.end())
-                .strafeRight(9.75)
+                .strafeLeft(9.75)
                 .back(24)
-                .strafeRight(parkDistance)
+                .strafeLeft(parkDistance)
                 .build();
         drive.followTrajectorySequence(park);
 
@@ -267,6 +302,7 @@ public class RightHigh extends LinearOpMode {
         moveSlide(intakeSlide, intakeSlide.targetPositionRest, 30);
         telemetry.update();
     }
+
     /**
      * Initialize the Vuforia localization engine.
      */
