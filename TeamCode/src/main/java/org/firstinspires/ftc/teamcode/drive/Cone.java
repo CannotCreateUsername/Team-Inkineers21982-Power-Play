@@ -88,7 +88,7 @@ public class Cone {
 //            return false;
 //        }
 //    }
-    public void pickCone() {
+    private void pickCone() {
         switch (pickupState) {
             case ALIGNING:
                 intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
