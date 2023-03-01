@@ -38,7 +38,7 @@ public class AutoHigh {
 
     public void followPath(int parkDistance, int side) {
         // locations
-        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        Pose2d pickUp = positions.ConeStack;
         Pose2d dropOff = positions.High;
 
         Pose2d startPose = new Pose2d(36*side, -60, 90);
@@ -48,7 +48,7 @@ public class AutoHigh {
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
                 .strafeLeft(24*side)
-                .lineToLinearHeading(new Pose2d(24*side, 0, Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(24*side, 0, Math.toRadians(positions.sideRotation)))
                 .build();
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq1.end())
                 .strafeLeft(10*side)
@@ -68,7 +68,7 @@ public class AutoHigh {
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
         runtime.reset();
-        while (runtime.seconds() < 2) {
+        while (runtime.seconds() < 1) {
             // wait.. add telemetry here
             op.telemetry.addData("Waiting", "to align");
             op.telemetry.update();

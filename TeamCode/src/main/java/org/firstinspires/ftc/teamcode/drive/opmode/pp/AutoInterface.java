@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHigh;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="0-All Autos", group="Linear Opmode")
+@Autonomous(name="0 - All Autos", group="Linear Opmode")
 public class AutoInterface extends LinearOpMode {
 
     private enum Side {
@@ -49,10 +49,14 @@ public class AutoInterface extends LinearOpMode {
     public int startSide = 1;
 
     // Positions
-    public Pose2d LeftConeStack = new Pose2d(-54,-12, Math.toRadians(0));
-    public Pose2d RightConeStack = new Pose2d(54,-12, Math.toRadians(180));
+//    these are no longer used because they are inaccurate.
+//    public Pose2d LeftConeStack = new Pose2d(-54,-12, Math.toRadians(0));
+//    public Pose2d RightConeStack = new Pose2d(54,-12, Math.toRadians(180));
+    public Pose2d ConeStack = new Pose2d(36,-12, Math.toRadians(180));
+    public double sideRotation;
 
     public Pose2d Start = new Pose2d(34, -62, Math.toRadians(90));
+    public Pose2d Low = new Pose2d(42, -12, Math.toRadians(90));
     public Pose2d Medium = new Pose2d(24, -12, Math.toRadians(90));
     public Pose2d High = new Pose2d(24, -12, Math.toRadians(-90));
     public Pose2d BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
@@ -341,7 +345,10 @@ public class AutoInterface extends LinearOpMode {
     }
 
     private void initSide() {
+        sideRotation = startSide > 0 ? 180 : 0;
+        ConeStack = new Pose2d(36*startSide, -12, Math.toRadians(sideRotation));
         Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
+        Low = new Pose2d(42*startSide, -12, Math.toRadians(90));
         Medium = new Pose2d(24*startSide, -12, Math.toRadians(90));
         High = new Pose2d(24*startSide, -12, Math.toRadians(-90));
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));

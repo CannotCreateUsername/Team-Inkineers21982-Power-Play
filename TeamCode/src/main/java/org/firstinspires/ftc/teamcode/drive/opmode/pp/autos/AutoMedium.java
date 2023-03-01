@@ -38,7 +38,7 @@ public class AutoMedium {
 
     public void followPath(int parkDistance, int side) {
         // locations
-        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        Pose2d pickUp = positions.ConeStack;
         Pose2d dropOff = positions.Medium;
 
         Pose2d startPose = new Pose2d(0, 0, 0);
@@ -48,8 +48,8 @@ public class AutoMedium {
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
                 .strafeLeft(24*side)
-                .forward(48)
-                .strafeRight(8*side)
+                .forward(46)
+                .strafeRight(10*side)
                 .build();
         TrajectorySequence drop = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)
@@ -65,7 +65,7 @@ public class AutoMedium {
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
         runtime.reset();
-        while (runtime.seconds() < 2) {
+        while (runtime.seconds() < 1) {
             // wait.. add telemetry here
             op.telemetry.addData("Waiting", "to align");
             op.telemetry.update();
