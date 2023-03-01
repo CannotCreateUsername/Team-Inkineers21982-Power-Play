@@ -29,17 +29,31 @@ public class AutoHigh {
     Cone cone;
     AutoInterface positions = new AutoInterface();
 
-    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
+    public Pose2d Start = positions.Start;
+    public Pose2d Low = positions.Low;
+    public Pose2d Medium = positions.Medium;
+    public Pose2d High = positions.High;
+    public Pose2d BottomHigh = positions.BottomHigh;
+
+    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int startSide) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
+
+        // junctions
+        Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
+        Low = new Pose2d(42*startSide, -12, Math.toRadians(90));
+        Medium = new Pose2d(0*startSide, -12, Math.toRadians(90));
+        High = new Pose2d(0*startSide, -12, Math.toRadians(-90));
+        BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
     }
 
     public void followPath(int parkDistance, int side) {
         // locations
-        Pose2d pickUp = positions.ConeStack;
-        Pose2d dropOff = positions.High;
+        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        double sideRotation = side > 0 ? 180 : 0;
+        Pose2d dropOff = High;
 
         Pose2d startPose = new Pose2d(36*side, -60, 90);
         drive.setPoseEstimate(startPose);
@@ -48,7 +62,7 @@ public class AutoHigh {
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
                 .strafeLeft(24*side)
-                .lineToLinearHeading(new Pose2d(24*side, 0, Math.toRadians(positions.sideRotation)))
+                .lineToLinearHeading(new Pose2d(12*side, 0, Math.toRadians(sideRotation)))
                 .build();
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq1.end())
                 .strafeLeft(10*side)
@@ -68,14 +82,9 @@ public class AutoHigh {
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
         runtime.reset();
-        while (runtime.seconds() < 1) {
-            // wait.. add telemetry here
-            op.telemetry.addData("Waiting", "to align");
-            op.telemetry.update();
-        }
         cone.align(IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(trajSeq2);
-        drive.setPoseEstimate(new Pose2d(24, -12, Math.toRadians(0)));
+        drive.setPoseEstimate(new Pose2d(12*side, -12, Math.toRadians(0)));
         for (int i = 0; i < 2; i++) {
             drive.followTrajectorySequence(pickup);
             cone.pickUpCone();

@@ -64,7 +64,7 @@ public class LeftTEST {
     }
 
     public void followPath2() {
-        Pose2d pickUp = positions.ConeStack;
+        Pose2d pickUp = positions.LeftConeStack;
         Pose2d dropOff = positions.Medium;
 
         drive.setPoseEstimate(pickUp);

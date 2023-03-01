@@ -8,5 +8,5 @@ public class AlignerConstants {
     public static double LATERAL_Kd = 0.097;
     public static double VERTICAL_Kp = 0.2;
     public static double VERTICAL_Kd = 0;
-    public static double LATERAL_ERROR_THRESHOLD = 1.1;
+    public static double LATERAL_ERROR_THRESHOLD = 5;
 }
