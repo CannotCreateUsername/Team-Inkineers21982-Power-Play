@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.old;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -22,7 +23,8 @@ import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHigh;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="0-All Autos", group="Linear Opmode")
+@Disabled
+@Autonomous(name="Interface Old", group="Linear Opmode")
 public class AutoInterface2 extends LinearOpMode {
 
     private enum Side {
