@@ -59,7 +59,7 @@ public class Cone {
     IntakeSlideSubsystemAuto intakeSlide;
     SampleMecanumDrive drive;
     LinearOpMode op;
-    StickDriveMediator stickDrive;
+    public StickDriveMediator stickDrive;
 
     public void init (SampleMecanumDrive d, IntakeSlideSubsystemAuto i, HardwareMap hardwareMap, LinearOpMode o) {
         drive = d;
@@ -68,7 +68,7 @@ public class Cone {
         stickDrive = new StickDriveMediator(op);
         stickDrive.setDrive(drive);
         stickDrive.setSlide(intakeSlide);
-        stickDrive.observeStick();
+        // stickDrive.observeStick();
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -303,6 +303,8 @@ public class Cone {
             straightDistance(-10);
             intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
             intakeSlide.run();
+            // stop camera stream to conserve CPU
+            stickDrive.stopCamera();
             op.telemetry.addData("Drop Off:", "Completed");
             op.telemetry.update();
             loaded = false;
