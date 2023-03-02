@@ -171,7 +171,8 @@ public class Cone {
                     stopMovement();
                 }
             }
-            intakeSlide.stackDiff = intakeSlide.stackDiff - 200;
+            // cone stack height changes if there is less cones
+            intakeSlide.stackDiff = intakeSlide.stackDiff - 100;
         }
     }
 
