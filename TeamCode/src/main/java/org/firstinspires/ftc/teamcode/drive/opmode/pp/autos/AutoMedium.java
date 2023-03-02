@@ -29,27 +29,38 @@ public class AutoMedium {
     Cone cone;
     AutoInterface positions = new AutoInterface();
 
-    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
+    public Pose2d Start = positions.Start;
+    public Pose2d Low = positions.Low;
+    public Pose2d Medium = positions.Medium;
+    public Pose2d High = positions.High;
+    public Pose2d BottomHigh = positions.BottomHigh;
+
+    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int startSide) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
+
+        // junctions
+        Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
+        Low = new Pose2d(42*startSide, -12, Math.toRadians(90));
+        Medium = new Pose2d(0*startSide, -12, Math.toRadians(90));
+        High = new Pose2d(0*startSide, -12, Math.toRadians(-90));
+        BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
     }
 
     public void followPath(int parkDistance, int side) {
         // locations
         Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
-        Pose2d dropOff = positions.Medium;
+        Pose2d dropOff = Medium;
 
         Pose2d startPose = new Pose2d(0, 0, 0);
         drive.setPoseEstimate(startPose);
 
         // forward/backwards does not need to be reversed
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(2)
-                .strafeLeft(24*side)
                 .forward(48)
-                .strafeRight(8*side)
+                .strafeLeft(12*side)
                 .build();
         TrajectorySequence drop = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)
@@ -65,11 +76,6 @@ public class AutoMedium {
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
         runtime.reset();
-        while (runtime.seconds() < 2) {
-            // wait.. add telemetry here
-            op.telemetry.addData("Waiting", "to align");
-            op.telemetry.update();
-        }
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
         drive.setPoseEstimate(dropOff);
         for (int i = 0; i < 1; i++) {

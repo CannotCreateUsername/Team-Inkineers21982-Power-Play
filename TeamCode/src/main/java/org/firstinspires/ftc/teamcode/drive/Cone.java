@@ -299,7 +299,7 @@ public class Cone {
             while (timer.seconds() < 1.5 && op.opModeIsActive()) {
                 intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
             }
-            straightDistance(-8);
+            straightDistance(-10);
             intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
             intakeSlide.run();
             op.telemetry.addData("Drop Off:", "Completed");

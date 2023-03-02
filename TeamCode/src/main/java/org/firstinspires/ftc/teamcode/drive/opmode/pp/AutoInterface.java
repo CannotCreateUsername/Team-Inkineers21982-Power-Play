@@ -25,7 +25,7 @@ import org.firstinspires.ftc.teamcode.drive.opmode.pp.autos.RightHigh;
 import java.util.ArrayList;
 import java.util.List;
 
-@Autonomous(name="0-All Autos", group="Linear Opmode")
+@Autonomous(name="0 - All Autos", group="Linear Opmode")
 public class AutoInterface extends LinearOpMode {
 
     private enum Side {
@@ -49,10 +49,16 @@ public class AutoInterface extends LinearOpMode {
     public int startSide = 1;
 
     // Positions
-    public Pose2d LeftConeStack = new Pose2d(-54,-12, Math.toRadians(0));
-    public Pose2d RightConeStack = new Pose2d(54,-12, Math.toRadians(180));
+//    these are no longer used because they are inaccurate.
+//    public Pose2d LeftConeStack = new Pose2d(-54,-12, Math.toRadians(0));
+//    public Pose2d RightConeStack = new Pose2d(54,-12, Math.toRadians(180));
+
+    public Pose2d LeftConeStack = new Pose2d(-38,-12, Math.toRadians(0));
+    public Pose2d RightConeStack = new Pose2d(38,-12, Math.toRadians(180));
+
 
     public Pose2d Start = new Pose2d(34, -62, Math.toRadians(90));
+    public Pose2d Low = new Pose2d(42, -12, Math.toRadians(90));
     public Pose2d Medium = new Pose2d(24, -12, Math.toRadians(90));
     public Pose2d High = new Pose2d(24, -12, Math.toRadians(-90));
     public Pose2d BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
@@ -149,15 +155,15 @@ public class AutoInterface extends LinearOpMode {
                 case SELECTING:
                     if (gamepad1.a) {
                         junctions = Junctions.HIGH_MEDIUM;
-                        auto1.init(drive, intakeSlide, cone, this);
+                        auto1.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     } else if (gamepad1.x) {
                         junctions = Junctions.DOUBLE_MEDIUM;
-                        auto3.init(drive, intakeSlide, cone, this);
+                        auto3.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     } else if (gamepad1.y) {
                         junctions = Junctions.DOUBLE_HIGH;
-                        auto2.init(drive, intakeSlide, cone, this);
+                        auto2.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     } else if (gamepad1.b) {
                         junctions = Junctions.HIGH;
@@ -178,8 +184,8 @@ public class AutoInterface extends LinearOpMode {
             telemetry.addData("Run Test:", "DPAD UP");
             telemetry.update();
         }
-        // flip or keep x coordinates
-        initSide();
+        // flip or keep x coordinates (doesn't work)
+//        initSide();
          /*
             read: Trajectories Overview
             https://learnroadrunner.com/trajectories.html#trajectories-vs-paths
@@ -340,10 +346,11 @@ public class AutoInterface extends LinearOpMode {
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
     }
 
-    private void initSide() {
-        Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
-        Medium = new Pose2d(24*startSide, -12, Math.toRadians(90));
-        High = new Pose2d(24*startSide, -12, Math.toRadians(-90));
-        BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
-    }
+//    private void initSide() {
+//        Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
+//        Low = new Pose2d(42*startSide, -12, Math.toRadians(90));
+//        Medium = new Pose2d(24*startSide, -12, Math.toRadians(90));
+//        High = new Pose2d(24*startSide, -12, Math.toRadians(-90));
+//        BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
+//    }
 }
