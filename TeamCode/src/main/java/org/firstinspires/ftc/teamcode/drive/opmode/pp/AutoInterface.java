@@ -166,7 +166,7 @@ public class AutoInterface extends LinearOpMode {
                         junctionsSelected = true;
                     } else if (gamepad1.dpad_up) {
                         junctions = Junctions.LEFT_TEST;
-                        leftTest.init(drive, intakeSlide, cone, this);
+                        leftTest.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     }
             }

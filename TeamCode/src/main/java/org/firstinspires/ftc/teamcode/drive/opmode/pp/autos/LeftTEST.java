@@ -27,11 +27,33 @@ public class LeftTEST {
     Cone cone;
     AutoInterface positions = new AutoInterface();
 
-    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o) {
+    double widthOfTile = 23.5; 		//includes ½ of tile edge on both sides
+    double widthOfTileEdge = 0.75;
+    double lengthOfRobot =13.972;
+    double widthOfRobot = 13.465;
+
+    // Low Top
+    float yTop = 48;
+    float xTop = -12;
+
+    // Low Beside
+    float yBeside = 36;
+    float xBeside = 0;
+
+    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int side) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
+
+        Pose2d TopLow = new Pose2d(xTop, yTop, Math.toRadians(90));
+        Pose2d BesideLow = new Pose2d(xBeside, yBeside, Math.toRadians(90));
+        Pose2d TopMedium = new Pose2d(xTop+24, yTop, Math.toRadians(90));
+        Pose2d BesideMedium = new Pose2d(xBeside+24, yBeside, Math.toRadians(90));
+        Pose2d TopHigh = new Pose2d(xTop+48, yTop, Math.toRadians(90));
+        Pose2d BesideHigh = new Pose2d(xBeside+48, yBeside, Math.toRadians(90));
+        Pose2d ConeStack = new Pose2d(xTop, yTop, Math.toRadians(0));
+
     }
 
     public void followPath(int parkDistance) {
@@ -78,5 +100,8 @@ public class LeftTEST {
         drive.followTrajectorySequence(trajSeq1);
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
         intakeSlide.run();
+    }
+    public void followPath3() {
+
     }
 }
