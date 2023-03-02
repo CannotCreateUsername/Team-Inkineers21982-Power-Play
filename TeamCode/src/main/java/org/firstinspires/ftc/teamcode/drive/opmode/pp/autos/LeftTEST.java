@@ -1,20 +1,36 @@
 package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
 
 
+import android.sax.StartElementListener;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.drive.Cone;
+import org.firstinspires.ftc.teamcode.drive.constants.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.opmode.pp.AutoInterface;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
 public class LeftTEST {
+    enum TestSelect {
+        MOVE_TO_MIDDLE_OF_ARENA,
+        MOVE_TO_TOP_LEFT_MID,
+        MOVE_TO_TOP_MID,
+        MOVE_TO_CONE_STACK,
+        BACK_INTO_MID_JUNCTION_FROM_TOP,
+        MOVE_AND_SCORE_IN_HIGH_JUNCTION,
+    }
+    TestSelect testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
+    boolean testSelected = false;
+
     enum DriveState {
-        TRAJECTORY1,
-        DROP_OFF,
+        TRAJ_1,
         PARK,
         IDLE,
     }
@@ -27,32 +43,76 @@ public class LeftTEST {
     Cone cone;
     AutoInterface positions = new AutoInterface();
 
-    double widthOfTile = 23.5; 		//includes ½ of tile edge on both sides
+    double widthOfTile = 23.5; 		//includes 0.5 of tile edge on both sides
     double widthOfTileEdge = 0.75;
-    double lengthOfRobot =13.972;
+    double lengthOfRobot = 13.972;
     double widthOfRobot = 13.465;
 
-    // Low Top
-    float yTop = 48;
-    float xTop = -12;
+    double yStartCenterOffset = 0.5 * widthOfTile + 0.5 * lengthOfRobot - lengthOfRobot  - widthOfTileEdge;
+    //Distance from back of robot to center of cone guide
+    //Math: diameterOfGear + radiusOfCone + yIntakeEdgeOffset = lengthOfConeGuide
+    float lengthOfConeGuide = 5;
+    float diameterOfCone = 4;
 
-    // Low Beside
-    float yBeside = 36;
-    float xBeside = 0;
+    double xStart = 0;
+    double yStart = 0;
 
-    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int side) {
+    double xBesideLow = xStart;
+    double yBesideLow = yStart + 0.5 * widthOfTile + yStartCenterOffset;
+    double xTopMid = xStart + 0.5 * widthOfTile;
+    double yTopMid = yBesideLow + 0.5 * widthOfTile;
+    double xConeStack = xStart - 1.5 * widthOfTile + 0.5 * widthOfRobot + 0.5 * widthOfTileEdge;
+    double yConeStack = yTopMid;
+    double xTopLow = xTopMid - widthOfTile;
+    double yTopLow = yTopMid;
+    double xTopHigh = xTopMid + widthOfTile;
+    double yTopHigh = yTopMid;
+    double xBesideMid = xStart + widthOfTile;
+    double yBesideMid = yBesideLow;
+    double xBesideHigh = xBesideMid + widthOfTile;
+    double yBesideHigh = yBesideLow;
+
+    //Should be about 7.764”
+    double distanceBackIntoJunction = lengthOfConeGuide + ((widthOfTile - 0.5*diameterOfCone) - (0.5*widthOfTile + 0.5*lengthOfRobot));
+
+    Pose2d Start;
+    Pose2d ConeStack;
+    Pose2d TopLow;
+    Pose2d TopMid;
+    Pose2d TopHigh;
+    Pose2d BesideLow;
+    Pose2d BesideMid;
+    Pose2d BesideHigh;
+
+    Pose2d TopLeftMid;
+    Pose2d TopLeftHigh;
+    Pose2d TopRightHigh;
+    Pose2d LeftMiddleArenaHigh;
+    Pose2d RightMiddleArenaHigh;
+
+
+    public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int iSide) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
 
-        Pose2d TopLow = new Pose2d(xTop, yTop, Math.toRadians(90));
-        Pose2d BesideLow = new Pose2d(xBeside, yBeside, Math.toRadians(90));
-        Pose2d TopMedium = new Pose2d(xTop+24, yTop, Math.toRadians(90));
-        Pose2d BesideMedium = new Pose2d(xBeside+24, yBeside, Math.toRadians(90));
-        Pose2d TopHigh = new Pose2d(xTop+48, yTop, Math.toRadians(90));
-        Pose2d BesideHigh = new Pose2d(xBeside+48, yBeside, Math.toRadians(90));
-        Pose2d ConeStack = new Pose2d(xTop, yTop, Math.toRadians(0));
+        //Set Position Coordinates
+        //Top and besides are relative to the specified junction, not arena
+        Start = new Pose2d(iSide * xStart, yStart);
+        ConeStack = new Pose2d(iSide * xConeStack, yConeStack);
+        TopLow = new Pose2d(iSide * xTopLow, yTopLow);
+        TopMid = new Pose2d(iSide * xTopMid, yTopMid);
+        TopHigh = new Pose2d(iSide * xTopHigh, yTopHigh);
+        BesideLow = new Pose2d(iSide * xBesideLow, yBesideLow);
+        BesideMid = new Pose2d(iSide * xBesideMid, yBesideMid);
+        BesideHigh = new Pose2d(iSide * xBesideHigh, yBesideHigh);
+
+        TopLeftMid = new Pose2d(iSide * xBesideLow, yTopMid);
+        TopLeftHigh = new Pose2d(iSide * xBesideMid, yTopHigh);
+        TopRightHigh = new Pose2d(iSide * xBesideHigh, yTopHigh);
+        LeftMiddleArenaHigh = new Pose2d(iSide * xBesideLow, yBesideLow+widthOfTile);
+        RightMiddleArenaHigh = new Pose2d(iSide *  xBesideMid, yBesideMid+widthOfTile);
 
     }
 
@@ -94,14 +154,207 @@ public class LeftTEST {
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)
                 .build();
-
         if (op.isStopRequested()) return;
         runtime.reset();
         drive.followTrajectorySequence(trajSeq1);
+        // reset slides to rest
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
         intakeSlide.run();
     }
-    public void followPath3() {
+    public void runOtherTests(GamepadEx gamepad1) {
+        while (!testSelected && op.opModeIsActive()) {
+            if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+                testSelected = true;
+            }
+            switch (testSelect) {
+                case MOVE_TO_MIDDLE_OF_ARENA:
+                    // test 1
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_TOP_LEFT_MID;
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_AND_SCORE_IN_HIGH_JUNCTION;
+                    }
+                    break;
+                case MOVE_TO_TOP_LEFT_MID:
+                    // test 2
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_TOP_MID;
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
+                    }
+                    break;
+                case MOVE_TO_TOP_MID:
+                    // test 3
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_CONE_STACK;
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_TOP_LEFT_MID;
+                    }
+                    break;
+                case MOVE_TO_CONE_STACK:
+                    // test 4
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                        testSelect = TestSelect.BACK_INTO_MID_JUNCTION_FROM_TOP;
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_TOP_MID;
+                    }
+                    break;
+                case BACK_INTO_MID_JUNCTION_FROM_TOP:
+                    // test 5
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_AND_SCORE_IN_HIGH_JUNCTION;
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_CONE_STACK;
+                    }
+                    break;
+                case MOVE_AND_SCORE_IN_HIGH_JUNCTION:
+                    // test 6
+                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                        testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
+                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                        testSelect = TestSelect.BACK_INTO_MID_JUNCTION_FROM_TOP;
+                    }
+                    break;
+            }
+            op.telemetry.addData("To Cycle Tests:", "Right/Left Bumper");
+            op.telemetry.addData("Test Selected:", testSelect.name());
+            op.telemetry.addData("To End Selection:", "Gamepad A");
+            op.telemetry.update();
+        }
+        op.telemetry.addData("Test Selected:", testSelect.name());
+        switch (testSelect) {
+            case MOVE_TO_MIDDLE_OF_ARENA:
+                op.telemetry.addData("Test:", "Push robot while it is moving to test the robot ability to realign itself on path to destination");
+                op.telemetry.update();
+                MoveToMiddleOfArena();
+                break;
+            case MOVE_TO_TOP_LEFT_MID:
+                op.telemetry.update();
+                MoveToTopLeftMid();
+                break;
+            case MOVE_TO_TOP_MID:
+                op.telemetry.update();
+                MoveToTopMid();
+                break;
+            case MOVE_TO_CONE_STACK:
+                op.telemetry.update();
+                MoveToConeStack();
+                break;
+            case BACK_INTO_MID_JUNCTION_FROM_TOP:
+                op.telemetry.update();
+                BackIntoMidJunctionFromTop();
+                break;
+            case MOVE_AND_SCORE_IN_HIGH_JUNCTION:
+                op.telemetry.update();
+                MoveAndScoreHighJunction();
+                break;
+        }
+    }
 
+    // MEDIUM velocity constraint is about 60%.
+    // SLOW velocity constraint is about 40%.
+    /**
+     * Test 1 for roadrunner capabilities
+     */
+    // finished
+    private void MoveToMiddleOfArena() {
+        drive.setPoseEstimate(Start);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                // set to 40%
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_SLOW, SampleMecanumDrive.ACCEL_CONSTRAINT_SLOW) // max speed
+                .lineToLinearHeading(LeftMiddleArenaHigh)
+                .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP;
+        intakeSlide.run();
+        drive.followTrajectorySequence(traj1);
+        // reset slides to rest
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+    }
+
+    /**
+     * Test 2 for roadrunner capabilities
+     */
+    // finished
+    private void MoveToTopLeftMid() {
+        drive.setPoseEstimate(Start);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                // set to 60%
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(TopLeftMid)
+                .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.LOW;
+        drive.followTrajectorySequence(traj1);
+        // reset slides to rest
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+    }
+
+    /**
+     * Test 3 for roadrunner capabilities
+     */
+    private void MoveToTopMid() {
+        drive.setPoseEstimate(Start);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(TopLeftMid)
+                .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+
+        // reset slides to rest
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+    }
+
+    /**
+     * Test 4 for roadrunner capabilities
+     */
+    private void MoveToConeStack() {
+        drive.setPoseEstimate(Start);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+
+        // reset slides to rest
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+    }
+
+    /**
+     * Test 5 for roadrunner capabilities
+     */
+    private void BackIntoMidJunctionFromTop() {
+        drive.setPoseEstimate(TopMid);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(TopMid)
+                .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+
+        // reset slides to rest
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+    }
+
+    /**
+     * Test 6 for roadrunner capabilities
+     */
+    private void MoveAndScoreHighJunction() {
+        drive.setPoseEstimate(Start);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .build();
     }
 }
