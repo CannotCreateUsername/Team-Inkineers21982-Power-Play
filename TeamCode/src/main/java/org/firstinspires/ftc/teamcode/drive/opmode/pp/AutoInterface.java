@@ -48,21 +48,17 @@ public class AutoInterface extends LinearOpMode {
     private boolean sideSelected = false;
     private boolean junctionsSelected = false;
     private boolean testSelected = false;
-    public int startSide = 1;
+    public int startSide = -1;
 
     // Positions
-//    these are no longer used because they are inaccurate.
-//    public Pose2d LeftConeStack = new Pose2d(-54,-12, Math.toRadians(0));
-//    public Pose2d RightConeStack = new Pose2d(54,-12, Math.toRadians(180));
-
     public Pose2d LeftConeStack = new Pose2d(-38,-12, Math.toRadians(0));
     public Pose2d RightConeStack = new Pose2d(38,-12, Math.toRadians(180));
 
 
-    public Pose2d Start = new Pose2d(34, -62, Math.toRadians(90));
-    public Pose2d Low = new Pose2d(42, -12, Math.toRadians(90));
-    public Pose2d Medium = new Pose2d(24, -12, Math.toRadians(90));
-    public Pose2d High = new Pose2d(24, -12, Math.toRadians(-90));
+    public Pose2d Start = new Pose2d(-34, -62, Math.toRadians(90));
+    public Pose2d Low = new Pose2d(-42, -12, Math.toRadians(90));
+    public Pose2d Medium = new Pose2d(-24, -12, Math.toRadians(90));
+    public Pose2d High = new Pose2d(-24, -12, Math.toRadians(-90));
     public Pose2d BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
     // Vuforia Variables
@@ -139,12 +135,12 @@ public class AutoInterface extends LinearOpMode {
                     if (gamepad1.left_bumper) {
                         side = Side.LEFT;
                         // reverse X coordinate of Pose2Ds
-                        startSide = -1;
+                        startSide = 1;
                         sideSelected = true;
                     } else if (gamepad1.right_bumper) {
                         side = Side.RIGHT;
                         // keep X coordinate of Pose2Ds the same
-                        startSide = 1;
+                        startSide = -1;
                         sideSelected = true;
                     }
             }

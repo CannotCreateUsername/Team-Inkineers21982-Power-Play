@@ -42,8 +42,8 @@ public class AutoHighMedium {
         op = o;
 
         // junctions
-        Start = new Pose2d(34*startSide, -62, Math.toRadians(90));
-        Low = new Pose2d(42*startSide, -12, Math.toRadians(90));
+        Start = new Pose2d(-34*startSide, -62, Math.toRadians(90));
+        Low = new Pose2d(-42*startSide, -12, Math.toRadians(90));
         Medium = new Pose2d(0*startSide, -12, Math.toRadians(90));
         High = new Pose2d(0*startSide, -12, Math.toRadians(-90));
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
