@@ -148,6 +148,9 @@ public class StickObserverPipeline extends OpenCvPipeline {
         scaledThresh.release();
         finalMask.release();
         edges.release();
+        hierarchy.release();
+
+
 
         //change the return to whatever mat you want
         //for example, if I want to look at the lenient thresh:
