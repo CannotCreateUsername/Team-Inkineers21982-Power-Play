@@ -156,20 +156,60 @@ public class AutoMedium {
         intakeSlide.runToREST();
     }
 
-    public void followPath2() {
-        Pose2d pickUp = ConeStack;
-        Pose2d dropOff = TopMid;
-
-        drive.setPoseEstimate(pickUp);
-
-        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(pickUp)
-                .lineToLinearHeading(dropOff)
+    public void followPath2(int parkDistance) {
+        drive.setPoseEstimate(Start);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(TopLeftMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
+                .lineToLinearHeading(TopMid)
+                .build();
+        TrajectorySequence traj2 = drive.trajectorySequenceBuilder(TopMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(ConeStack)
+                .build();
+        TrajectorySequence traj3 = drive.trajectorySequenceBuilder(traj2.end())
+                .lineToLinearHeading(TopMid)
+                .build();
+        TrajectorySequence park = drive.trajectorySequenceBuilder(TopMid)
+                .lineToLinearHeading(new Pose2d(parkDistance*positions.startSide, -12, Math.toRadians(90)))
                 .build();
 
         if (op.isStopRequested()) return;
         runtime.reset();
-        drive.followTrajectorySequence(trajSeq1);
+        intakeSlide.runToMEDIUM();
+        drive.followTrajectorySequence(traj1);
+        BackIntoMidJunctionFromTop(); // drops the cone as well
+        for (int i = 0; i < 2; i++) {
+            drive.followTrajectorySequence(traj2);
+            cone.simplePickUp();
+            drive.followTrajectorySequence(traj3);
+            BackIntoMidJunctionFromTop();
+        }
+        drive.followTrajectorySequence(park);
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
         intakeSlide.run();
+    }
+    private void BackIntoMidJunctionFromTop() {
+        drive.setPoseEstimate(TopMid);
+        TrajectorySequence traj1 = drive.trajectorySequenceBuilder(TopMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
+                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(0)))
+                .resetConstraints()
+                .build();
+        TrajectorySequence traj2 = drive.trajectorySequenceBuilder(traj1.end())
+                .lineToLinearHeading(TopMid)
+                .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+        intakeSlide.runToMEDIUM();
+        drive.followTrajectorySequence(traj1);
+        cone.simpleDropOff();
+        drive.followTrajectorySequence(traj2);
     }
 }
