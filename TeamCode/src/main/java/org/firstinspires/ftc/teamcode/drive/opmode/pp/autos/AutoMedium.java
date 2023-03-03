@@ -73,9 +73,10 @@ public class AutoMedium {
                 .build();
 
         if (op.isStopRequested()) return;
+        // turn on camera
+        cone.stickDrive.observeStick();
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
-        runtime.reset();
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
         drive.setPoseEstimate(dropOff);
         for (int i = 0; i < 1; i++) {

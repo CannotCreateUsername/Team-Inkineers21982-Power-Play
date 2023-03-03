@@ -58,7 +58,7 @@ public class LeftTEST {
     double yStart = 0;
 
     double xBesideLow = xStart;
-    double yBesideLow = yStart + 0.5 * widthOfTile + yStartCenterOffset;
+    double yBesideLow = yStart + 1.5 * widthOfTile + yStartCenterOffset;
     double xTopMid = xStart + 0.5 * widthOfTile;
     double yTopMid = yBesideLow + 0.5 * widthOfTile;
     double xConeStack = xStart - 1.5 * widthOfTile + 0.5 * widthOfRobot + 0.5 * widthOfTileEdge;
@@ -90,29 +90,33 @@ public class LeftTEST {
     Pose2d LeftMiddleArenaHigh;
     Pose2d RightMiddleArenaHigh;
 
+    boolean previousGamepadR;
+    boolean previousGamepadL;
+
 
     public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int iSide) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
+        iSide = iSide < 0 ? 1:-1;
 
         //Set Position Coordinates
         //Top and besides are relative to the specified junction, not arena
-        Start = new Pose2d(iSide * xStart, yStart);
-        ConeStack = new Pose2d(iSide * xConeStack, yConeStack);
-        TopLow = new Pose2d(iSide * xTopLow, yTopLow);
-        TopMid = new Pose2d(iSide * xTopMid, yTopMid);
-        TopHigh = new Pose2d(iSide * xTopHigh, yTopHigh);
-        BesideLow = new Pose2d(iSide * xBesideLow, yBesideLow);
-        BesideMid = new Pose2d(iSide * xBesideMid, yBesideMid);
-        BesideHigh = new Pose2d(iSide * xBesideHigh, yBesideHigh);
+        Start = new Pose2d(iSide * xStart, yStart , Math.toRadians(90));
+        ConeStack = new Pose2d(iSide * xConeStack, yConeStack, Math.toRadians(0));
+        TopLow = new Pose2d(iSide * xTopLow, yTopLow, Math.toRadians(90));
+        TopMid = new Pose2d(iSide * xTopMid, yTopMid, Math.toRadians(90));
+        TopHigh = new Pose2d(iSide * xTopHigh, yTopHigh, Math.toRadians(90));
+        BesideLow = new Pose2d(iSide * xBesideLow, yBesideLow, Math.toRadians(90));
+        BesideMid = new Pose2d(iSide * xBesideMid, yBesideMid, Math.toRadians(90));
+        BesideHigh = new Pose2d(iSide * xBesideHigh, yBesideHigh, Math.toRadians(90));
 
-        TopLeftMid = new Pose2d(iSide * xBesideLow, yTopMid);
-        TopLeftHigh = new Pose2d(iSide * xBesideMid, yTopHigh);
-        TopRightHigh = new Pose2d(iSide * xBesideHigh, yTopHigh);
-        LeftMiddleArenaHigh = new Pose2d(iSide * xBesideLow, yBesideLow+widthOfTile);
-        RightMiddleArenaHigh = new Pose2d(iSide *  xBesideMid, yBesideMid+widthOfTile);
+        TopLeftMid = new Pose2d(iSide * xBesideLow, yTopMid, Math.toRadians(90));
+        TopLeftHigh = new Pose2d(iSide * xBesideMid, yTopHigh, Math.toRadians(90));
+        TopRightHigh = new Pose2d(iSide * xBesideHigh, yTopHigh, Math.toRadians(90));
+        LeftMiddleArenaHigh = new Pose2d(iSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(90));
+        RightMiddleArenaHigh = new Pose2d(iSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(90));
 
     }
 
@@ -141,8 +145,7 @@ public class LeftTEST {
         }
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
         drive.followTrajectorySequence(park);
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
     public void followPath2() {
@@ -158,60 +161,78 @@ public class LeftTEST {
         runtime.reset();
         drive.followTrajectorySequence(trajSeq1);
         // reset slides to rest
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
-    public void runOtherTests(GamepadEx gamepad1) {
+    public void runOtherTests(Gamepad gamepad1) {
+        if (op.isStopRequested()) return;
         while (!testSelected && op.opModeIsActive()) {
-            if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+            if (gamepad1.a) {
                 testSelected = true;
             }
             switch (testSelect) {
                 case MOVE_TO_MIDDLE_OF_ARENA:
                     // test 1
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "1");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_TOP_LEFT_MID;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_AND_SCORE_IN_HIGH_JUNCTION;
                     }
                     break;
                 case MOVE_TO_TOP_LEFT_MID:
                     // test 2
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "2");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_TOP_MID;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
                     }
                     break;
                 case MOVE_TO_TOP_MID:
                     // test 3
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "3");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_CONE_STACK;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_TOP_LEFT_MID;
                     }
                     break;
                 case MOVE_TO_CONE_STACK:
                     // test 4
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "4");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.BACK_INTO_MID_JUNCTION_FROM_TOP;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_TOP_MID;
                     }
                     break;
                 case BACK_INTO_MID_JUNCTION_FROM_TOP:
                     // test 5
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "5");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_AND_SCORE_IN_HIGH_JUNCTION;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_CONE_STACK;
                     }
                     break;
                 case MOVE_AND_SCORE_IN_HIGH_JUNCTION:
                     // test 6
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "6");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.BACK_INTO_MID_JUNCTION_FROM_TOP;
                     }
                     break;
@@ -237,6 +258,7 @@ public class LeftTEST {
                 MoveToTopMid();
                 break;
             case MOVE_TO_CONE_STACK:
+                op.telemetry.addData("Test:", "Do not preload cone at start");
                 op.telemetry.update();
                 MoveToConeStack();
                 break;
@@ -264,16 +286,15 @@ public class LeftTEST {
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_SLOW, SampleMecanumDrive.ACCEL_CONSTRAINT_SLOW) // max speed
                 .lineToLinearHeading(LeftMiddleArenaHigh)
+                .resetConstraints()
                 .build();
 
         if (op.isStopRequested()) return;
         runtime.reset();
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP;
-        intakeSlide.run();
+        intakeSlide.runToPICKUP();
         drive.followTrajectorySequence(traj1);
         // reset slides to rest
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
     /**
@@ -287,34 +308,44 @@ public class LeftTEST {
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .lineToLinearHeading(TopLeftMid)
+                .resetConstraints()
                 .build();
 
         if (op.isStopRequested()) return;
         runtime.reset();
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.LOW;
+        intakeSlide.runToLOW();
         drive.followTrajectorySequence(traj1);
         // reset slides to rest
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
     /**
      * Test 3 for roadrunner capabilities
      */
+    // finished
     private void MoveToTopMid() {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .lineToLinearHeading(TopLeftMid)
+                .resetConstraints()
+                .build();
+        TrajectorySequence traj2 = drive.trajectorySequenceBuilder(TopLeftMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
+                .lineToLinearHeading(TopMid)
+                .resetConstraints()
                 .build();
 
         if (op.isStopRequested()) return;
         runtime.reset();
-
+        intakeSlide.runToLOW();
+        drive.followTrajectorySequence(traj1);
+        intakeSlide.runToMEDIUM();
+        drive.followTrajectorySequence(traj2);
         // reset slides to rest
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
     /**
@@ -323,14 +354,20 @@ public class LeftTEST {
     private void MoveToConeStack() {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(TopLeftMid)
+                .lineToLinearHeading(ConeStack)
+                .resetConstraints()
                 .build();
 
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
         if (op.isStopRequested()) return;
         runtime.reset();
-
-        // reset slides to rest
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToPICKUP2();
+        drive.followTrajectorySequence(traj1);
+        // fails to intake because intake position is already set to IN
+        cone.simplePickUp();
     }
 
     /**
@@ -339,14 +376,18 @@ public class LeftTEST {
     private void BackIntoMidJunctionFromTop() {
         drive.setPoseEstimate(TopMid);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(TopMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
+                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(90)))
+                .lineToLinearHeading(TopMid)
                 .build();
 
         if (op.isStopRequested()) return;
         runtime.reset();
-
+        intakeSlide.runToMEDIUM();
+        drive.followTrajectorySequence(traj1);
         // reset slides to rest
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
     /**
@@ -356,5 +397,11 @@ public class LeftTEST {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
                 .build();
+
+        if (op.isStopRequested()) return;
+        runtime.reset();
+
+        // reset slides to rest
+        intakeSlide.runToREST();
     }
 }

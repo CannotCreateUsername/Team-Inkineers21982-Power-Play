@@ -81,7 +81,8 @@ public class AutoHighMedium {
         if (op.isStopRequested()) return;
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
-        runtime.reset();
+        // turn on camera
+        cone.stickDrive.observeStick();
         cone.align(IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.setPoseEstimate(positions.BottomHigh);
         drive.followTrajectorySequence(goToReady);

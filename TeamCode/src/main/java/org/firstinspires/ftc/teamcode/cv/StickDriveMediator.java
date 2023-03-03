@@ -303,7 +303,7 @@ public class StickDriveMediator {
                 webcamBack.startStreaming(WIDTH, HEIGHT, OpenCvCameraRotation.UPRIGHT);
                 //if you are using dashboard, update dashboard camera view
                 // dashboard : 192.168.43.1:8080/dash
-                FtcDashboard.getInstance().startCameraStream(webcamBack, 5);
+                // FtcDashboard.getInstance().startCameraStream(webcamBack, 5);
 
             }
 

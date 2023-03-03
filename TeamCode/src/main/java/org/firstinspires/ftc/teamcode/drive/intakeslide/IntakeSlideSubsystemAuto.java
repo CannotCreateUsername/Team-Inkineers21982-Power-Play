@@ -7,13 +7,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class IntakeSlideSubsystemAuto {
     // 2022-10-19: THIS NUMBER MUST BE CHANGED TO MATCH ACTUAL HIEGHT!!!!!!!
+    public int stackDiff = 400;
     public final int targetPositionHigh = 2842;
     public final int targetPositionMedium = 2025;
     public final int targetPositionLow = 1175;
     public final int targetPositionPickup = 300;
-    public final int targetPositionPickup2 = 700;
+    public final int targetPositionPickup2 = targetPositionPickup + stackDiff;
     public final int targetPositionRest = 0;  // ideally it should be zero !!!
-    public int stackDiff = 500;
 
     // distance error factor
     // https://gm0.org/en/latest/docs/software/concepts/control-loops.html?highlight=pid#built-in-pid-controller
@@ -151,6 +151,7 @@ public class IntakeSlideSubsystemAuto {
         }
     }
 
+    // MAKE THIS FUNCTION PRIVATE!! REPLACED BY runTo FUNCTIONS!
     public void run() {
         switch (liftState) {
             case REST:
@@ -189,6 +190,36 @@ public class IntakeSlideSubsystemAuto {
                 setIntakePosition(intakeState.OUT);
                 break;
         }
+    }
+
+    // simplify actions (test to see if it works)
+    public void runToLOW() {
+        liftState = LiftState.LOW;
+        run();
+    }
+    public void runToMEDIUM() {
+        liftState = LiftState.MEDIUM;
+        run();
+    }
+    public void runToHIGH() {
+        liftState = LiftState.HIGH;
+        run();
+    }
+    public void runToPICKUP() {
+        liftState = LiftState.PICKUP;
+        run();
+    }
+    public void runToPICKUP2() {
+        liftState = LiftState.PICKUP2;
+        run();
+    }
+    public void runToREST() {
+        liftState = LiftState.REST;
+        run();
+    }
+    public void runToHeight(IntakeSlideSubsystemAuto.LiftState height) {
+        liftState = height;
+        run();
     }
 
     public int getSlidePosition() { return slides.getCurrentPosition(); }

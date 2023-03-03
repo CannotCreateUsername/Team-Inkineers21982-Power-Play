@@ -59,7 +59,7 @@ public class Cone {
     IntakeSlideSubsystemAuto intakeSlide;
     SampleMecanumDrive drive;
     LinearOpMode op;
-    StickDriveMediator stickDrive;
+    public StickDriveMediator stickDrive;
 
     public void init (SampleMecanumDrive d, IntakeSlideSubsystemAuto i, HardwareMap hardwareMap, LinearOpMode o) {
         drive = d;
@@ -68,7 +68,7 @@ public class Cone {
         stickDrive = new StickDriveMediator(op);
         stickDrive.setDrive(drive);
         stickDrive.setSlide(intakeSlide);
-        stickDrive.observeStick();
+        // stickDrive.observeStick();
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -91,8 +91,8 @@ public class Cone {
     private void pickCone() {
         switch (pickupState) {
             case ALIGNING:
-                intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
-                intakeSlide.run();
+                intakeSlide.runToPICKUP2();
+                
                 timer.reset();
                 //|| !againstWall()
                 //|| (sensorTouch1.isPressed() && sensorTouch2.isPressed())
@@ -114,8 +114,8 @@ public class Cone {
             case ALIGNED:
                 timer.reset();
                 intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
-                intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-                intakeSlide.run();
+                intakeSlide.runToREST();
+                
                 while (timer.seconds() < 0.5) {
                     op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
                     op.telemetry.addData("State", pickupState.name());
@@ -125,8 +125,7 @@ public class Cone {
                 pickupState = PickupState.LOADED;
                 break;
             case LOADED:
-                intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.LOW;
-                intakeSlide.run();
+                intakeSlide.runToLOW();
                 timer.reset();
                 while (timer.seconds() < 1 && op.opModeIsActive()) {
                     // wait
@@ -151,6 +150,17 @@ public class Cone {
             pickCone();
         }
     }
+    public void simplePickUp() {
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+        intakeSlide.runToREST();
+        
+        while (timer.seconds() < 0.5) {
+            op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+            op.telemetry.addData("State", pickupState.name());
+            op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
+            op.telemetry.update();
+        }
+    }
 
     // change speed (direction) for strafe right/left for different starting positions
     public void dropOffCone(double speed, IntakeSlideSubsystemAuto.LiftState height, boolean cone) {
@@ -171,7 +181,8 @@ public class Cone {
                     stopMovement();
                 }
             }
-            intakeSlide.stackDiff = intakeSlide.stackDiff - 200;
+            // cone stack height changes if there is less cones
+            intakeSlide.stackDiff = intakeSlide.stackDiff - 100;
         }
     }
 
@@ -180,8 +191,7 @@ public class Cone {
             case UNALIGNED:
                 break;
             case ALIGNING:
-                intakeSlide.liftState = height;
-                intakeSlide.run();
+                intakeSlide.runToHeight(height);
                 timer.reset();
 
                 // whether a cone has already been dropped
@@ -202,7 +212,6 @@ public class Cone {
                 } else {
                     straightDistance(3);
                 }
-
                 if (sensorRange.getDistance(DistanceUnit.CM) < 15 || sensorRange.getDistance(DistanceUnit.CM) > LATERAL_DISTANCE) {
                     dropOffState = DropOffState.ALIGNED;
                 }
@@ -241,8 +250,8 @@ public class Cone {
 
                 loaded = false;
 
-                intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
-                intakeSlide.run();
+                intakeSlide.runToPICKUP2();
+                
                 op.telemetry.addData("Drop Off:", "Completed");
                 op.telemetry.update();
                 dropOffState = DropOffState.UNALIGNED;
@@ -300,8 +309,10 @@ public class Cone {
                 intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
             }
             straightDistance(-10);
-            intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.PICKUP2;
-            intakeSlide.run();
+            intakeSlide.runToPICKUP2();
+            
+            // stop camera stream to conserve CPU
+            stickDrive.stopCamera();
             op.telemetry.addData("Drop Off:", "Completed");
             op.telemetry.update();
             loaded = false;
