@@ -58,7 +58,7 @@ public class LeftTEST {
     double yStart = 0;
 
     double xBesideLow = xStart;
-    double yBesideLow = yStart + 0.5 * widthOfTile + yStartCenterOffset;
+    double yBesideLow = yStart + 1.5 * widthOfTile + yStartCenterOffset;
     double xTopMid = xStart + 0.5 * widthOfTile;
     double yTopMid = yBesideLow + 0.5 * widthOfTile;
     double xConeStack = xStart - 1.5 * widthOfTile + 0.5 * widthOfRobot + 0.5 * widthOfTileEdge;
@@ -90,12 +90,16 @@ public class LeftTEST {
     Pose2d LeftMiddleArenaHigh;
     Pose2d RightMiddleArenaHigh;
 
+    boolean previousGamepadR;
+    boolean previousGamepadL;
+
 
     public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int iSide) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
+        iSide = iSide < 0 ? 1:-1;
 
         //Set Position Coordinates
         //Top and besides are relative to the specified junction, not arena
@@ -159,57 +163,76 @@ public class LeftTEST {
         // reset slides to rest
         intakeSlide.runToREST();
     }
-    public void runOtherTests(GamepadEx gamepad1) {
+    public void runOtherTests(Gamepad gamepad1) {
+        if (op.isStopRequested()) return;
         while (!testSelected && op.opModeIsActive()) {
-            if (gamepad1.wasJustReleased(GamepadKeys.Button.A)) {
+            if (gamepad1.a) {
                 testSelected = true;
             }
             switch (testSelect) {
                 case MOVE_TO_MIDDLE_OF_ARENA:
                     // test 1
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "1");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_TOP_LEFT_MID;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_AND_SCORE_IN_HIGH_JUNCTION;
                     }
                     break;
                 case MOVE_TO_TOP_LEFT_MID:
                     // test 2
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "2");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_TOP_MID;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
                     }
                     break;
                 case MOVE_TO_TOP_MID:
                     // test 3
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "3");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_CONE_STACK;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_TOP_LEFT_MID;
                     }
                     break;
                 case MOVE_TO_CONE_STACK:
                     // test 4
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "4");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.BACK_INTO_MID_JUNCTION_FROM_TOP;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_TOP_MID;
                     }
                     break;
                 case BACK_INTO_MID_JUNCTION_FROM_TOP:
                     // test 5
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "5");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_AND_SCORE_IN_HIGH_JUNCTION;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.MOVE_TO_CONE_STACK;
                     }
                     break;
                 case MOVE_AND_SCORE_IN_HIGH_JUNCTION:
                     // test 6
-                    if (gamepad1.wasJustReleased(GamepadKeys.Button.RIGHT_BUMPER)) {
+                    previousGamepadR = gamepad1.right_bumper;
+                    previousGamepadL = gamepad1.left_bumper;
+                    op.telemetry.addData("Test", "6");
+                    if (gamepad1.right_bumper != previousGamepadR) {
                         testSelect = TestSelect.MOVE_TO_MIDDLE_OF_ARENA;
-                    } else if (gamepad1.wasJustReleased(GamepadKeys.Button.LEFT_BUMPER)) {
+                    } else if (gamepad1.left_bumper != previousGamepadL) {
                         testSelect = TestSelect.BACK_INTO_MID_JUNCTION_FROM_TOP;
                     }
                     break;
@@ -338,12 +361,13 @@ public class LeftTEST {
                 .resetConstraints()
                 .build();
 
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
         if (op.isStopRequested()) return;
         runtime.reset();
         intakeSlide.runToPICKUP2();
         drive.followTrajectorySequence(traj1);
-        // reset slides to rest
-        intakeSlide.runToREST();
+        // fails to intake because intake position is already set to IN
+        cone.simplePickUp();
     }
 
     /**

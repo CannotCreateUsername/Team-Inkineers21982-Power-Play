@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.pp;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -83,7 +84,6 @@ public class AutoInterface extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException  {
-        GamepadEx gamepadEx1 = new GamepadEx(gamepad1);
 
         Side side;
         Junctions junctions;
@@ -326,8 +326,10 @@ public class AutoInterface extends LinearOpMode {
                         testSelected = true;
                     }
                     else if (gamepad1.x) {
-                        leftTest.runOtherTests(gamepadEx1);
+                        leftTest.runOtherTests(gamepad1);
+                        testSelected = true;
                     }
+                    telemetry.addData("Run other tests:", "Gamepad X");
                     telemetry.addData("Auto:", "Left Test");
                     telemetry.update();
                 }

@@ -151,6 +151,17 @@ public class Cone {
             pickCone();
         }
     }
+    public void simplePickUp() {
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
+        intakeSlide.run();
+        while (timer.seconds() < 0.5) {
+            op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+            op.telemetry.addData("State", pickupState.name());
+            op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
+            op.telemetry.update();
+        }
+    }
 
     // change speed (direction) for strafe right/left for different starting positions
     public void dropOffCone(double speed, IntakeSlideSubsystemAuto.LiftState height, boolean cone) {
