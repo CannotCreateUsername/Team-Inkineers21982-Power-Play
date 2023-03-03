@@ -103,20 +103,20 @@ public class LeftTEST {
 
         //Set Position Coordinates
         //Top and besides are relative to the specified junction, not arena
-        Start = new Pose2d(iSide * xStart, yStart , Math.toRadians(90));
-        ConeStack = new Pose2d(iSide * xConeStack, yConeStack, Math.toRadians(0));
-        TopLow = new Pose2d(iSide * xTopLow, yTopLow, Math.toRadians(90));
-        TopMid = new Pose2d(iSide * xTopMid, yTopMid, Math.toRadians(90));
-        TopHigh = new Pose2d(iSide * xTopHigh, yTopHigh, Math.toRadians(90));
-        BesideLow = new Pose2d(iSide * xBesideLow, yBesideLow, Math.toRadians(90));
-        BesideMid = new Pose2d(iSide * xBesideMid, yBesideMid, Math.toRadians(90));
-        BesideHigh = new Pose2d(iSide * xBesideHigh, yBesideHigh, Math.toRadians(90));
+        Start = new Pose2d(iSide * xStart, yStart , Math.toRadians(0));
+        ConeStack = new Pose2d(iSide * xConeStack, yConeStack, Math.toRadians(-90));
+        TopLow = new Pose2d(iSide * xTopLow, yTopLow, Math.toRadians(0));
+        TopMid = new Pose2d(iSide * xTopMid, yTopMid, Math.toRadians(0));
+        TopHigh = new Pose2d(iSide * xTopHigh, yTopHigh, Math.toRadians(0));
+        BesideLow = new Pose2d(iSide * xBesideLow, yBesideLow, Math.toRadians(0));
+        BesideMid = new Pose2d(iSide * xBesideMid, yBesideMid, Math.toRadians(0));
+        BesideHigh = new Pose2d(iSide * xBesideHigh, yBesideHigh, Math.toRadians(0));
 
-        TopLeftMid = new Pose2d(iSide * xBesideLow, yTopMid, Math.toRadians(90));
-        TopLeftHigh = new Pose2d(iSide * xBesideMid, yTopHigh, Math.toRadians(90));
-        TopRightHigh = new Pose2d(iSide * xBesideHigh, yTopHigh, Math.toRadians(90));
-        LeftMiddleArenaHigh = new Pose2d(iSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(90));
-        RightMiddleArenaHigh = new Pose2d(iSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(90));
+        TopLeftMid = new Pose2d(iSide * xBesideLow, yTopMid, Math.toRadians(0));
+        TopLeftHigh = new Pose2d(iSide * xBesideMid, yTopHigh, Math.toRadians(0));
+        TopRightHigh = new Pose2d(iSide * xBesideHigh, yTopHigh, Math.toRadians(0));
+        LeftMiddleArenaHigh = new Pose2d(iSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(0));
+        RightMiddleArenaHigh = new Pose2d(iSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(0));
 
     }
 
@@ -378,8 +378,9 @@ public class LeftTEST {
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(TopMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
-                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(0)))
                 .lineToLinearHeading(TopMid)
+                .resetConstraints()
                 .build();
 
         if (op.isStopRequested()) return;
@@ -396,11 +397,31 @@ public class LeftTEST {
     private void MoveAndScoreHighJunction() {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(TopLeftMid)
+                .resetConstraints()
+                .build();
+        TrajectorySequence traj2 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_SLOW, SampleMecanumDrive.ACCEL_CONSTRAINT_SLOW) // max speed
+                .lineToLinearHeading(new Pose2d(positions.startSide*xBesideLow*-1, yBesideLow+widthOfTile, Math.toRadians(-90)))
+                .lineToLinearHeading(new Pose2d(xBesideLow+distanceBackIntoJunction, yBesideLow+widthOfTile, Math.toRadians(-90)))
+                .build();
+        TrajectorySequence traj3 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_SLOW, SampleMecanumDrive.ACCEL_CONSTRAINT_SLOW) // max speed
+                .lineToLinearHeading(LeftMiddleArenaHigh)
                 .build();
 
         if (op.isStopRequested()) return;
         runtime.reset();
-
+        intakeSlide.runToLOW();
+        drive.followTrajectorySequence(traj1);
+        intakeSlide.runToHIGH();
+        drive.followTrajectorySequence(traj2);
+        cone.simpleDropOff();
+        drive.followTrajectorySequence(traj3);
         // reset slides to rest
         intakeSlide.runToREST();
     }

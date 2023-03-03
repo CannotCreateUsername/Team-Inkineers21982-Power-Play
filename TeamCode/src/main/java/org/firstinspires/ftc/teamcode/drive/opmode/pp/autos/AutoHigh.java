@@ -81,8 +81,6 @@ public class AutoHigh {
         if (op.isStopRequested()) return;
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
-        // turn on camera
-        cone.stickDrive.observeStick();
         cone.align(IntakeSlideSubsystemAuto.LiftState.HIGH, false);
         drive.followTrajectorySequence(trajSeq2);
         drive.setPoseEstimate(new Pose2d(12*side, -12, Math.toRadians(0)));
@@ -94,9 +92,7 @@ public class AutoHigh {
             coneThere = true;
         }
         drive.followTrajectorySequence(park);
-
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
 //    public void followPath2() {

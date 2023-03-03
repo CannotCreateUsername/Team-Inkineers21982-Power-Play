@@ -68,7 +68,8 @@ public class Cone {
         stickDrive = new StickDriveMediator(op);
         stickDrive.setDrive(drive);
         stickDrive.setSlide(intakeSlide);
-        // stickDrive.observeStick();
+        // turn on camera
+        stickDrive.observeStick();
 
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -159,6 +160,12 @@ public class Cone {
             op.telemetry.addData("State", pickupState.name());
             op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
             op.telemetry.update();
+        }
+    }
+    public void simpleDropOff() {
+        timer.reset();
+        while (timer.seconds() < 1.5 && op.opModeIsActive()) {
+            intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.OUT);
         }
     }
 
@@ -310,9 +317,6 @@ public class Cone {
             }
             straightDistance(-10);
             intakeSlide.runToPICKUP2();
-            
-            // stop camera stream to conserve CPU
-            stickDrive.stopCamera();
             op.telemetry.addData("Drop Off:", "Completed");
             op.telemetry.update();
             loaded = false;

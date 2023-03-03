@@ -336,6 +336,7 @@ public class AutoInterface extends LinearOpMode {
                 break;
         }
         telemetry.update();
+        cone.stickDrive.stopCamera();
     }
 
     /**

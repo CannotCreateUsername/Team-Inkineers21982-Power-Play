@@ -73,8 +73,6 @@ public class AutoMedium {
                 .build();
 
         if (op.isStopRequested()) return;
-        // turn on camera
-        cone.stickDrive.observeStick();
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
@@ -87,8 +85,7 @@ public class AutoMedium {
             coneThere = true;
         }
         drive.followTrajectorySequence(park);
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        intakeSlide.runToREST();
     }
 
 //    public void followPath2() {

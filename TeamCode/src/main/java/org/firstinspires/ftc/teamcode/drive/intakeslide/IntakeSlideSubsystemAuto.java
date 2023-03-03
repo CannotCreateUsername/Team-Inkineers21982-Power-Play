@@ -151,7 +151,7 @@ public class IntakeSlideSubsystemAuto {
         }
     }
 
-    // MAKE THIS FUNCTION PRIVATE!! REPLACED BY runTo FUNCTIONS!
+    // MAKE THIS FUNCTION PRIVATE!! REPLACED BY runTo FUNCTIONS! (canceled due to being too much work)
     public void run() {
         switch (liftState) {
             case REST:
