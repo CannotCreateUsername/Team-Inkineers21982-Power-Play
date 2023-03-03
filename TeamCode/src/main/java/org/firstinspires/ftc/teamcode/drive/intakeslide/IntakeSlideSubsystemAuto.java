@@ -217,6 +217,10 @@ public class IntakeSlideSubsystemAuto {
         liftState = LiftState.REST;
         run();
     }
+    public void runToHeight(IntakeSlideSubsystemAuto.LiftState height) {
+        liftState = height;
+        run();
+    }
 
     public int getSlidePosition() { return slides.getCurrentPosition(); }
     public int getCurrentTarget() { return currentTarget; }
