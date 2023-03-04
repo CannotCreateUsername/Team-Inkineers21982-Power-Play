@@ -84,34 +84,38 @@ public class AutoMedium {
     Pose2d LeftMiddleArenaHigh;
     Pose2d RightMiddleArenaHigh;
 
+    int iSide;
+    
     public void init(SampleMecanumDrive d, IntakeSlideSubsystemAuto i, Cone c, LinearOpMode o, int startSide) {
         drive = d;
         intakeSlide = i;
         cone = c;
         op = o;
+        iSide = startSide;
+        double rotation = iSide > 0 ? 0:180;
 
         // junctions
-        Start2 = new Pose2d(-34*startSide, -62, Math.toRadians(90));
-        Low = new Pose2d(-42*startSide, -12, Math.toRadians(90));
-        Medium = new Pose2d(-0*startSide, -12, Math.toRadians(90));
-        High = new Pose2d(-0*startSide, -12, Math.toRadians(-90));
+        Start2 = new Pose2d(-34*iSide, -62, Math.toRadians(90));
+        Low = new Pose2d(-42*iSide, -12, Math.toRadians(90));
+        Medium = new Pose2d(-0*iSide, -12, Math.toRadians(90));
+        High = new Pose2d(-0*iSide, -12, Math.toRadians(-90));
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
-        Start = new Pose2d(startSide * xStart, yStart , Math.toRadians(90));
-        ConeStack = new Pose2d(startSide * xConeStack + (1 * startSide), yConeStack, Math.toRadians(0));
-        //ConeStack = new Pose2d(startSide * xConeStack - 2, yConeStack, Math.toRadians(0));
-        TopLow = new Pose2d(startSide * xTopLow, yTopLow, Math.toRadians(90));
-        TopMid = new Pose2d(startSide * xTopMid, yTopMid, Math.toRadians(90));
-        TopHigh = new Pose2d(startSide * xTopHigh, yTopHigh, Math.toRadians(90));
-        BesideLow = new Pose2d(startSide * xBesideLow, yBesideLow, Math.toRadians(90));
-        BesideMid = new Pose2d(startSide * xBesideMid, yBesideMid, Math.toRadians(90));
-        BesideHigh = new Pose2d(startSide * xBesideHigh, yBesideHigh, Math.toRadians(90));
+        Start = new Pose2d(iSide * xStart, yStart , Math.toRadians(90));
+        ConeStack = new Pose2d(iSide * xConeStack + (1 * iSide), yConeStack, Math.toRadians(rotation));
+        //ConeStack = new Pose2d(iSide * xConeStack - 2, yConeStack, Math.toRadians(0));
+        TopLow = new Pose2d(iSide * xTopLow, yTopLow, Math.toRadians(90));
+        TopMid = new Pose2d(iSide * xTopMid, yTopMid, Math.toRadians(90));
+        TopHigh = new Pose2d(iSide * xTopHigh, yTopHigh, Math.toRadians(90));
+        BesideLow = new Pose2d(iSide * xBesideLow, yBesideLow, Math.toRadians(90));
+        BesideMid = new Pose2d(iSide * xBesideMid, yBesideMid, Math.toRadians(90));
+        BesideHigh = new Pose2d(iSide * xBesideHigh, yBesideHigh, Math.toRadians(90));
 
-        TopLeftMid = new Pose2d(startSide * xBesideLow, yTopMid, Math.toRadians(90));
-        TopLeftHigh = new Pose2d(startSide * xBesideMid, yTopHigh, Math.toRadians(90));
-        TopRightHigh = new Pose2d(startSide * xBesideHigh, yTopHigh, Math.toRadians(90));
-        LeftMiddleArenaHigh = new Pose2d(startSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(90));
-        RightMiddleArenaHigh = new Pose2d(startSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(90));
+        TopLeftMid = new Pose2d(iSide * xBesideLow, yTopMid, Math.toRadians(90));
+        TopLeftHigh = new Pose2d(iSide * xBesideMid, yTopHigh, Math.toRadians(90));
+        TopRightHigh = new Pose2d(iSide * xBesideHigh, yTopHigh, Math.toRadians(90));
+        LeftMiddleArenaHigh = new Pose2d(iSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(90));
+        RightMiddleArenaHigh = new Pose2d(iSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(90));
 
     }
 
@@ -218,7 +222,7 @@ public class AutoMedium {
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(TopMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
-                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(xTopMid * iSide, yTopMid-distanceBackIntoJunction, Math.toRadians(90)))
                 .resetConstraints()
                 .build();
         TrajectorySequence traj2 = drive.trajectorySequenceBuilder(traj1.end())
