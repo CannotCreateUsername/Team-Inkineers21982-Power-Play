@@ -162,6 +162,25 @@ public class Cone {
             op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
             op.telemetry.update();
         }
+        intakeSlide.runToLOW();
+        timer.reset();
+        while (timer.seconds() < 0.5) {
+            // wait for slides to finish moving
+        }
+        intakeSlide.stackDiff = intakeSlide.stackDiff - 100;
+        loaded = true;
+    }
+    public void simplePickUp2() {
+        intakeSlide.stack = true;
+        intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
+        intakeSlide.runToREST();
+        timer.reset();
+        while (timer.seconds() < 0.5) {
+            op.telemetry.addData("Distance", sensorRange.getDistance(DistanceUnit.CM));
+            op.telemetry.addData("State", pickupState.name());
+            op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
+            op.telemetry.update();
+        }
         intakeSlide.runToMEDIUM();
         timer.reset();
         while (timer.seconds() < 0.5) {

@@ -178,7 +178,7 @@ public class AutoInterface extends LinearOpMode {
             }
             telemetry.addData("Selected Side:", side.name());
             telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
-            telemetry.addData("To select DOUBLE MEDIUM:", "Gamepad X");
+            telemetry.addData("To select CYCLE MEDIUM:", "Gamepad X");
             telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
             telemetry.addData("To select HIGH:", "Gamepad B");
             telemetry.addData("Run Test:", "DPAD UP");

@@ -98,7 +98,7 @@ public class AutoMedium {
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
         Start = new Pose2d(startSide * xStart, yStart , Math.toRadians(90));
-        ConeStack = new Pose2d(startSide * xConeStack + 1, yConeStack, Math.toRadians(0));
+        ConeStack = new Pose2d(startSide * xConeStack + (1 * startSide), yConeStack, Math.toRadians(0));
         //ConeStack = new Pose2d(startSide * xConeStack - 2, yConeStack, Math.toRadians(0));
         TopLow = new Pose2d(startSide * xTopLow, yTopLow, Math.toRadians(90));
         TopMid = new Pose2d(startSide * xTopMid, yTopMid, Math.toRadians(90));
@@ -158,6 +158,8 @@ public class AutoMedium {
             coneThere = true;
         }
         drive.followTrajectorySequence(park);
+        // tells intake to run to original rest state (and not cone stack)
+        intakeSlide.stack = false;
         intakeSlide.runToREST();
     }
 
@@ -198,14 +200,18 @@ public class AutoMedium {
         // change middle number for amount of times
         for (int i = 0; i < 2; i++) {
             drive.followTrajectorySequence(traj2);
-            cone.simplePickUp();
+            cone.simplePickUp2();
             drive.followTrajectorySequence(traj3);
             BackIntoMidJunctionFromTop();
             intakeSlide.runToPICKUP2();
         }
         drive.followTrajectorySequence(park);
-        intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
-        intakeSlide.run();
+        // tells intake to run to original rest state (and not cone stack)
+        intakeSlide.stack = false;
+        intakeSlide.runToREST();
+        while (runtime.seconds() < 2) {
+            // wait for slides to finish running to rest since it runs async
+        }
     }
     private void BackIntoMidJunctionFromTop() {
         drive.setPoseEstimate(TopMid);
