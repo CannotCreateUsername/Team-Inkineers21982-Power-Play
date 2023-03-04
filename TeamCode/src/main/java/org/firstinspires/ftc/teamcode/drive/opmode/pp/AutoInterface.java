@@ -48,7 +48,7 @@ public class AutoInterface extends LinearOpMode {
     private boolean sideSelected = false;
     private boolean junctionsSelected = false;
     private boolean testSelected = false;
-    public int startSide = -1;
+    public int startSide = 1;
 
     // Positions
     public Pose2d LeftConeStack = new Pose2d(-38,-12, Math.toRadians(0));
@@ -172,6 +172,7 @@ public class AutoInterface extends LinearOpMode {
                     } else if (gamepad1.dpad_up) {
                         junctions = Junctions.LEFT_TEST;
                         leftTest.init(drive, intakeSlide, cone, this, startSide);
+                        auto3.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     }
             }
@@ -209,6 +210,7 @@ public class AutoInterface extends LinearOpMode {
         String targetName = "NOT FOUND";
 
         runtime.reset();
+        // not needed if using robot centric coordinate system
         if (side == Side.RIGHT) {
             while (!isStopRequested() && !opModeIsActive()) {
                 if (!targetVisible) {
@@ -219,15 +221,18 @@ public class AutoInterface extends LinearOpMode {
                             if (targetName == "PowerPlay2") {
                                 label = 1;
 //                                parkDistance = 1;
-                                parkDistance = 12;
+//                                parkDistance = 12;
+                                parkDistance = -24;
                             } else if (targetName == "PowerPlay1") {
                                 label = 2;
 //                                parkDistance = 24;
-                                parkDistance = 36;
+//                                parkDistance = 36;
+                                parkDistance = 0;
                             } else if (targetName == "PowerPlay3") {
                                 label = 3;
 //                                parkDistance = 48;
-                                parkDistance = 60;
+//                                parkDistance = 60;
+                                parkDistance = 24;
                             }
                             break;
                         }
@@ -251,15 +256,18 @@ public class AutoInterface extends LinearOpMode {
                             if (targetName == "PowerPlay2") {
                                 label = 1;
 //                                parkDistance = 48;
-                                parkDistance = 60;
+//                                parkDistance = 60;
+                                parkDistance = -24;
                             } else if (targetName == "PowerPlay1") {
                                 label = 2;
 //                                parkDistance = 24;
-                                parkDistance = 36;
+//                                parkDistance = 36;
+                                parkDistance = 0;
                             } else if (targetName == "PowerPlay3") {
                                 label = 3;
 //                                parkDistance = 1;
-                                parkDistance = 12;
+//                                parkDistance = 12;
+                                parkDistance = 24;
                             }
                             break;
                         }
@@ -268,7 +276,7 @@ public class AutoInterface extends LinearOpMode {
                 intakeSlide.setIntakePosition(IntakeSlideSubsystemAuto.IntakeState.IN);
                 telemetry.addData("Visible Target", targetName);
                 telemetry.addData("Zone #", label);
-                telemetry.addData("Parking:", parkDistance);
+                telemetry.addData("Park distance:", parkDistance);
                 telemetry.addData("Selected Side:", side.name());
                 telemetry.addData("Selected Auto:", junctions.name());
                 telemetry.update();
@@ -312,9 +320,9 @@ public class AutoInterface extends LinearOpMode {
                 break;
             case LEFT_TEST:
                 // runs test programs
-                while (!testSelected) {
+                while (!testSelected && opModeIsActive()) {
                     if (gamepad1.a) {
-                        leftTest.followPath(parkDistance);
+                        auto3.followPath2(parkDistance);
                         testSelected = true;
                     }
                     else if (gamepad1.b) {

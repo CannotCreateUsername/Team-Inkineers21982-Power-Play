@@ -51,7 +51,7 @@ public class AutoHigh {
 
     public void followPath(int parkDistance, int side) {
         // locations
-        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        Pose2d pickUp = side > 0 ? positions.LeftConeStack:positions.RightConeStack;
         double sideRotation = side > 0 ? 180 : 0;
         Pose2d dropOff = High;
 
@@ -61,11 +61,11 @@ public class AutoHigh {
         // forward/backwards does not need to be reversed
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(2)
-                .strafeLeft(24*side)
+                .strafeLeft(-24*side)
                 .lineToLinearHeading(new Pose2d(12*side, 0, Math.toRadians(sideRotation)))
                 .build();
         TrajectorySequence trajSeq2 = drive.trajectorySequenceBuilder(trajSeq1.end())
-                .strafeLeft(10*side)
+                .strafeLeft(-10*side)
                 .back(12)
                 .build();
         TrajectorySequence drop = drive.trajectorySequenceBuilder(pickUp)

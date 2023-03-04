@@ -97,26 +97,32 @@ public class AutoMedium {
         High = new Pose2d(-0*startSide, -12, Math.toRadians(-90));
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
-        Start = new Pose2d(startSide * xStart, yStart , Math.toRadians(0));
-        ConeStack = new Pose2d(startSide * xConeStack, yConeStack, Math.toRadians(-90));
-        TopLow = new Pose2d(startSide * xTopLow, yTopLow, Math.toRadians(0));
-        TopMid = new Pose2d(startSide * xTopMid, yTopMid, Math.toRadians(0));
-        TopHigh = new Pose2d(startSide * xTopHigh, yTopHigh, Math.toRadians(0));
-        BesideLow = new Pose2d(startSide * xBesideLow, yBesideLow, Math.toRadians(0));
-        BesideMid = new Pose2d(startSide * xBesideMid, yBesideMid, Math.toRadians(0));
-        BesideHigh = new Pose2d(startSide * xBesideHigh, yBesideHigh, Math.toRadians(0));
+        Start = new Pose2d(startSide * xStart, yStart , Math.toRadians(90));
+        ConeStack = new Pose2d(startSide * xConeStack + 0.75, yConeStack, Math.toRadians(0));
+        //ConeStack = new Pose2d(startSide * xConeStack - 2, yConeStack, Math.toRadians(0));
+        TopLow = new Pose2d(startSide * xTopLow, yTopLow, Math.toRadians(90));
+        TopMid = new Pose2d(startSide * xTopMid, yTopMid, Math.toRadians(90));
+        TopHigh = new Pose2d(startSide * xTopHigh, yTopHigh, Math.toRadians(90));
+        BesideLow = new Pose2d(startSide * xBesideLow, yBesideLow, Math.toRadians(90));
+        BesideMid = new Pose2d(startSide * xBesideMid, yBesideMid, Math.toRadians(90));
+        BesideHigh = new Pose2d(startSide * xBesideHigh, yBesideHigh, Math.toRadians(90));
 
-        TopLeftMid = new Pose2d(startSide * xBesideLow, yTopMid, Math.toRadians(0));
-        TopLeftHigh = new Pose2d(startSide * xBesideMid, yTopHigh, Math.toRadians(0));
-        TopRightHigh = new Pose2d(startSide * xBesideHigh, yTopHigh, Math.toRadians(0));
-        LeftMiddleArenaHigh = new Pose2d(startSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(0));
-        RightMiddleArenaHigh = new Pose2d(startSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(0));
+        TopLeftMid = new Pose2d(startSide * xBesideLow, yTopMid, Math.toRadians(90));
+        TopLeftHigh = new Pose2d(startSide * xBesideMid, yTopHigh, Math.toRadians(90));
+        TopRightHigh = new Pose2d(startSide * xBesideHigh, yTopHigh, Math.toRadians(90));
+        LeftMiddleArenaHigh = new Pose2d(startSide * xBesideLow, yBesideLow+widthOfTile, Math.toRadians(90));
+        RightMiddleArenaHigh = new Pose2d(startSide *  xBesideMid, yBesideMid+widthOfTile, Math.toRadians(90));
 
     }
 
+    /**
+     * Uses field centric coordinate system
+     * @param parkDistance
+     * @param side
+     */
     public void followPath(int parkDistance, int side) {
         // locations
-        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        Pose2d pickUp = side > 0 ? positions.LeftConeStack:positions.RightConeStack;
         Pose2d dropOff = Medium;
 
         Pose2d startPose = new Pose2d(0, 0, 0);
@@ -127,7 +133,7 @@ public class AutoMedium {
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .forward(48)
-                .strafeLeft(12*side)
+                .strafeLeft(-10*side)
                 .build();
         TrajectorySequence drop = drive.trajectorySequenceBuilder(pickUp)
                 .lineToLinearHeading(dropOff)
@@ -140,7 +146,6 @@ public class AutoMedium {
                 .build();
 
         if (op.isStopRequested()) return;
-        intakeSlide.runToLOW();
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;
         cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
@@ -156,11 +161,13 @@ public class AutoMedium {
         intakeSlide.runToREST();
     }
 
+    /**
+     * Uses robot centric coordinate system
+     * @param parkDistance
+     */
     public void followPath2(int parkDistance) {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
-                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .lineToLinearHeading(TopLeftMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
@@ -170,12 +177,16 @@ public class AutoMedium {
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .lineToLinearHeading(ConeStack)
+                .resetConstraints()
                 .build();
         TrajectorySequence traj3 = drive.trajectorySequenceBuilder(traj2.end())
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .lineToLinearHeading(TopMid)
+                .resetConstraints()
                 .build();
         TrajectorySequence park = drive.trajectorySequenceBuilder(TopMid)
-                .lineToLinearHeading(new Pose2d(parkDistance*positions.startSide, -12, Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(parkDistance, yTopMid, Math.toRadians(90)))
                 .build();
 
         if (op.isStopRequested()) return;
@@ -183,11 +194,14 @@ public class AutoMedium {
         intakeSlide.runToMEDIUM();
         drive.followTrajectorySequence(traj1);
         BackIntoMidJunctionFromTop(); // drops the cone as well
+        intakeSlide.runToPICKUP2();
+        // change middle number for amount of times
         for (int i = 0; i < 2; i++) {
             drive.followTrajectorySequence(traj2);
             cone.simplePickUp();
             drive.followTrajectorySequence(traj3);
             BackIntoMidJunctionFromTop();
+            intakeSlide.runToPICKUP2();
         }
         drive.followTrajectorySequence(park);
         intakeSlide.liftState = IntakeSlideSubsystemAuto.LiftState.REST;
@@ -198,7 +212,7 @@ public class AutoMedium {
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(TopMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
-                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(xTopMid, yTopMid-distanceBackIntoJunction, Math.toRadians(90)))
                 .resetConstraints()
                 .build();
         TrajectorySequence traj2 = drive.trajectorySequenceBuilder(traj1.end())

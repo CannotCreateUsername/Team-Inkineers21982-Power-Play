@@ -51,7 +51,7 @@ public class AutoHighMedium {
 
     public void followPath(int parkDistance, int side) {
         // locations
-        Pose2d pickUp = side > 0 ? positions.RightConeStack:positions.LeftConeStack;
+        Pose2d pickUp = side > 0 ? positions.LeftConeStack:positions.RightConeStack;
         Pose2d dropOff = Medium;
 
         Pose2d startPose = new Pose2d(0, 0, 0);
@@ -60,7 +60,7 @@ public class AutoHighMedium {
         // forward/backwards does not need to be reversed
         TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
                 .forward(48)
-                .strafeLeft(36*side)
+                .strafeLeft(-36*side)
                 .build();
 
         TrajectorySequence drop = drive.trajectorySequenceBuilder(pickUp)
