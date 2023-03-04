@@ -217,6 +217,9 @@ public class AutoHighMedium {
             drive.followTrajectorySequence(traj4);
         }
         cone.simplePickUp();
+        // tells intake to run to original rest state (and not cone stack)
+        intakeSlide.stack = false;
+        intakeSlide.runToREST();
         drive.followTrajectorySequence(park);
         // tells intake to run to original rest state (and not cone stack)
         intakeSlide.stack = false;

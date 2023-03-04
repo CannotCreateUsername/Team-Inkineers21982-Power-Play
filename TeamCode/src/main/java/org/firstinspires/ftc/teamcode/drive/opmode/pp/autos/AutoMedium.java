@@ -209,13 +209,10 @@ public class AutoMedium {
             BackIntoMidJunctionFromTop();
             intakeSlide.runToPICKUP2();
         }
-        drive.followTrajectorySequence(park);
         // tells intake to run to original rest state (and not cone stack)
         intakeSlide.stack = false;
         intakeSlide.runToREST();
-        while (runtime.seconds() < 2) {
-            // wait for slides to finish running to rest since it runs async
-        }
+        drive.followTrajectorySequence(park);
     }
     private void BackIntoMidJunctionFromTop() {
         drive.setPoseEstimate(TopMid);
