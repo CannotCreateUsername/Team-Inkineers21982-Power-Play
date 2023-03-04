@@ -162,9 +162,9 @@ public class Cone {
             op.telemetry.addData("Lift State", intakeSlide.getCurrentState());
             op.telemetry.update();
         }
-        intakeSlide.runToLOW();
+        intakeSlide.runToMEDIUM();
         timer.reset();
-        while (timer.seconds() < 1) {
+        while (timer.seconds() < 0.5) {
             // wait for slides to finish moving
         }
         intakeSlide.stackDiff = intakeSlide.stackDiff - 100;

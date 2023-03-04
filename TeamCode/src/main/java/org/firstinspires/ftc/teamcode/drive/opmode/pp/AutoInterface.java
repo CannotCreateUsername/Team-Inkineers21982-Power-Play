@@ -299,13 +299,13 @@ public class AutoInterface extends LinearOpMode {
         // remember to set poseEstimate in each class
         switch (junctions) {
             case HIGH_MEDIUM:
-                auto1.followPath(parkDistance, startSide);
+                auto1.followPath2(parkDistance);
                 break;
             case DOUBLE_HIGH:
                 auto2.followPath(parkDistance, startSide);
                 break;
             case DOUBLE_MEDIUM:
-                auto3.followPath(parkDistance, startSide);
+                auto3.followPath2(parkDistance);
                 break;
             case HIGH:
                 // follow the old high junction and park autos
@@ -322,7 +322,7 @@ public class AutoInterface extends LinearOpMode {
                 // runs test programs
                 while (!testSelected && opModeIsActive()) {
                     if (gamepad1.a) {
-                        auto3.followPath2(parkDistance);
+                        leftTest.followPath(parkDistance);
                         testSelected = true;
                     }
                     else if (gamepad1.b) {

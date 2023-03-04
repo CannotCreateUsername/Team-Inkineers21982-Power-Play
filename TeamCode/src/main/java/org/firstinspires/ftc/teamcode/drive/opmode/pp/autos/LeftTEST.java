@@ -133,6 +133,12 @@ public class LeftTEST {
                 .strafeLeft(parkDistance)
                 .build();
 
+        TrajectorySequence strafeTest = drive.trajectorySequenceBuilder(startPose)
+                .lineToLinearHeading(TopLeftMid)
+                .lineToLinearHeading(TopHigh)
+                .lineToLinearHeading(TopLeftMid)
+                .build();
+
         if (op.isStopRequested()) return;
         drive.followTrajectorySequence(trajSeq1);
         cone.drop = true;

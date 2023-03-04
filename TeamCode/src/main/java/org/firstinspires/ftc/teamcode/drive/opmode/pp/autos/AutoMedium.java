@@ -98,7 +98,7 @@ public class AutoMedium {
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
         Start = new Pose2d(startSide * xStart, yStart , Math.toRadians(90));
-        ConeStack = new Pose2d(startSide * xConeStack + 0.75, yConeStack, Math.toRadians(0));
+        ConeStack = new Pose2d(startSide * xConeStack + 1, yConeStack, Math.toRadians(0));
         //ConeStack = new Pose2d(startSide * xConeStack - 2, yConeStack, Math.toRadians(0));
         TopLow = new Pose2d(startSide * xTopLow, yTopLow, Math.toRadians(90));
         TopMid = new Pose2d(startSide * xTopMid, yTopMid, Math.toRadians(90));
@@ -175,13 +175,13 @@ public class AutoMedium {
                 .build();
         TrajectorySequence traj2 = drive.trajectorySequenceBuilder(TopMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_FAST, SampleMecanumDrive.ACCEL_CONSTRAINT_FAST) // max speed
                 .lineToLinearHeading(ConeStack)
                 .resetConstraints()
                 .build();
         TrajectorySequence traj3 = drive.trajectorySequenceBuilder(traj2.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_FAST, SampleMecanumDrive.ACCEL_CONSTRAINT_FAST) // max speed
                 .lineToLinearHeading(TopMid)
                 .resetConstraints()
                 .build();
