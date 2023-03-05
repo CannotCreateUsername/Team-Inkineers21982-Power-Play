@@ -172,6 +172,7 @@ public class AutoHighMedium {
     public void followPath2(int parkDistance) {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .lineToLinearHeading(LeftMiddleArenaHigh)
                 .lineToLinearHeading(TopLeftMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
                 .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_HALF, SampleMecanumDrive.ACCEL_CONSTRAINT_HALF) // max speed
@@ -209,22 +210,13 @@ public class AutoHighMedium {
         intakeSlide.runToPICKUP2();
         drive.followTrajectorySequence(traj2);
         // change middle number for amount of times
-        for (int i = 0; i < 1; i++) {
-            cone.simplePickUp();
-            drive.followTrajectorySequence(traj3);
-            BackIntoMidJunctionFromTop2();
-            intakeSlide.runToPICKUP2();
-            drive.followTrajectorySequence(traj4);
-        }
         cone.simplePickUp();
-        drive.followTrajectorySequence(park);
+        drive.followTrajectorySequence(traj3);
+        BackIntoMidJunctionFromTop2();
         // tells intake to run to original rest state (and not cone stack)
         intakeSlide.stack = false;
         intakeSlide.runToREST();
-        runtime.reset();
-        while (runtime.seconds() < 2) {
-            // wait for slides to finish running to rest since it runs async
-        }
+        drive.followTrajectorySequence(park);
     }
     private void BackIntoMidJunctionFromTop() {
             drive.setPoseEstimate(TopMid);
