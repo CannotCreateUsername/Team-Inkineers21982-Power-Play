@@ -49,8 +49,8 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
 
     // IY , using localizationtest , the measured X distance is 87.66.
     // Measured Distance / Telemetry Distance Traveled
-    public static double X_MULTIPLIER = 1.0227;  //Nov-2022: X reading : 90.62;    //1.0266940;    // Aug-2022:  1.0266940 = 90/87.66 // Multiplier in the X direction
-    public static double Y_MULTIPLIER = 1.0227;  // Nov-2022: y reading: 90.82  ; // Multiplier in the Y direction
+    public static double X_MULTIPLIER = 1.0227;  //3-5-23:  X_MULTIPLIER = 1.0227  //Nov-2022: X reading : 90.62;    //1.0266940;    // Aug-2022:  1.0266940 = 90/87.66 // Multiplier in the X direction
+    public static double Y_MULTIPLIER = 1.0227;  //3-5-23: Y_MULTIPLIER = 1.0227 //Nov-2022: y reading: 90.82  ; // Multiplier in the Y direction
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
 

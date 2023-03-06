@@ -322,7 +322,7 @@ public class AutoInterface extends LinearOpMode {
                 // runs test programs
                 while (!testSelected && opModeIsActive()) {
                     if (gamepad1.a) {
-                        leftTest.followPath(parkDistance);
+                        leftTest.followPath(gamepad1);
                         testSelected = true;
                     }
                     else if (gamepad1.b) {
@@ -333,6 +333,7 @@ public class AutoInterface extends LinearOpMode {
                         leftTest.runOtherTests(gamepad1);
                         testSelected = true;
                     }
+                    telemetry.addData("Run strafe test:", "Gamepad A");
                     telemetry.addData("Run other tests:", "Gamepad X");
                     telemetry.addData("Auto:", "Left Test");
                     telemetry.update();

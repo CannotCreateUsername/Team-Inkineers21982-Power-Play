@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.drive.opmode.pp.autos;
 import android.sax.StartElementListener;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -119,38 +120,56 @@ public class LeftTEST {
 
     }
 
-    public void followPath(int parkDistance) {
-        Pose2d startPose = new Pose2d(0, 0, 0);
+    public void followPath(Gamepad gamepad1) {
+        Pose2d startPose = Start;
         drive.setPoseEstimate(startPose);
 
-        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
-                .forward(50)
-                .strafeRight(8)
-                .build();
-
-        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq1.end())
-                .strafeRight(16)
-                .strafeLeft(parkDistance)
-                .build();
+//        TrajectorySequence trajSeq1 = drive.trajectorySequenceBuilder(startPose)
+//                .forward(50)
+//                .strafeRight(8)
+//                .build();
+//
+//        TrajectorySequence park = drive.trajectorySequenceBuilder(trajSeq1.end())
+//                .strafeRight(16)
+//                .strafeLeft(parkDistance)
+//                .build();
 
         TrajectorySequence strafeTest = drive.trajectorySequenceBuilder(startPose)
-                .lineToLinearHeading(TopLeftMid)
-                .lineToLinearHeading(TopHigh)
-                .lineToLinearHeading(TopLeftMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(new Pose2d(24, 0, Math.toRadians(90)))
+                .build();
+        TrajectorySequence strafeTestLeft = drive.trajectorySequenceBuilder(startPose)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .lineToLinearHeading(new Pose2d(-24, 0, Math.toRadians(90)))
                 .build();
 
         if (op.isStopRequested()) return;
-        drive.followTrajectorySequence(trajSeq1);
-        cone.drop = true;
-        runtime.reset();
-        while (runtime.seconds() < 2) {
-            // wait.. add telemetry here
-            op.telemetry.addData("Waiting", "to align");
-            op.telemetry.update();
+//        drive.followTrajectorySequence(trajSeq1);
+//        cone.drop = true;
+//        runtime.reset();
+//        while (runtime.seconds() < 2) {
+//            // wait.. add telemetry here
+//            op.telemetry.addData("Waiting", "to align");
+//            op.telemetry.update();
+//        }
+//        cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
+//        drive.followTrajectorySequence(park);
+//        intakeSlide.runToREST();
+        intakeSlide.runToPICKUP2();
+        drive.followTrajectorySequence(strafeTest);
+        while (op.opModeIsActive()) {
+            if (gamepad1.b) {
+                drive.setPoseEstimate(startPose);
+                drive.followTrajectorySequence(strafeTestLeft);
+            } else if (gamepad1.a) {
+                drive.setPoseEstimate(startPose);
+                drive.followTrajectorySequence(strafeTest);
+            } else if (gamepad1.x) {
+                break;
+            }
         }
-        cone.align(IntakeSlideSubsystemAuto.LiftState.MEDIUM, false);
-        drive.followTrajectorySequence(park);
-        intakeSlide.runToREST();
     }
 
     public void followPath2() {

@@ -172,6 +172,8 @@ public class AutoHighMedium {
     public void followPath2(int parkDistance) {
         drive.setPoseEstimate(Start);
         TrajectorySequence traj1 = drive.trajectorySequenceBuilder(Start)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
                 .lineToLinearHeading(LeftMiddleArenaHigh)
                 .lineToLinearHeading(TopLeftMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
