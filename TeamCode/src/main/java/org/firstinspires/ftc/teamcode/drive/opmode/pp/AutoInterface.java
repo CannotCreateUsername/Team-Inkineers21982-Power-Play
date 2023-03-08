@@ -66,7 +66,6 @@ public class AutoInterface extends LinearOpMode {
     int parkDistance = 1;
 
     private ElapsedTime runtime = new ElapsedTime();
-    private boolean coneThere = false;
 
     public static final String TAG = "Vuforia VuMark Sample";
 
