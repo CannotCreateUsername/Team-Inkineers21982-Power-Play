@@ -78,10 +78,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     LeftYInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         alignStick.runTurning(90);
                         turnState = TurnState.LEFT;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         alignStick.runTurning(-90);
                         turnState = TurnState.RIGHT;
                     }
@@ -90,10 +90,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = -gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     LeftYInput = gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         alignStick.runTurning(-90);
                         turnState = TurnState.STRAIGHT;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         drive.turn(Math.toRadians(-180));
                         turnState = TurnState.RIGHT;
                     }
@@ -102,10 +102,10 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
                     LeftXInput = gamepad1.left_stick_y * leftStickMultiplierY * intakeSlide.dropOffMultiplier;
                     LeftYInput = -gamepad1.left_stick_x * leftStickMultiplierX * intakeSlide.dropOffMultiplier;
                     RightXInput = gamepad1.right_stick_x * rightStickMultiplierX * intakeSlide.dropOffMultiplier;
-                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
+                    if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
                         drive.turn(Math.toRadians(-180));
                         turnState = TurnState.LEFT;
-                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.Y)) {
+                    } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
                         alignStick.runTurning(90);
                         turnState = TurnState.STRAIGHT;
                     }

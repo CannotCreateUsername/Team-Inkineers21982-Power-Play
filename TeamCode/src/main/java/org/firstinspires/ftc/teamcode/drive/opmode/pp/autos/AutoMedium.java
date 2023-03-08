@@ -102,7 +102,7 @@ public class AutoMedium {
         BottomHigh = new Pose2d(0, -12,  Math.toRadians(90));
 
         Start = new Pose2d(iSide * xStart, yStart , Math.toRadians(90));
-        ConeStack = new Pose2d(iSide * xConeStack + (1 * iSide), yConeStack, Math.toRadians(rotation));
+        ConeStack = new Pose2d(iSide * xConeStack + (0.75 * iSide), yConeStack, Math.toRadians(rotation));
         //ConeStack = new Pose2d(iSide * xConeStack - 2, yConeStack, Math.toRadians(0));
         TopLow = new Pose2d(iSide * xTopLow, yTopLow, Math.toRadians(90));
         TopMid = new Pose2d(iSide * xTopMid, yTopMid, Math.toRadians(90));

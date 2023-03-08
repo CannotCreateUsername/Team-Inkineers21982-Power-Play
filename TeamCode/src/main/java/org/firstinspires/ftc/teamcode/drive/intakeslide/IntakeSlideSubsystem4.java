@@ -186,7 +186,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                 } else {
                     autoIn = false;
                 }
-                dropOffMultiplier = 0.5;
+                dropOffMultiplier = 0.8;
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.RIGHT_BUMPER)) {
                     // code here
                     currentTarget = targetPositionHigh;
@@ -218,7 +218,7 @@ public class IntakeSlideSubsystem4 extends IntakeSlide2 {
                 } else {
                     autoIn = false;
                 }
-                dropOffMultiplier = 0.5;
+                dropOffMultiplier = 0.6;
                 // DO SOMETHING TO MAKE DRIVING SLOWER WHILE THE CASE IS HIGH FOR BETTER CONTROL
                 if (gamepad1.wasJustPressed(GamepadKeys.Button.LEFT_BUMPER)) {
                     // code here
