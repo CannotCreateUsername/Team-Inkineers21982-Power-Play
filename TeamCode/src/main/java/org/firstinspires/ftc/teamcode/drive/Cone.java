@@ -167,7 +167,7 @@ public class Cone {
         while (timer.seconds() < 0.5) {
             // wait for slides to finish moving
         }
-        intakeSlide.stackDiff = intakeSlide.stackDiff - 100;
+        intakeSlide.stackDiff -= 100;
         loaded = true;
     }
     public void simplePickUp2() {
