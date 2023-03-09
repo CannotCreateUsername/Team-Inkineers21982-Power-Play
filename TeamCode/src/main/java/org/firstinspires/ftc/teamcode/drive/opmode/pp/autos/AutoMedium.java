@@ -181,17 +181,19 @@ public class AutoMedium {
                 .build();
         TrajectorySequence traj2 = drive.trajectorySequenceBuilder(TopMid)
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_FAST, SampleMecanumDrive.ACCEL_CONSTRAINT_FAST) // max speed
                 .lineToLinearHeading(ConeStack)
                 .resetConstraints()
                 .build();
         TrajectorySequence traj3 = drive.trajectorySequenceBuilder(traj2.end())
                 .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
-                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_MEDIUM, SampleMecanumDrive.ACCEL_CONSTRAINT_MEDIUM) // max speed
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_FAST, SampleMecanumDrive.ACCEL_CONSTRAINT_FAST) // max speed
                 .lineToLinearHeading(TopMid)
                 .resetConstraints()
                 .build();
         TrajectorySequence park = drive.trajectorySequenceBuilder(TopMid)
+                .setTurnConstraint(DriveConstants.MAX_ANG_VEL, DriveConstants.MAX_ANG_ACCEL)
+                .setConstraints(SampleMecanumDrive.VEL_CONSTRAINT_FAST, SampleMecanumDrive.ACCEL_CONSTRAINT_FAST) // max speed
                 .lineToLinearHeading(new Pose2d(parkDistance, yTopMid, Math.toRadians(90)))
                 .build();
 

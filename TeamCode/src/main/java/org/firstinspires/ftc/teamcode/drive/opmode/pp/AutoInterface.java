@@ -37,9 +37,9 @@ public class AutoInterface extends LinearOpMode {
     }
     private enum Junctions {
         SELECTING,
-        DOUBLE_HIGH,
-        DOUBLE_MEDIUM,
         HIGH_MEDIUM,
+        DOUBLE_MEDIUM,
+        MEDIUM_HIGH,
         HIGH,
         LEFT_TEST
     }
@@ -95,7 +95,7 @@ public class AutoInterface extends LinearOpMode {
         
         // initialize autos
         AutoHighMedium auto1 = new AutoHighMedium();
-        AutoHigh auto2 = new AutoHigh();
+//        AutoHigh auto2 = new AutoHigh();
         AutoMedium auto3 = new AutoMedium();
 
         // older autos (for backup)
@@ -160,8 +160,8 @@ public class AutoInterface extends LinearOpMode {
                         auto3.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     } else if (gamepad1.y) {
-                        junctions = Junctions.DOUBLE_HIGH;
-                        auto2.init(drive, intakeSlide, cone, this, startSide);
+                        junctions = Junctions.HIGH_MEDIUM;
+                        auto1.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     } else if (gamepad1.b) {
                         junctions = Junctions.HIGH;
@@ -176,9 +176,9 @@ public class AutoInterface extends LinearOpMode {
                     }
             }
             telemetry.addData("Selected Side:", side.name());
-            telemetry.addData("To select DOUBLE HIGH:", "Gamepad Y");
+            telemetry.addData("To select HIGH MEDIUM:", "Gamepad Y");
             telemetry.addData("To select CYCLE MEDIUM:", "Gamepad X");
-            telemetry.addData("To select HIGH MEDIUM:", "Gamepad A");
+            telemetry.addData("To select MEDIUM HIGH:", "Gamepad A");
             telemetry.addData("To select HIGH:", "Gamepad B");
             telemetry.addData("Run Test:", "DPAD UP");
             telemetry.update();
@@ -297,11 +297,11 @@ public class AutoInterface extends LinearOpMode {
         // all paths are on the right side by default
         // remember to set poseEstimate in each class
         switch (junctions) {
-            case HIGH_MEDIUM:
+            case MEDIUM_HIGH:
                 auto1.followPath2(parkDistance);
                 break;
-            case DOUBLE_HIGH:
-                auto2.followPath(parkDistance, startSide);
+            case HIGH_MEDIUM:
+                auto1.followPath3(parkDistance);
                 break;
             case DOUBLE_MEDIUM:
                 auto3.followPath2(parkDistance);
