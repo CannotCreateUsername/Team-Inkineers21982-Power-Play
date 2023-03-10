@@ -160,8 +160,8 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
             telemetry.addData("Rotation", turnState.name());
 
             // Distance
-            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
-            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
+//            telemetry.addData("range", String.format("%.01f cm", alignStick.getDistanceReadingCM()));
+//            telemetry.addData("range", String.format("%.01f mm", alignStick.getDistanceReadingMM()));
 //            telemetry.addData("Align State", alignStick.getAlignState());
 //            telemetry.addData("Light State", alignStick.getLightState());
 //            telemetry.addData("Align Multiplier", alignStick.getGameStickMultiplier());
