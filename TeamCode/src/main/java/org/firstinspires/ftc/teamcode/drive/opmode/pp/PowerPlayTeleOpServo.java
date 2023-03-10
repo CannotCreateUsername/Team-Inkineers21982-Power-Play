@@ -133,7 +133,7 @@ public class PowerPlayTeleOpServo extends LinearOpMode {
 
             drive.update();
 
-            alignStick.run();
+//            alignStick.run();
 //            if (gamepadEx1.wasJustReleased(GamepadKeys.Button.X)) {
 //                alignStick.turnAlign(gamepadEx1,0.5);
 //            } else if (gamepadEx1.wasJustReleased(GamepadKeys.Button.B)) {

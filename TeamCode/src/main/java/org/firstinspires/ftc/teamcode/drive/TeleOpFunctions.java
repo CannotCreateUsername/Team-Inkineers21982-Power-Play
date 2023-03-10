@@ -65,9 +65,9 @@ public class TeleOpFunctions {
         gamepad1 = gamepad;
         op = o;
 
-        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
-        redLED = hardwareMap.get(DigitalChannel.class, "red");
-        greenLED = hardwareMap.get(DigitalChannel.class, "green");
+//        sensorRange = hardwareMap.get(DistanceSensor.class, "sensor_range");
+//        redLED = hardwareMap.get(DigitalChannel.class, "red");
+//        greenLED = hardwareMap.get(DigitalChannel.class, "green");
         imu = hardwareMap.get(IMU.class, "IMU");
 
         IMU.Parameters myIMUparameters;
@@ -82,13 +82,13 @@ public class TeleOpFunctions {
         imu.initialize(myIMUparameters);
 
 
-        redLED.setMode(DigitalChannel.Mode.OUTPUT);
-        greenLED.setMode(DigitalChannel.Mode.OUTPUT);
+//        redLED.setMode(DigitalChannel.Mode.OUTPUT);
+//        greenLED.setMode(DigitalChannel.Mode.OUTPUT);
 
         previousGameStickState = GamePadState.NETURAL;
         currentGameStickState = GamePadState.NETURAL;
         alignState = AlignState.UNALIGNED;
-        lightState = LightState.OFF;
+//        lightState = LightState.OFF;
         isStopped = false;
     }
 
