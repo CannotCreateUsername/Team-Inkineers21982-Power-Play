@@ -152,7 +152,7 @@ public class AutoInterface extends LinearOpMode {
             switch (junctions) {
                 case SELECTING:
                     if (gamepad1.a) {
-                        junctions = Junctions.HIGH_MEDIUM;
+                        junctions = Junctions.MEDIUM_HIGH;
                         auto1.init(drive, intakeSlide, cone, this, startSide);
                         junctionsSelected = true;
                     } else if (gamepad1.x) {
