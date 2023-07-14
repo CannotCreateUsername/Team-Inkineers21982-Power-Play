@@ -21,10 +21,15 @@ This was our first season using Java for our robot. It was a huge leap from the 
 So that was pretty neat. 
 
 **This project includes the following libraries:**
+
 FTC Robot Controller version 8.0 (https://github.com/FIRST-Tech-Challenge/FtcRobotController)
+
 RoadRunner QuickStart (https://learnroadrunner.com/installing.html#method-1-downloading-the-quickstart)
+
 MeepMeep -- which is a roadrunner visualization tool (https://learnroadrunner.com/tool/meepmeep.html)
+
 FTCLib (https://docs.ftclib.org/ftclib/v/v2.0.0/)
+
 EasyOpenCV (https://github.com/OpenFTC/EasyOpenCV)
 
 Last Update: 7/14/2023
