@@ -1,4 +1,4 @@
-## NOTICE
+## UNDER THE SEA!!
 
 This repository contains the private project for Team 21982 Inkineers for FTC Power Play (2022-2023) competition season, our first year as a team.
 
@@ -16,9 +16,22 @@ This was our first season using Java for our robot. It was a huge leap from the 
 - touch sensors to minimize damage against walls
 - odometry wheels for localization during autonomous
 
+### Files
+The drive file contains anything to do with driving...
+It has some classes that store methods such as Cone.java and TeleOpFunctions.java
+
+The intakeslide package contains most of the code (including methods and functions) relating to our elevator and intake.
+
+The opmode package contains all our OpModes. Many of the files are old iterations of code and tests for sensors and other stuff. 
+All of the main OpModes are stored in the 'pp' package. Even in there, more old autonomous code is stored in the 'old' folder. 
+
+The calibration package contains all the files to tune and calibrate the robot for odometry.
+
+### INTO THE ABYSS
 *I spent more than 10 hours a week, some times 10 hours in a single day, alone in the night, programming and debugging this robot we named Odyssey. It was a perilous task; ensuring that all the robot components work decently so that we might have a chance at competition. Just last year I was using block code. Now, I faced the challenges of computer vision, odometry, PID, Java itself, and a bunch of other sensors. I spent endless ours tuning the robot so that it would not screw up, tuning it for our solo driver which was also me... coding all the autonomous paths, with three backups each... There were so many iterations and different methods that I have experimented with... and in the end, it was well worth it -- we won the first place control award at interleague, then placing as finalist at regionals.*
 
-So that was pretty neat. ^This should be a clear warning that my code is messy^
+So that was pretty neat. *^ This should be a clear warning that my code is messy ^*
+Nevertheless, it was an inkredible year. 
 
 **This project includes the following libraries:**
 
