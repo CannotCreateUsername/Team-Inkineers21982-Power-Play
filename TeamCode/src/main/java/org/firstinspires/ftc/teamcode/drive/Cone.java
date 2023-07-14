@@ -14,7 +14,10 @@ import org.firstinspires.ftc.teamcode.drive.intakeslide.IntakeSlideSubsystemAuto
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 public class Cone {
-
+    // This is the class that controls the intake subsystem and stores the methods to pick up and release cones.
+    // It is intended to be utilized in the autonomous classes such as AutoHigh.java
+    // Methods such as pickCone() and dropOff() utilize finite state machines, which in this case isn't really the appropriate situation.
+    // In this case, it would be better to not even use finite state machines and delete it completely, progressing down the chain of if statements instead.
     private enum PickupState {
         ALIGNING,
         ALIGNED,
@@ -31,7 +34,7 @@ public class Cone {
     ElapsedTime timer = new ElapsedTime();
     public boolean loaded = true;
     
-    // Alignment
+    // Unused alignment (to junctions) variables
     private int s = 0;
     private int checks = 0;
     private int positives = 0;

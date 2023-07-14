@@ -5,6 +5,9 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 public class GamepadHelper {
+    // This class is used to control the speed ramping for the wheels;
+    // The longer the joystick is held down, the faster the robot goes.
+    // This allows for control and speed
 
     public enum GamePadState {
         POSITIVE,
