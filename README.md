@@ -18,7 +18,7 @@ This was our first season using Java for our robot. It was a huge leap from the 
 
 *I spent more than 10 hours a week, some times 10 hours in a single day, alone in the night, programming and debugging this robot we named Odyssey. It was a perilous task; ensuring that all the robot components work decently so that we might have a chance at competition. Just last year I was using block code. Now, I faced the challenges of computer vision, odometry, PID, Java itself, and a bunch of other sensors. I spent endless ours tuning the robot so that it would not screw up, tuning it for our solo driver which was also me... coding all the autonomous paths, with three backups each... There were so many iterations and different methods that I have experimented with... and in the end, it was well worth it -- we won the first place control award at interleague, then placing as finalist at regionals.*
 
-So that was pretty neat. 
+So that was pretty neat. ^This should be a clear warning that my code is messy^
 
 **This project includes the following libraries:**
 
@@ -32,6 +32,7 @@ FTCLib (https://docs.ftclib.org/ftclib/v/v2.0.0/)
 
 EasyOpenCV (https://github.com/OpenFTC/EasyOpenCV)
 
+**Lastly, thank you to mentor Ivan Y. for guiding us through this process. We have learned so much from him, and I would not have written half of the code here if it wasn't for his knowledge and expertise.**
 
 Last Update: 7/14/2023
 Cleaning up and updating for publishing
